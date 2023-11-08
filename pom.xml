@@ -30,7 +30,7 @@
         <cxf.version>4.0.2</cxf.version>
         <istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
         <jakarta.xml.bind-api.version>4.0.0</jakarta.xml.bind-api.version>
-        <jaxb-impl.version>4.0.3</jaxb-impl.version>
+        <jaxb-impl.version>4.0.4</jaxb-impl.version>
         <mockwebserver.version>4.11.0</mockwebserver.version>
         <zjsonpatch.version>0.4.14</zjsonpatch.version>
 
