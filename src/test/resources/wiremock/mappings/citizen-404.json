@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/citizenmapping/b1b46458-7ff0-42d2-b29c-3bf20729cfea/personalnumber"
+    },
+    "response": {
+        "bodyFileName": "../__files/citizenmapping-404.txt",
+        "headers": {
+            "Content-Type": "text/plain"
+        },
+        "status": "404"
+    }
+}

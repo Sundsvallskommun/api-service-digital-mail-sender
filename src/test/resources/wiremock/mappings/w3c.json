@@ -1,0 +1,13 @@
+{
+  "request": {
+    "method": "POST",
+    "url": "/w3c"
+  },
+  "response": {
+    "body": "{\"messages\":[]}",
+    "headers": {
+      "Content-Type": "application/json;charset=utf-8"
+    },
+    "status": "200"
+  }
+}

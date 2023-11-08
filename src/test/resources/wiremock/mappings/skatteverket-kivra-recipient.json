@@ -1,0 +1,35 @@
+{
+    "request": {
+        "bodyPatterns": [
+            {
+                "matchesXPath": "//*[ns17:recipientId='192301010168']",
+                "xPathNamespaces": {
+                    "ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"
+                }
+            }
+        ],
+        "method": "POST",
+        "url": "/skatteverket"
+    },
+    "response": {
+        "bodyFileName": "../__files/skatteverket-kivra-recipient.xml",
+        "headers": {
+            "Connection": [
+                "keep-alive"
+            ],
+            "Content-Type": [
+                "text/xml;charset=UTF-8"
+            ],
+            "Keep-Alive": [
+                "timeout=60"
+            ],
+            "Transfer-Encoding": [
+                "chunked"
+            ],
+            "Content-Encoding": [
+                ""
+            ]
+        },
+        "status": 200
+    }
+}

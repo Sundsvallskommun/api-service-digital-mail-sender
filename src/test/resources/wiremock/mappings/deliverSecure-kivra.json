@@ -1,0 +1,35 @@
+{
+  "request": {
+    "bodyPatterns": [
+      {
+        "matchesXPath": "//*[ns8:Recipient='192301010168']",
+        "xPathNamespaces": {
+          "ns8": "http://minameddelanden.gov.se/schema/Message/v2"
+        }
+      }
+    ],
+    "method": "POST",
+    "url": "/deliversecure"
+  },
+  "response": {
+    "bodyFileName": "../__files/deliverSecure-kivra.xml",
+    "headers": {
+      "Connection": [
+        "keep-alive"
+      ],
+      "Content-Type": [
+        "text/xml;charset=UTF-8"
+      ],
+      "Keep-Alive": [
+        "timeout=60"
+      ],
+      "Transfer-Encoding": [
+        "chunked"
+      ],
+      "Content-Encoding": [
+        ""
+      ]
+    },
+    "status": 200
+  }
+}
