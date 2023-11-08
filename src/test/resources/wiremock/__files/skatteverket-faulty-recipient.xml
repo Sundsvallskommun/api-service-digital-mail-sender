@@ -1,0 +1,19 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+   <S:Body>
+      <ns1:isRegisteredResponse xmlns:ns1="http://minameddelanden.gov.se/schema/Recipient/v3" xmlns:ns15="http://minameddelanden.gov.se/schema/Recipient" xmlns:ns17="http://minameddelanden.gov.se/schema/Sender" xmlns:ns3="http://minameddelanden.gov.se/schema/Authority" xmlns:ns4="http://minameddelanden.gov.se/schema/Common">
+         <ns1:return>
+            <ns15:RecipientId>192301010160</ns15:RecipientId>
+            <ns15:Type>Secure</ns15:Type>
+            <ns15:Pending>false</ns15:Pending>
+            <ns15:ServiceSupplier>
+               <ns15:Id>165568402266</ns15:Id>
+               <ns15:Name>sandbox-mm.kivra.com</ns15:Name>
+               <ns15:ServiceAdress>https://sandbox-mm.kivra.com/service/v3</ns15:ServiceAdress>
+               <ns15:InternalServiceAdress/>
+            </ns15:ServiceSupplier>
+            <ns15:LastRegistration>2021-12-16T14:37:35.708+01:00</ns15:LastRegistration>
+         </ns1:return>
+      </ns1:isRegisteredResponse>
+   </S:Body>
+</S:Envelope>

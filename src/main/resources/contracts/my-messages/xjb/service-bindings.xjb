@@ -1,0 +1,22 @@
+<!-- Bindings file to add @XmlRootElement to generated classes. "<xjc:simple/>" is the magic word -->
+<jaxb:bindings
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+        xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+        xmlns:annox="http://annox.dev.java.net"
+        jaxb:version="3.0"
+        jaxb:extensionBindingPrefixes="annox xjc">
+
+    <jaxb:globalBindings>
+        <xjc:simple/>
+    </jaxb:globalBindings>
+
+    <jaxb:bindings schemaLocation="../schema/v3/Message.xsd" node="//xs:complexType[@name='SealedDelivery']">
+        <annox:annotateClass>@javax.xml.bind.annotation.XmlRootElement(name="deliverSecure")</annox:annotateClass>
+    </jaxb:bindings>
+
+    <jaxb:bindings schemaLocation="../schema/v3/Service.xsd" node="/xs:schema/xs:element[@name='deliverSecure']/xs:complexType/xs:sequence/xs:element">
+        <annox:annotate target="field">@javax.xml.bind.annotation.XmlElement(name="deliverSecure",required=false)</annox:annotate>
+    </jaxb:bindings>
+
+</jaxb:bindings>

@@ -1,0 +1,20 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+    <soap:Body>
+        <ns8:deliverSecureResponse xmlns:ns2="http://minameddelanden.gov.se/schema/Sender" xmlns:ns3="http://minameddelanden.gov.se/schema/Message/v2"
+                                   xmlns:ns4="http://minameddelanden.gov.se/schema/Message/v3" xmlns:ns5="http://minameddelanden.gov.se/schema/OfficialMatter/v3"
+                                   xmlns:ns6="http://minameddelanden.gov.se/schema/Message" xmlns:ns7="http://www.w3.org/2000/09/xmldsig#" xmlns:ns8="http://minameddelanden.gov.se/schema/Service/v3"
+                                   xmlns:ns9="http://minameddelanden.gov.se/externalschema/Invoice/v1" xmlns:ns10="http://minameddelanden.gov.se/schema/Service"
+                                   xmlns:ns11="http://minameddelanden.gov.se/schema/Common/v3" xmlns:ns12="http://minameddelanden.gov.se/schema/Notification/v3"
+                                   xmlns:ns13="http://minameddelanden.gov.se/schema/Notification/v2" xmlns:ns14="http://minameddelanden.gov.se/schema/Reply"
+                                   xmlns:ns15="http://minameddelanden.gov.se/schema/Receipt" xmlns:ns16="http://minameddelanden.gov.se/schema/Notification"
+                                   xmlns:ns17="urn:oasis:names:specification:ubl:schema:xsd:CoreComponentParameters-1.0">
+            <ns8:return>
+                <ns10:TransId>3832352f-fa74-4c17-ab6a-a6e3ab8324f3</ns10:TransId>
+                <ns10:Status>
+                    <ns10:RecipientId>190101010159</ns10:RecipientId>
+                    <ns10:Delivered>true</ns10:Delivered>
+                </ns10:Status>
+            </ns8:return>
+        </ns8:deliverSecureResponse>
+    </soap:Body>
+</soap:Envelope>

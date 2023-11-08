@@ -1,0 +1,21 @@
+{
+  "partyId": "6a5c3d04-412d-11ec-973a-0242ac130003",
+  "type": "INVOICE",
+  "subject": "Faktura från Sundsvalls kommun",
+  "reference": "Faktura #12345",
+  "details": {
+    "amount": 123.45,
+    "dueDate": "2023-10-30",
+    "paymentReferenceType": "SE_OCR",
+    "paymentReference": "426523791",
+    "accountType": "BANKGIRO",
+    "accountNumber": "991-1884"
+  },
+  "files": [
+    {
+      "contentType": "application/pdf",
+      "body": "c29tZSBwZGYgZGF0YQo=",
+      "filename": "invoice_12345.pdf"
+    }
+  ]
+}

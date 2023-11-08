@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           xmlns:jaxb="https://jakarta.ee/xml/ns/jaxb"
+           xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc"
+           elementFormDefault="qualified" attributeFormDefault="unqualified"
+           jaxb:extensionBindingPrefixes="xjc" jaxb:version="3.0">
+    <xs:annotation>
+        <xs:appinfo>
+            <jaxb:globalBindings>
+                <jaxb:serializable/>
+                <xjc:simple/>
+            </jaxb:globalBindings>
+        </xs:appinfo>
+    </xs:annotation>
+    <!-- FIXME this should be corrected if possible, it is not so stringent to have private XSD's in the public API -->
+    <xs:import schemaLocation="../META-INF/wsdl/private/schema/DistributeMessage.xsd"
+               namespace="http://minameddelanden.gov.se/schema/DistributeMessage"/>
+    <xs:import schemaLocation="../META-INF/wsdl/private/schema/DistributeNotification.xsd"
+               namespace="http://minameddelanden.gov.se/schema/DistributeNotification"/>
+    <xs:import schemaLocation="../META-INF/wsdl/private/schema/Agreement.xsd"
+               namespace="http://minameddelanden.gov.se/schema/Recipient/v2" />
+
+</xs:schema>

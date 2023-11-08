@@ -1,0 +1,24 @@
+<S:Envelope xmlns:S="http://schemas.xmlsoap.org/soap/envelope/">
+    <S:Body>
+        <ns1:isReachableResponse xmlns:ns1="http://minameddelanden.gov.se/schema/Recipient/v3"
+                                 xmlns:ns15="http://minameddelanden.gov.se/schema/Recipient"
+        >
+            <ns1:return>
+                <ns15:AccountStatus>
+                    <ns15:RecipientId>190101010159</ns15:RecipientId>
+                    <ns15:Type>Secure</ns15:Type>
+                    <ns15:Pending>false</ns15:Pending>
+                    <ns15:ServiceSupplier>
+                        <ns15:Id>165568402266</ns15:Id>
+                        <ns15:Name>Kivra</ns15:Name>
+                        <ns15:ServiceAdress>https://mm.kivra.com/service/v3</ns15:ServiceAdress>
+                        <ns15:UIAdress>https://www.kivra.com</ns15:UIAdress>
+                        <ns15:InternalServiceAdress/>
+                    </ns15:ServiceSupplier>
+                    <ns15:LastRegistration>2016-10-30T15:38:49.517+01:00</ns15:LastRegistration>
+                </ns15:AccountStatus>
+                <ns15:SenderAccepted>true</ns15:SenderAccepted>
+            </ns1:return>
+        </ns1:isReachableResponse>
+    </S:Body>
+</S:Envelope>

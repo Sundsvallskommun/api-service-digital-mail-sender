@@ -1,0 +1,43 @@
+package se.sundsvall.digitalmail.integration.skatteverket;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import se.sundsvall.digitalmail.api.model.BodyInformation;
+import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
+import se.sundsvall.digitalmail.api.model.SupportInfo;
+
+class DigitalMailDtoTest {
+
+    @Test
+    void test() {
+        List<String> list = new ArrayList<>(List.of("a", "b", "c"));
+        list.addAll(Collections.emptyList());
+
+        System.out.println(list);
+    }
+    
+    @Test
+    void testConstructor() {
+        final var request = DigitalMailRequest.builder()
+            .withPartyId("partyId")
+            .withHeaderSubject("Subject")
+            .withSupportInfo(new SupportInfo())
+            .withAttachments(new ArrayList<>())
+            .withBodyInformation(BodyInformation.PlainText.builder().build())
+            .build();
+        
+        final var dto = new DigitalMailDto(request);
+        
+        assertThat(dto.getPartyId()).isEqualTo("partyId");
+        assertThat(dto.getHeaderSubject()).isEqualTo("Subject");
+        assertThat(dto.getSupportInfo()).isNotNull();
+        assertThat(dto.getAttachments()).isNotNull();
+        assertThat(dto.getBodyInformation()).isNotNull();
+    }
+}
