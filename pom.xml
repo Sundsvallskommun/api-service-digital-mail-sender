@@ -34,7 +34,7 @@
         <mockwebserver.version>4.11.0</mockwebserver.version>
         <zjsonpatch.version>0.4.14</zjsonpatch.version>
 
-        <openapi-generator-maven-plugin>7.0.1</openapi-generator-maven-plugin>
+        <openapi-generator-maven-plugin>7.1.0</openapi-generator-maven-plugin>
     </properties>
 
     <dependencies>
