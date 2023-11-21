@@ -13,6 +13,7 @@ import jakarta.validation.ValidationException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 
 import se.sundsvall.digitalmail.api.model.validation.ValidHtml;
 
@@ -48,9 +49,16 @@ public class ValidHtmlConstraintValidator implements ConstraintValidator<ValidHt
             // Decode the BASE64-encoded HTML
             var html = new String(BASE64_DECODER.decode(value.trim()));
             // Validate
-            var validationResult = HTML_VALIDATOR.validate(new ByteArrayInputStream(html.getBytes()));
+            var validationResultAsString = HTML_VALIDATOR.validate(new ByteArrayInputStream(html.getBytes()));
             // Check
-            return GSON.fromJson(validationResult, ValidationResult.class).isValid();
+            var validationResult = GSON.fromJson(validationResultAsString, ValidationResult.class);
+            if (validationResult.isValid()) {
+                return true;
+            }
+
+            ((ConstraintValidatorContextImpl) context).addMessageParameter("errors", validationResult.errors());
+
+            return false;
         } catch (Exception e) {
             throw new ValidationException("Unable to validate HTML", e);
         }
@@ -62,10 +70,17 @@ public class ValidHtmlConstraintValidator implements ConstraintValidator<ValidHt
      */
     record ValidationResult(List<Message> messages) {
 
-        boolean isValid() {
-            return messages.isEmpty();
+        List<String> errors() {
+            return messages.stream()
+                .filter(message -> "error".equalsIgnoreCase(message.type()))
+                .map(Message::message)
+                .toList();
         }
 
-        record Message() { }
+        boolean isValid() {
+            return errors().isEmpty();
+        }
+
+        record Message(String type, String message) { }
     }
 }

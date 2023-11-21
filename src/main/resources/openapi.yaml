@@ -7,13 +7,13 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "2.0"
 servers:
-  - url: http://localhost:8080
-    description: Generated server url
+- url: http://localhost:8080
+  description: Generated server url
 paths:
   /send-digital-mail:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital mail
       operationId: sendDigitalMail
       requestBody:
@@ -38,13 +38,13 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
         "404":
           description: Not Found
           content:
@@ -66,7 +66,7 @@ paths:
   /send-digital-invoice:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital invoice
       operationId: sendDigitalInvoice
       requestBody:
@@ -91,13 +91,13 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
         "404":
           description: Not Found
           content:
@@ -119,16 +119,16 @@ paths:
   /has-available-mailbox/{partyId}:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Check if a party has a digital mailbox and if said party has chosen
         to receive digital mail
       operationId: hasAvailableMailbox
       parameters:
-        - name: partyId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation (available mailbox(es) found)
@@ -153,7 +153,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -171,10 +171,6 @@ components:
     Problem:
       type: object
       properties:
-        title:
-          type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -187,6 +183,10 @@ components:
             type: object
         status:
           $ref: '#/components/schemas/StatusType'
+        title:
+          type: string
+        detail:
+          type: string
     StatusType:
       type: object
       properties:
@@ -235,8 +235,6 @@ components:
           type: string
         message:
           type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -244,6 +242,8 @@ components:
           type: object
           additionalProperties:
             type: object
+        detail:
+          type: string
         suppressed:
           type: array
           items:
@@ -306,10 +306,6 @@ components:
                 type: string
         message:
           type: string
-        title:
-          type: string
-        detail:
-          type: string
         instance:
           type: string
           format: uri
@@ -322,6 +318,10 @@ components:
             type: object
         status:
           $ref: '#/components/schemas/StatusType'
+        title:
+          type: string
+        detail:
+          type: string
         suppressed:
           type: array
           items:
@@ -364,9 +364,9 @@ components:
           type: string
     Attachment:
       required:
-        - body
-        - contentType
-        - filename
+      - body
+      - contentType
+      - filename
       type: object
       properties:
         contentType:
@@ -383,7 +383,7 @@ components:
       description: A PDF file/attachment
     BodyInformation:
       required:
-        - contentType
+      - contentType
       type: object
       properties:
         contentType:
@@ -396,16 +396,12 @@ components:
       description: The body of the message
       discriminator:
         propertyName: contentType
-      oneOf:
-        - $ref: '#/components/schemas/PlainText'
-        - $ref: '#/components/schemas/Html'
     DigitalMailRequest:
       required:
-        - bodyInformation
-        - headerSubject
-        - municipalityId
-        - partyId
-        - supportInfo
+      - headerSubject
+      - municipalityId
+      - partyId
+      - supportInfo
       type: object
       properties:
         partyId:
@@ -429,48 +425,41 @@ components:
             $ref: '#/components/schemas/Attachment'
         bodyInformation:
           oneOf:
-            - $ref: '#/components/schemas/Html'
-            - $ref: '#/components/schemas/PlainText'
+          - $ref: '#/components/schemas/Html'
+          - $ref: '#/components/schemas/PlainText'
       description: The body of the digital mail request
     Html:
       required:
-        - body
+      - body
+      - contentType
       type: object
       description: HTML body
-      discriminator:
-        propertyName: contentType
       allOf:
-        - $ref: '#/components/schemas/BodyInformation'
-        - type: object
-          properties:
-            contentType:
-              type: string
-            body:
-              type: string
-              description: BASE64-encoded HTML body
-              example: PCFET0NUWVBFIGh0bWw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij48dGl0bGU+VGVzdDwvdGl0bGU+PC9oZWFkPjxib2R5PjxwPkhlbGxvPC9wPjwvYm9keT48L2h0bWw+
+      - $ref: '#/components/schemas/BodyInformation'
+      - type: object
+        properties:
+          body:
+            type: string
+            description: BASE64-encoded HTML body
     PlainText:
       required:
-        - body
+      - body
+      - contentType
       type: object
       description: Plain-text body
-      discriminator:
-        propertyName: contentType
       allOf:
-        - $ref: '#/components/schemas/BodyInformation'
-        - type: object
-          properties:
-            contentType:
-              type: string
-            body:
-              type: string
-              description: Plain text body
+      - $ref: '#/components/schemas/BodyInformation'
+      - type: object
+        properties:
+          body:
+            type: string
+            description: Plain-text body
     SupportInfo:
       required:
-        - contactInformationEmail
-        - contactInformationPhoneNumber
-        - contactInformationUrl
-        - supportText
+      - contactInformationEmail
+      - contactInformationPhoneNumber
+      - contactInformationUrl
+      - supportText
       type: object
       properties:
         supportText:
@@ -510,12 +499,12 @@ components:
           $ref: '#/components/schemas/DeliveryStatus'
     Details:
       required:
-        - accountNumber
-        - accountType
-        - amount
-        - dueDate
-        - paymentReference
-        - paymentReferenceType
+      - accountNumber
+      - accountType
+      - amount
+      - dueDate
+      - paymentReference
+      - paymentReferenceType
       type: object
       properties:
         amount:
@@ -533,8 +522,8 @@ components:
           description: The payment reference type
           example: SE_OCR
           enum:
-            - SE_OCR
-            - TENANT_REF
+          - SE_OCR
+          - TENANT_REF
         paymentReference:
           maxLength: 25
           type: string
@@ -545,8 +534,8 @@ components:
           description: The receiving account type
           example: BANKGIRO
           enum:
-            - BANKGIRO
-            - PLUSGIRO
+          - BANKGIRO
+          - PLUSGIRO
         accountNumber:
           type: string
           description: The receiving account (a valid BANKGIRO or PLUSGIRO number)
@@ -554,11 +543,11 @@ components:
       description: Invoice details
     DigitalInvoiceRequest:
       required:
-        - details
-        - files
-        - partyId
-        - subject
-        - type
+      - details
+      - files
+      - partyId
+      - subject
+      - type
       type: object
       properties:
         partyId:
@@ -570,10 +559,10 @@ components:
           type: string
           description: Invoice type
           example: INVOICE
-          enum:
-            - INVOICE
-            - REMINDER
           default: INVOICE
+          enum:
+          - INVOICE
+          - REMINDER
         subject:
           type: string
           description: The invoice subject
