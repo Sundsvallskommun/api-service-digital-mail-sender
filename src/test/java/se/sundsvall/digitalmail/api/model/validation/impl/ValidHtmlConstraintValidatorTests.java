@@ -1,9 +1,11 @@
 package se.sundsvall.digitalmail.api.model.validation.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -22,6 +24,9 @@ class ValidHtmlConstraintValidatorTests {
     @Mock
     private ValidHtml mockAnnotation;
 
+    @Mock
+    private ConstraintValidatorContextImpl mockConstraintValidatorContext;
+
     @InjectMocks
     private ValidHtmlConstraintValidator validator;
 
@@ -38,9 +43,10 @@ class ValidHtmlConstraintValidatorTests {
     void invalidValue(@Load("invalid-html.base64") final String html) {
         validator.initialize(mockAnnotation);
 
-        assertThat(validator.isValid(html, null)).isFalse();
+        assertThat(validator.isValid(html, mockConstraintValidatorContext)).isFalse();
 
         verify(mockAnnotation).nullable();
+        verify(mockConstraintValidatorContext).addMessageParameter(any(String.class), any());
     }
 
     @ParameterizedTest(name = "[{index}] value=\"{0}\"")

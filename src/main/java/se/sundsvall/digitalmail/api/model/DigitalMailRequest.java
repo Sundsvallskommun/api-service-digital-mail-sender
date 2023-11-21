@@ -11,7 +11,6 @@ import jakarta.validation.constraints.NotNull;
 
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
-import se.sundsvall.digitalmail.api.model.validation.ValidBodyInformation;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
@@ -46,7 +45,7 @@ public class DigitalMailRequest {
 
     @Builder.Default
     private List<File> attachments = new ArrayList<>();
-    
-    @ValidBodyInformation(nullable = true)
+
+    @Valid
     private BodyInformation bodyInformation;
 }
