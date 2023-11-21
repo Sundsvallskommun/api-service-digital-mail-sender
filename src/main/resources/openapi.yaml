@@ -456,9 +456,6 @@ components:
             description: Plain-text body
     SupportInfo:
       required:
-      - contactInformationEmail
-      - contactInformationPhoneNumber
-      - contactInformationUrl
       - supportText
       type: object
       properties:
