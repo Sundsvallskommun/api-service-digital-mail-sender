@@ -24,7 +24,7 @@
         <published.container.port.test>8740</published.container.port.test>
         <published.container.port.production>8740</published.container.port.production>
 
-        <commons-io.version>2.13.0</commons-io.version>
+        <commons-io.version>2.15.1</commons-io.version>
         <nu-html-validator.version>20.6.30</nu-html-validator.version>
         <jetty.version>9.4.53.v20231009</jetty.version>
         <cxf.version>4.0.2</cxf.version>
