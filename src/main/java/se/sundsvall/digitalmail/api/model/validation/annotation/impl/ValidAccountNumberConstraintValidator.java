@@ -1,11 +1,11 @@
-package se.sundsvall.digitalmail.api.model.validation.impl;
+package se.sundsvall.digitalmail.api.model.validation.annotation.impl;
 
 import static java.util.Objects.isNull;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 
-import se.sundsvall.digitalmail.api.model.validation.ValidAccountNumber;
+import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumber;
 
 public class ValidAccountNumberConstraintValidator implements ConstraintValidator<ValidAccountNumber, String> {
 

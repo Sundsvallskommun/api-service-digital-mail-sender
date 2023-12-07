@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
-import se.sundsvall.digitalmail.api.model.validation.ValidAccountNumber;
+import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumber;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;

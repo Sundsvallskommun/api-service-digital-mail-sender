@@ -3,6 +3,8 @@ package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -15,6 +17,9 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
 
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
@@ -33,8 +38,6 @@ import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.File;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
 import se.gov.minameddelanden.common.sign.X509KeySelector;
 import se.gov.minameddelanden.schema.message.v3.SealedDelivery;
 import se.gov.minameddelanden.schema.message.v3.SignedDelivery;
@@ -95,9 +98,9 @@ class DigitalMailMapperTest {
     @Test
     void testCreateBodyBytes_forTextPlain() {
         final var bodyContent = "Some body";
-        final var bodyBytes = mapper.createBody(BodyInformation.PlainText.builder()
+        final var bodyBytes = mapper.createBody(BodyInformation.builder()
             .withBody(bodyContent)
-            .withContentType(MediaType.TEXT_PLAIN_VALUE)
+            .withContentType(TEXT_PLAIN_VALUE)
             .build());
     
         assertThat(new String(bodyBytes)).isEqualTo(bodyContent);
@@ -109,9 +112,9 @@ class DigitalMailMapperTest {
         // Sent in data is base64-encoded
         final var encoded = Base64.getEncoder().encode(bodyContent.getBytes(StandardCharsets.UTF_8));
     
-        final var bodyBytes = mapper.createBody(BodyInformation.Html.builder()
+        final var bodyBytes = mapper.createBody(BodyInformation.builder()
             .withBody(new String(encoded))
-            .withContentType(MediaType.TEXT_HTML_VALUE)
+            .withContentType(TEXT_HTML_VALUE)
             .build());
         
         // Check that the text we sent in is the same as the bytes generated.
@@ -184,7 +187,7 @@ class DigitalMailMapperTest {
         final var messageBody = mapper.createMessageBody(digitalMailRequestDto);
 
         assertThat(messageBody.getBody()).isEqualTo(new byte[0]);
-        assertThat(messageBody.getContentType()).isEqualTo(MediaType.TEXT_PLAIN_VALUE);
+        assertThat(messageBody.getContentType()).isEqualTo(TEXT_PLAIN_VALUE);
     }
 
     //TODO, implement validation of created message, so it works..

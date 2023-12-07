@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.integration.skatteverket;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -29,7 +30,7 @@ class DigitalMailDtoTest {
             .withHeaderSubject("Subject")
             .withSupportInfo(new SupportInfo())
             .withAttachments(new ArrayList<>())
-            .withBodyInformation(BodyInformation.PlainText.builder().build())
+            .withBodyInformation(BodyInformation.builder().withContentType(TEXT_PLAIN_VALUE).build())
             .build();
         
         final var dto = new DigitalMailDto(request);

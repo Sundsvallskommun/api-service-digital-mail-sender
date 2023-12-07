@@ -1,47 +1,27 @@
-package se.sundsvall.digitalmail.api.model.validation.impl;
-
-import static java.util.Objects.isNull;
-import static org.apache.commons.lang3.StringUtils.isBlank;
+package se.sundsvall.digitalmail.api.model.validation;
 
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.List;
 
-import jakarta.validation.ConstraintValidator;
-import jakarta.validation.ConstraintValidatorContext;
 import jakarta.validation.ValidationException;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import org.hibernate.validator.internal.engine.constraintvalidation.ConstraintValidatorContextImpl;
-
-import se.sundsvall.digitalmail.api.model.validation.ValidHtml;
+import org.springframework.stereotype.Component;
 
 import nu.validator.client.EmbeddedValidator;
 
-public class ValidHtmlConstraintValidator implements ConstraintValidator<ValidHtml, String> {
+@Component
+public class HtmlValidator {
 
     private static final EmbeddedValidator HTML_VALIDATOR = new EmbeddedValidator();
     private static final Gson GSON = new GsonBuilder().create();
     private static final Base64.Decoder BASE64_DECODER = Base64.getDecoder();
 
-    private boolean nullable;
-
-    @Override
-    public void initialize(final ValidHtml annotation) {
-        nullable = annotation.nullable();
-    }
-
-    @Override
-    public boolean isValid(final String value, final ConstraintValidatorContext context) {
-        if (isNull(value) && nullable) {
-            return true;
-        } else if (isNull(value)) {
-            return false;
-        }
-
+    public boolean validate(final String value) {
         // Treat empty HTML as invalid
-        if (isBlank(value.trim())) {
+        if (value == null || value.trim().isEmpty()) {
             return false;
         }
 
@@ -56,7 +36,7 @@ public class ValidHtmlConstraintValidator implements ConstraintValidator<ValidHt
                 return true;
             }
 
-            ((ConstraintValidatorContextImpl) context).addMessageParameter("errors", validationResult.errors());
+            //((ConstraintValidatorContextImpl) context).addMessageParameter("errors", validationResult.errors());
 
             return false;
         } catch (Exception e) {

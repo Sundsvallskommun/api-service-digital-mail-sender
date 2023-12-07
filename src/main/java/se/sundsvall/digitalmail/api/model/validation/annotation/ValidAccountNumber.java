@@ -1,8 +1,7 @@
-package se.sundsvall.digitalmail.api.model.validation;
+package se.sundsvall.digitalmail.api.model.validation.annotation;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -13,18 +12,18 @@ import java.lang.annotation.Target;
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 
-import se.sundsvall.digitalmail.api.model.validation.impl.ValidHtmlConstraintValidator;
+import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidAccountNumberConstraintValidator;
 
 /**
- * The annotated element must be valid HTML.
+ * The annotated element must be a valid BANKGIRO or PLUSGIRO number.
  */
 @Documented
-@Target({FIELD, CONSTRUCTOR, METHOD, PARAMETER})
+@Target({FIELD, CONSTRUCTOR, PARAMETER})
 @Retention(RUNTIME)
-@Constraint(validatedBy = ValidHtmlConstraintValidator.class)
-public @interface ValidHtml {
+@Constraint(validatedBy = ValidAccountNumberConstraintValidator.class)
+public @interface ValidAccountNumber {
 
-    String message() default "invalid HTML: {errors}";
+    String message() default "not a valid account number";
 
     boolean nullable() default false;
 
