@@ -1,5 +1,7 @@
 package se.sundsvall.digitalmail.api.model.validation;
 
+import static org.apache.commons.lang3.StringUtils.isBlank;
+
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.List;
@@ -21,7 +23,7 @@ public class HtmlValidator {
 
     public boolean validate(final String value) {
         // Treat empty HTML as invalid
-        if (value == null || value.trim().isEmpty()) {
+        if (isBlank(value)) {
             return false;
         }
 
@@ -35,8 +37,6 @@ public class HtmlValidator {
             if (validationResult.isValid()) {
                 return true;
             }
-
-            //((ConstraintValidatorContextImpl) context).addMessageParameter("errors", validationResult.errors());
 
             return false;
         } catch (Exception e) {
