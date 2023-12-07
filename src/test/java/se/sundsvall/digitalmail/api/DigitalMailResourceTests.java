@@ -3,6 +3,7 @@ package se.sundsvall.digitalmail.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,6 +13,7 @@ import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static org.zalando.problem.Status.BAD_REQUEST;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDto;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDtoWithHtmlBody;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceRequest;
 
 import java.util.UUID;
@@ -22,6 +24,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import org.zalando.problem.violations.Violation;
 
@@ -29,6 +32,7 @@ import se.sundsvall.digitalmail.DigitalMail;
 import se.sundsvall.digitalmail.api.model.DeliveryStatus;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
+import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.service.DigitalMailService;
@@ -36,6 +40,9 @@ import se.sundsvall.digitalmail.service.DigitalMailService;
 @ActiveProfiles("junit")
 @SpringBootTest(classes = DigitalMail.class, webEnvironment = RANDOM_PORT)
 class DigitalMailResourceTests {
+
+    @MockBean
+    private HtmlValidator mockHtmlValidator;
 
     @MockBean
     private DigitalMailService mockDigitalMailService;
@@ -75,6 +82,30 @@ class DigitalMailResourceTests {
         });
 
         verify(mockDigitalMailService, times(1)).sendDigitalMail(any(DigitalMailDto.class));
+        verify(mockHtmlValidator, never()).validate(any(String.class));
+    }
+
+    @Test
+    void sendDigitalMailWithInvalidHtmlThrowsProblem() {
+        var request = generateDigitalMailRequestDtoWithHtmlBody();
+
+        when(mockHtmlValidator.validate(any(String.class))).thenReturn(false);
+
+        var result = webTestClient.post()
+            .uri("/send-digital-mail")
+            .contentType(APPLICATION_JSON)
+            .body(fromValue(request))
+            .exchange()
+            .expectStatus()
+            .isBadRequest()
+            .expectBody(Problem.class)
+            .returnResult()
+            .getResponseBody();
+
+        assertThat(result).isNotNull();
+
+        verify(mockDigitalMailService, never()).sendDigitalInvoice(any(InvoiceDto.class));
+        verify(mockHtmlValidator, times(1)).validate(any(String.class));
     }
 
     @Test

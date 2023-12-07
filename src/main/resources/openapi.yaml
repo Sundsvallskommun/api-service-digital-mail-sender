@@ -190,11 +190,11 @@ components:
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -383,19 +383,19 @@ components:
       description: A PDF file/attachment
     BodyInformation:
       required:
+      - body
       - contentType
       type: object
       properties:
         contentType:
           type: string
           description: "The content type for the message, text/plain for only text,\
-            \ text/html for html messages."
+            \ text/html for HTML messages."
           example: text/html
         body:
           type: string
+          description: Plain-text body
       description: The body of the message
-      discriminator:
-        propertyName: contentType
     DigitalMailRequest:
       required:
       - headerSubject
@@ -424,36 +424,8 @@ components:
           items:
             $ref: '#/components/schemas/Attachment'
         bodyInformation:
-          oneOf:
-          - $ref: '#/components/schemas/Html'
-          - $ref: '#/components/schemas/PlainText'
+          $ref: '#/components/schemas/BodyInformation'
       description: The body of the digital mail request
-    Html:
-      required:
-      - body
-      - contentType
-      type: object
-      description: HTML body
-      allOf:
-      - $ref: '#/components/schemas/BodyInformation'
-      - type: object
-        properties:
-          body:
-            type: string
-            description: BASE64-encoded HTML body
-    PlainText:
-      required:
-      - body
-      - contentType
-      type: object
-      description: Plain-text body
-      allOf:
-      - $ref: '#/components/schemas/BodyInformation'
-      - type: object
-        properties:
-          body:
-            type: string
-            description: Plain-text body
     SupportInfo:
       required:
       - supportText

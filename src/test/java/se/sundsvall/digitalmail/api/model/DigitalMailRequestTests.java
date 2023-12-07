@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.api.model;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.util.List;
 
@@ -19,7 +20,7 @@ class DigitalMailRequestTests {
         digitalMailRequest.setMunicipalityId(municipalityId);
         digitalMailRequest.setHeaderSubject(headerSubject);
         digitalMailRequest.setSupportInfo(new SupportInfo());
-        digitalMailRequest.setBodyInformation(new BodyInformation.PlainText());
+        digitalMailRequest.setBodyInformation(BodyInformation.builder().withContentType(TEXT_PLAIN_VALUE).build());
         digitalMailRequest.setAttachments(List.of(new File(), new File()));
 
         assertThat(digitalMailRequest.getPartyId()).isEqualTo(partyId);

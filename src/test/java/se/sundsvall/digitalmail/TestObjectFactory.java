@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail;
 
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
 import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
 import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
@@ -33,7 +34,7 @@ public final class TestObjectFactory {
             .withPartyId(UUID.randomUUID().toString())
             .withHeaderSubject("Some subject")
             .withMunicipalityId("2281")
-            .withBodyInformation(BodyInformation.PlainText.builder()
+            .withBodyInformation(BodyInformation.builder()
                 .withBody("Body text")
                 .withContentType(MediaType.TEXT_PLAIN_VALUE)
                 .build())
@@ -44,6 +45,12 @@ public final class TestObjectFactory {
         var mailRequestDto = new DigitalMailDto(mailRequest);
         mailRequestDto.setRecipientId("recipientId");
         return mailRequestDto;
+    }
+
+    public static DigitalMailDto generateDigitalMailRequestDtoWithHtmlBody() {
+        var dto = generateDigitalMailRequestDto();
+        dto.getBodyInformation().setContentType(TEXT_HTML_VALUE);
+        return dto;
     }
 
     public static DigitalInvoiceRequest generateInvoiceRequest() {
