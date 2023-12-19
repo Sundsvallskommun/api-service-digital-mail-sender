@@ -33,6 +33,6 @@ integration:
 logbook:
   exclusionfilters:
     # Exclude base64-encoded content from incoming requests.
-    json-path: "{'$.bodyInformation.body' : '[base64]', '$.attachments[*].body': '[base64]'}"
+    jsonPath: "{'$.bodyInformation.body' : '[base64]', '$.attachments[*].body': '[base64]'}"
     # Exclude base64-encoded content from traffic to/from skatteverket
-    x-path: "{'//Body/text()':'[base64]', '//SignatureValue/text()':'[base64]', '//X509Certificate/text()':'[base64]'}"
+    xPath: "{'//Body/text()':'[base64]', '//SignatureValue/text()':'[base64]', '//X509Certificate/text()':'[base64]'}"
