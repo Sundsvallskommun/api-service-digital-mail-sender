@@ -34,12 +34,9 @@ public class HtmlValidator {
             var validationResultAsString = HTML_VALIDATOR.validate(new ByteArrayInputStream(html.getBytes()));
             // Check
             var validationResult = GSON.fromJson(validationResultAsString, ValidationResult.class);
-            if (validationResult.isValid()) {
-                return true;
-            }
 
-            return false;
-        } catch (Exception e) {
+			return validationResult.isValid();
+		} catch (Exception e) {
             throw new ValidationException("Unable to validate HTML", e);
         }
     }
