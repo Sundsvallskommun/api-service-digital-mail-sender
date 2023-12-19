@@ -5,7 +5,7 @@
     <parent>
         <groupId>se.sundsvall.dept44</groupId>
         <artifactId>dept44-service-parent</artifactId>
-        <version>3.4</version>
+        <version>4.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -16,7 +16,7 @@
 
     <properties>
         <my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
-        <kivra-generated-sources-folder>${project.build.directory}/kivra-sources</kivra-generated-sources-folder>
+        <kivra-generated-sources-folder>src/main/java</kivra-generated-sources-folder>
         <kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
 
         <docker.image.name>ms-digitalmailsender</docker.image.name>
@@ -25,16 +25,13 @@
         <published.container.port.production>8740</published.container.port.production>
 
         <commons-io.version>2.15.1</commons-io.version>
-        <nu-html-validator.version>20.6.30</nu-html-validator.version>
-        <jetty.version>9.4.53.v20231009</jetty.version>
-        <cxf.version>4.0.2</cxf.version>
+        <nu-html-validator.version>18.11.5</nu-html-validator.version>
+        <cxf.version>4.0.3</cxf.version>
         <istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
-        <jakarta.xml.bind-api.version>4.0.0</jakarta.xml.bind-api.version>
-        <jaxb-impl.version>4.0.3</jaxb-impl.version>
-        <mockwebserver.version>4.11.0</mockwebserver.version>
-        <zjsonpatch.version>0.4.14</zjsonpatch.version>
-
-        <openapi-generator-maven-plugin>7.1.0</openapi-generator-maven-plugin>
+        <jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
+        <jaxb-impl.version>4.0.4</jaxb-impl.version>
+        <mockwebserver.version>4.12.0</mockwebserver.version>
+        <zjsonpatch.version>0.4.16</zjsonpatch.version>
     </properties>
 
     <dependencies>
@@ -44,7 +41,6 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>se.sundsvall.dept44</groupId>
             <artifactId>dept44-starter-webservicetemplate</artifactId>
@@ -61,14 +57,11 @@
             <groupId>se.sundsvall.dept44</groupId>
             <artifactId>dept44-common-validators</artifactId>
         </dependency>
-
-
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
@@ -92,11 +85,6 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-util-ajax</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>commons-io</groupId>
@@ -117,7 +105,6 @@
             <plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
-                <version>${openapi-generator-maven-plugin}</version>
                 <executions>
                     <execution>
                         <id>kivra-api</id>
