@@ -1,7 +1,7 @@
 {
     "request": {
         "method": "GET",
-        "url": "/citizenmapping/6a5c3d04-412d-11ec-973a-0242ac130003/personalnumber"
+        "url": "/party/PRIVATE/6a5c3d04-412d-11ec-973a-0242ac130003/legalId"
     },
     "response": {
         "headers": {
@@ -9,10 +9,9 @@
         },
         "status": "404",
         "jsonBody": {
-            "type": "https://tools.ietf.org/html/rfc7231#section-6.5.4",
             "title": "Not Found",
             "status": 404,
-            "traceId": "00-00638e3c73162a197ee3947dd9e6859b-4660bbf5cb167d0b-00"
+            "detail": "No legalId found!"
         }
     }
 }
