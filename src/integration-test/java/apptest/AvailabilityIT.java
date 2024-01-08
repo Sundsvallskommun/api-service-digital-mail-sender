@@ -26,7 +26,7 @@ class AvailabilityIT extends AbstractAppTest {
     }
 
     @Test
-    void test2_noMatchInCitizenMapping() {
+    void test2_noMatchInCitizen() {
         setupCall()
             .withServicePath(SERVICE_PATH)
             .withHttpMethod(POST)

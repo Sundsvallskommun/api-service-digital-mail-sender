@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.integration.citizenmapping;
+package se.sundsvall.digitalmail.integration.citizen;
 
 import java.util.concurrent.TimeUnit;
 
@@ -16,11 +16,13 @@ import feign.Request;
 import feign.codec.ErrorDecoder;
 
 @Import(FeignConfiguration.class)
-class CitizenMappingConfig {
+class CitizenConfig {
+
+    static final String INTEGRATION_NAME = "CitizenClient";
+
+    private final CitizenProperties properties;
     
-    private final CitizenMappingProperties properties;
-    
-    CitizenMappingConfig(final CitizenMappingProperties properties) {
+    CitizenConfig(final CitizenProperties properties) {
         this.properties = properties;
     }
     
@@ -34,7 +36,7 @@ class CitizenMappingConfig {
     }
 
     private ClientRegistration clientRegistration() {
-        return ClientRegistration.withRegistrationId("citizenmapping")
+        return ClientRegistration.withRegistrationId("citizen")
             .tokenUri(properties.oauth2().tokenUrl())
             .clientId(properties.oauth2().clientId())
             .clientSecret(properties.oauth2().clientSecret())
@@ -50,6 +52,6 @@ class CitizenMappingConfig {
     }
 
     private ErrorDecoder errorDecoder() {
-        return new ProblemErrorDecoder("CitizenMappingClient");
+        return new ProblemErrorDecoder(INTEGRATION_NAME);
     }
 }
