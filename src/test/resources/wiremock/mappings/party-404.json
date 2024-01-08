@@ -1,0 +1,17 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/party/PRIVATE/b1b46458-7ff0-42d2-b29c-3bf20729cfea/legalId"
+    },
+    "response": {
+        "headers": {
+            "Content-Type": "application/problem+json; charset=utf-8"
+        },
+        "status": "404",
+        "jsonBody": {
+            "title": "Not Found",
+            "status": 404,
+            "detail": "No legalId found!"
+        }
+    }
+}
