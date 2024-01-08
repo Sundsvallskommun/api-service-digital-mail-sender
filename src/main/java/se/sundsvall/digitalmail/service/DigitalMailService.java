@@ -8,9 +8,9 @@ import org.springframework.stereotype.Service;
 
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
-import se.sundsvall.digitalmail.integration.citizenmapping.CitizenMappingClient;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
+import se.sundsvall.digitalmail.integration.party.PartyClient;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
 
@@ -19,16 +19,16 @@ public class DigitalMailService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DigitalMailService.class);
     
-    private final CitizenMappingClient citizenMappingClient;
+    private final PartyClient partyClient;
     private final DigitalMailIntegration digitalMailIntegration;
     private final KivraIntegration kivraIntegration;
     private final AvailabilityService availabilityService;
 
-    DigitalMailService(final CitizenMappingClient citizenMappingClient,
+    DigitalMailService(final PartyClient partyClient,
             final DigitalMailIntegration digitalMailIntegration,
             final KivraIntegration kivraIntegration,
             final AvailabilityService availabilityService) {
-        this.citizenMappingClient = citizenMappingClient;
+        this.partyClient = partyClient;
         this.digitalMailIntegration = digitalMailIntegration;
         this.kivraIntegration = kivraIntegration;
         this.availabilityService = availabilityService;
@@ -40,7 +40,7 @@ public class DigitalMailService {
      * @return Response whether the sending went ok or not.
      */
     public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto) {
-        final var personalNumber = citizenMappingClient.getCitizenMapping(requestDto.getPartyId());
+        final var personalNumber = partyClient.getLegalId(requestDto.getPartyId());
         
         final var possibleMailbox = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
 
@@ -53,7 +53,7 @@ public class DigitalMailService {
     }
 
     public DigitalInvoiceResponse sendDigitalInvoice(final InvoiceDto invoiceDto) {
-        final var ssn = citizenMappingClient.getCitizenMapping(invoiceDto.getPartyId());
+        final var ssn = partyClient.getLegalId(invoiceDto.getPartyId());
         invoiceDto.setSsn(ssn);
 
         var result = kivraIntegration.sendInvoice(invoiceDto);
@@ -63,13 +63,13 @@ public class DigitalMailService {
 
     public boolean verifyRecipientHasSomeAvailableMailbox(final String partyId) {
         try {
-            final var personalNumber = citizenMappingClient.getCitizenMapping(partyId);
+            final var personalNumber = partyClient.getLegalId(partyId);
             // If this doesn't throw an exception, the recipient has an available mailbox
             availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
 
             return true;
         } catch (Exception e) {
-            LOGGER.error("Couldn't get personalNumber from citizenmapping", e);
+            LOGGER.error("Couldn't get legalId from party", e);
             return false;
         }
     }

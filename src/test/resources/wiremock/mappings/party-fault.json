@@ -1,10 +1,10 @@
 {
     "request": {
         "method": "GET",
-        "url": "/citizenmapping/e57e9dec-4132-11ec-973a-0242ac130003/personalnumber"
+        "url": "/party/PRIVATE/6a5c3d04-412d-11ec-973a-0242ac130004/legalId"
     },
     "response": {
-        "body": "190101010159",
+        "body": "192301010160",
         "headers": {
             "Content-Type": "text/plain"
         },

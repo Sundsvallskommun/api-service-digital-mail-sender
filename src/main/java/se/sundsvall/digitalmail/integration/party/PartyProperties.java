@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.integration.citizenmapping;
+package se.sundsvall.digitalmail.integration.party;
 
 import java.time.Duration;
 
@@ -13,8 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import se.sundsvall.digitalmail.integration.OAuth2;
 
 @Validated
-@ConfigurationProperties(prefix = "integration.citizenmapping")
-record CitizenMappingProperties(
+@ConfigurationProperties(prefix = "integration.party")
+record PartyProperties(
 
     @NotBlank
     String apiUrl,
