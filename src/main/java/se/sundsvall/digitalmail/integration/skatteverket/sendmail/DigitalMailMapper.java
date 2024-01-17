@@ -24,6 +24,7 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.apache.commons.lang.StringUtils;
 import org.jose4j.base64url.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,14 +293,16 @@ class DigitalMailMapper {
     }
     
     /**
-     * Creates thebody-element
-     * @param dto
-     * @return
+     * Creates the body-element
+     * Will create an empty body if no bodyInformation object or body is present.
+     * @param dto to be translated into a {@link MessageBody}
+     * @return A {@link MessageBody}
      */
-
     MessageBody createMessageBody(final DigitalMailDto dto) {
         final var messageBody = new MessageBody();
-        if (dto.getBodyInformation() != null) {
+
+        //Make sure we actually have a body to send
+        if (dto.getBodyInformation() != null && StringUtils.isNotBlank(dto.getBodyInformation().getBody())) {
             messageBody.setBody(createBody(dto.getBodyInformation()));
             messageBody.setContentType(dto.getBodyInformation().getContentType());
         } else {

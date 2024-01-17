@@ -5,12 +5,12 @@
     <parent>
         <groupId>se.sundsvall.dept44</groupId>
         <artifactId>dept44-service-parent</artifactId>
-        <version>4.1</version>
+        <version>4.2.0</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>se.sundsvall</groupId>
     <artifactId>api-service-digital-mail-sender</artifactId>
-    <version>2.0</version>
+    <version>2.1</version>
     <name>api-service-digital-mail-sender</name>
     <properties>
         <my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>

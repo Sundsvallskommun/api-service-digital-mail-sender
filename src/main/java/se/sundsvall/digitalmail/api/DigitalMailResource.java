@@ -7,7 +7,7 @@ import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.zalando.problem.Status.BAD_REQUEST;
 
-import jakarta.validation.Valid;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -34,6 +34,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @Validated
@@ -64,14 +65,17 @@ class DigitalMailResource {
         produces = { APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE }
     )
     ResponseEntity<DigitalMailResponse> sendDigitalMail(@Valid @RequestBody final DigitalMailRequest request) {
-        // Validate body as HTML
-        if (TEXT_HTML_VALUE.equals(request.getBodyInformation().getContentType()) && !htmlValidator.validate(request.getBodyInformation().getBody())) {
-            throw Problem.builder()
-                .withTitle("Body HTML is invalid")
-                .withStatus(BAD_REQUEST)
-                .withDetail("Use https://validator.w3.org/ to make sure your HTML validates")
-                .build();
-        }
+
+        // Validate body as HTML if content type is text/html
+        Optional.ofNullable(request.getBodyInformation())
+                .filter(bodyInfo -> TEXT_HTML_VALUE.equals(bodyInfo.getContentType()) && !htmlValidator.validate(bodyInfo.getBody()))
+                .ifPresent(bodyInfo -> {
+                    throw Problem.builder()
+                            .withTitle("Body HTML is invalid")
+                            .withStatus(BAD_REQUEST)
+                            .withDetail("Use https://validator.w3.org/ to make sure your HTML validates")
+                            .build();
+                });
 
         var response = digitalMailService.sendDigitalMail(new DigitalMailDto(request));
         return ok(response);
