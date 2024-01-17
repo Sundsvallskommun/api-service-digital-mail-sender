@@ -66,8 +66,9 @@ class DigitalMailResource {
     )
     ResponseEntity<DigitalMailResponse> sendDigitalMail(@Valid @RequestBody final DigitalMailRequest request) {
 
+        // Validate body as HTML if content type is text/html
         Optional.ofNullable(request.getBodyInformation())
-                .filter(bodyInfo -> TEXT_HTML_VALUE.equals(request.getBodyInformation().getContentType()) && !htmlValidator.validate(request.getBodyInformation().getBody()))
+                .filter(bodyInfo -> TEXT_HTML_VALUE.equals(bodyInfo.getContentType()) && !htmlValidator.validate(bodyInfo.getBody()))
                 .ifPresent(bodyInfo -> {
                     throw Problem.builder()
                             .withTitle("Body HTML is invalid")
