@@ -18,9 +18,6 @@ import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Disabled;
@@ -38,6 +35,8 @@ import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.File;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
 import se.gov.minameddelanden.common.sign.X509KeySelector;
 import se.gov.minameddelanden.schema.message.v3.SealedDelivery;
 import se.gov.minameddelanden.schema.message.v3.SignedDelivery;
@@ -71,7 +70,7 @@ class DigitalMailMapperTest {
         softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls Kommun");
         softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo("162120002411");
 
-        final var header = signedDelivery.getDelivery().getMessage().get(0).getHeader();
+        final var header = signedDelivery.getDelivery().getMessage().getFirst().getHeader();
     
         softly.assertThat(header.getSubject()).isEqualTo("Some subject");
         softly.assertThat(header.getLanguage()).isEqualTo("svSE");
@@ -180,9 +179,22 @@ class DigitalMailMapperTest {
     }
 
     @Test
-    void testEmptyMessageBody_shouldGenerateEmptyBody() {
+    void testEmptyMessageBodyInformation_shouldGenerateEmptyBody() {
         final var digitalMailRequestDto = TestObjectFactory.generateDigitalMailRequestDto();
         digitalMailRequestDto.setBodyInformation(null);
+
+        final var messageBody = mapper.createMessageBody(digitalMailRequestDto);
+
+        assertThat(messageBody.getBody()).isEqualTo(new byte[0]);
+        assertThat(messageBody.getContentType()).isEqualTo(TEXT_PLAIN_VALUE);
+    }
+
+    @Test
+    void testEmptyBody_shouldGenerateEmptyBody() {
+        final var digitalMailRequestDto = TestObjectFactory.generateDigitalMailRequestDto();
+        digitalMailRequestDto.setBodyInformation(BodyInformation.builder()
+                .withBody("")
+                .build());
 
         final var messageBody = mapper.createMessageBody(digitalMailRequestDto);
 

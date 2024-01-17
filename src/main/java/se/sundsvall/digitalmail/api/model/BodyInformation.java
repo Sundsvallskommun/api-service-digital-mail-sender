@@ -5,8 +5,6 @@ import static lombok.AccessLevel.PROTECTED;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
-import jakarta.validation.constraints.NotBlank;
-
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,8 +22,7 @@ public class BodyInformation {
     @Schema(description = "The content type for the message, text/plain for only text, text/html for HTML messages.", example = TEXT_HTML_VALUE, requiredMode = REQUIRED)
     private String contentType;
 
-    @NotBlank
-    @Schema(description = "Plain-text body", requiredMode = REQUIRED)
+    @Schema(description = "Plain-text body")
     private String body;
 
     public String getContentType() {
