@@ -29,7 +29,7 @@ class KivraMapperTests {
                 assertThat(payment.getPayable()).isTrue();
                 assertThat(payment.getCurrency()).isEqualTo(PaymentMultipleOptions.CurrencyEnum.SEK);
                 assertThat(payment.getOptions().getFirst().getDueDate()).isEqualTo(invoiceDto.getDueDate().format(DATE_FORMATTER));
-                assertThat(payment.getOptions().getFirst().getAmount()).isEqualTo(invoiceDto.getAmount());
+                assertThat(payment.getOptions().getFirst().getAmount()).isEqualTo(invoiceDto.getAmount().toString());
                 assertThat(payment.getOptions().getFirst().getType()).isEqualTo(PaymentMultipleOptionsOptionsInner.TypeEnum.fromValue(invoiceDto.getPaymentReferenceType().name()));
                 assertThat(payment.getMethod()).isEqualTo(PaymentMultipleOptions.MethodEnum.fromValue(invoiceDto.getAccountType().getValue()));
                 assertThat(payment.getAccount()).isEqualTo(invoiceDto.getAccountNumber());

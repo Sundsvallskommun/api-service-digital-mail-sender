@@ -4039,7 +4039,6 @@ components:
           description: Date when this Invoice is due
         total_owed:
           type: string
-          format: float
           example: "123.50"
           description: The total amount owed according to the invoice. **If `payable` equals `true` this must be a non negative number that’s greater than "0"**
         type:
@@ -4066,7 +4065,6 @@ components:
           description: Toggles whether the user may choose to pay only a portion of the total_owed amount or whether the user must always pay the complete total_owed amount
         min_amount:
           type: string
-          format: float
           example: "50.00"
           description: The minimum amount that can be paid when `variable_amount` equals `true`. Note that this is a soft limit, so whenever `variable_amount` is `true` the user will be able to choose freely the amount to be paid, but it may be warned if the amount paid is inferior to `min_amount`. `min_amount` must be greater than "0" and less than "total_owed".
 
@@ -4149,7 +4147,6 @@ components:
                 description: Date when this option is due.
               amount:
                 type: string
-                format: float
                 example: "123.50"
                 description: The payment amount for this option. A positive number.
               type:
@@ -4212,22 +4209,18 @@ components:
               $ref: "#/components/schemas/PaymentOptionIcon"
             min_limit:
               type: string
-              format: float
               example: "123.50"
               description: The smallest allowed amount to be paid. If not given it defaults to 1.00 SEK.
             min_suggested:
               type: string
-              format: float
               example: "123.50"
               description: The user is encouraged to pay more than this amount.
             max_suggested:
               type: string
-              format: float
               example: "123.50"
               description: The user is encouraged to not pay more than this amount.
             max_limit:
               type: string
-              format: float
               example: "123.50"
               description: The largest allowed amount to be paid. Note that even if this amount is not given or very high, limits from the payment provider or bank will still apply.
 

@@ -39,7 +39,7 @@ final class KivraMapper {
               .options(List.of(new PaymentMultipleOptionsOptionsInner()
                 .dueDate(invoiceDto.getDueDate().toString())
                 .reference(invoiceDto.getPaymentReference())
-                .amount(invoiceDto.getAmount())
+                .amount(invoiceDto.getAmount().toString())
                 .type(PaymentMultipleOptionsOptionsInner.TypeEnum.fromValue(invoiceDto.getPaymentReferenceType().name())))));
 
     }
