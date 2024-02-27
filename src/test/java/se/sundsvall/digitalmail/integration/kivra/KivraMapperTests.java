@@ -7,7 +7,8 @@ import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.mapInvoiceT
 
 import org.junit.jupiter.api.Test;
 
-import generated.com.kivra.Payment;
+import generated.com.kivra.PaymentMultipleOptions;
+import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
 
 class KivraMapperTests {
 
@@ -27,15 +28,15 @@ class KivraMapperTests {
         assertThat(content.getContext()).isNotNull();
         assertThat(content.getContext().getInvoice()).isNotNull().satisfies(invoice -> {
             assertThat(invoice.getInvoiceReference()).isEqualTo(invoiceDto.getReference());
-            assertThat(invoice.getPaymentOrPaymentMultipleOptions()).isInstanceOfSatisfying(Payment.class, payment -> {
+            assertThat(invoice.getPaymentOrPaymentMultipleOptions()).isInstanceOfSatisfying(PaymentMultipleOptions.class, payment -> {
                 assertThat(payment.getPayable()).isTrue();
-                assertThat(payment.getCurrency()).isEqualTo(Payment.CurrencyEnum.SEK);
-                assertThat(payment.getDueDate()).isEqualTo(invoiceDto.getDueDate().format(DATE_FORMATTER));
-                assertThat(payment.getTotalOwed()).isEqualTo(invoiceDto.getAmount());
-                assertThat(payment.getType()).isEqualTo(Payment.TypeEnum.fromValue(invoiceDto.getPaymentReferenceType().name()));
-                assertThat(payment.getMethod()).isEqualTo(Payment.MethodEnum.fromValue(invoiceDto.getAccountType().getValue()));
+                assertThat(payment.getCurrency()).isEqualTo(PaymentMultipleOptions.CurrencyEnum.SEK);
+                assertThat(payment.getOptions().getFirst().getDueDate()).isEqualTo(invoiceDto.getDueDate().format(DATE_FORMATTER));
+                assertThat(payment.getOptions().getFirst().getAmount()).isEqualTo(invoiceDto.getAmount());
+                assertThat(payment.getOptions().getFirst().getType()).isEqualTo(PaymentMultipleOptionsOptionsInner.TypeEnum.fromValue(invoiceDto.getPaymentReferenceType().name()));
+                assertThat(payment.getMethod()).isEqualTo(PaymentMultipleOptions.MethodEnum.fromValue(invoiceDto.getAccountType().getValue()));
                 assertThat(payment.getAccount()).isEqualTo(invoiceDto.getAccountNumber());
-                assertThat(payment.getReference()).isEqualTo(invoiceDto.getPaymentReference());
+                assertThat(payment.getOptions().getFirst().getReference()).isEqualTo(invoiceDto.getPaymentReference());
             });
         });
     }
