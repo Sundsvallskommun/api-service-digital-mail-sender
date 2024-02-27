@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import generated.com.kivra.ContentUser;
+import generated.com.kivra.ContentUserV2;
 
 @FeignClient(
     name = INTEGRATION_NAME,
@@ -18,5 +18,5 @@ import generated.com.kivra.ContentUser;
 interface KivraClient {
 
     @PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity<ContentUser> postContent(@RequestBody ContentUser content);
+    ResponseEntity<ContentUserV2> postContent(@RequestBody ContentUserV2 content);
 }

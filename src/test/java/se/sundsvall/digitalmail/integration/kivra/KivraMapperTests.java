@@ -24,11 +24,8 @@ class KivraMapperTests {
         assertThat(content.getSubject()).isEqualTo(invoiceDto.getSubject());
         assertThat(content.getGeneratedAt()).isEqualTo(invoiceDto.getGeneratedAt().format(DATE_FORMATTER));
         assertThat(content.getType()).isEqualTo(invoiceDto.getType().getValue());
-        assertThat(content.getFiles()).hasSameSizeAs(invoiceDto.getFiles());
-        assertThat(content.getContext()).isNotNull();
-        assertThat(content.getContext().getInvoice()).isNotNull().satisfies(invoice -> {
-            assertThat(invoice.getInvoiceReference()).isEqualTo(invoiceDto.getReference());
-            assertThat(invoice.getPaymentOrPaymentMultipleOptions()).isInstanceOfSatisfying(PaymentMultipleOptions.class, payment -> {
+        assertThat(content.getParts()).hasSameSizeAs(invoiceDto.getFiles());
+        assertThat(content.getPaymentMultipleOptions()).isInstanceOfSatisfying(PaymentMultipleOptions.class, payment -> {
                 assertThat(payment.getPayable()).isTrue();
                 assertThat(payment.getCurrency()).isEqualTo(PaymentMultipleOptions.CurrencyEnum.SEK);
                 assertThat(payment.getOptions().getFirst().getDueDate()).isEqualTo(invoiceDto.getDueDate().format(DATE_FORMATTER));
@@ -38,6 +35,6 @@ class KivraMapperTests {
                 assertThat(payment.getAccount()).isEqualTo(invoiceDto.getAccountNumber());
                 assertThat(payment.getOptions().getFirst().getReference()).isEqualTo(invoiceDto.getPaymentReference());
             });
-        });
+
     }
 }

@@ -14,7 +14,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import generated.com.kivra.ContentUser;
+import generated.com.kivra.ContentUserV2;
 
 @ExtendWith(MockitoExtension.class)
 class KivraIntegrationTests {
@@ -29,12 +29,12 @@ class KivraIntegrationTests {
 
     @Test
     void sendContent() {
-        when(mockClient.postContent(any(ContentUser.class))).thenReturn(ok(new ContentUser()));
+        when(mockClient.postContent(any(ContentUserV2.class))).thenReturn(ok(new ContentUserV2()));
 
         final var result = kivraIntegration.sendInvoice(invoiceDto);
 
         assertThat(result).isTrue();
 
-        verify(mockClient, times(1)).postContent(any(ContentUser.class));
+        verify(mockClient, times(1)).postContent(any(ContentUserV2.class));
     }
 }
