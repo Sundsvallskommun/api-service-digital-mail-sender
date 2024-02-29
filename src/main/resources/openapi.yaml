@@ -5,15 +5,15 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "2.1"
+  version: "2.2"
 servers:
-  - url: http://localhost:8080
-    description: Generated server url
+- url: http://localhost:8080
+  description: Generated server url
 paths:
   /send-digital-mail:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital mail
       operationId: sendDigitalMail
       requestBody:
@@ -38,13 +38,13 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
         "404":
           description: Not Found
           content:
@@ -66,7 +66,7 @@ paths:
   /send-digital-invoice:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital invoice
       operationId: sendDigitalInvoice
       requestBody:
@@ -91,13 +91,13 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: '#/components/schemas/Problem'
-                  - $ref: '#/components/schemas/ConstraintViolationProblem'
+                - $ref: '#/components/schemas/Problem'
+                - $ref: '#/components/schemas/ConstraintViolationProblem'
         "404":
           description: Not Found
           content:
@@ -119,16 +119,16 @@ paths:
   /has-available-mailbox/{partyId}:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Check if a party has a digital mailbox and if said party has chosen
         to receive digital mail
       operationId: hasAvailableMailbox
       parameters:
-        - name: partyId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation (available mailbox(es) found)
@@ -153,7 +153,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -171,30 +171,30 @@ components:
     Problem:
       type: object
       properties:
-        title:
-          type: string
-        detail:
-          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
         instance:
           type: string
           format: uri
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties:
-            type: object
+        title:
+          type: string
+        detail:
+          type: string
         status:
           $ref: '#/components/schemas/StatusType'
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -235,15 +235,15 @@ components:
           type: string
         message:
           type: string
-        detail:
-          type: string
-        instance:
-          type: string
-          format: uri
         parameters:
           type: object
           additionalProperties:
             type: object
+        instance:
+          type: string
+          format: uri
+        detail:
+          type: string
         suppressed:
           type: array
           items:
@@ -306,20 +306,20 @@ components:
                 type: boolean
         message:
           type: string
-        title:
-          type: string
-        detail:
-          type: string
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
         instance:
           type: string
           format: uri
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties:
-            type: object
+        title:
+          type: string
+        detail:
+          type: string
         status:
           $ref: '#/components/schemas/StatusType'
         suppressed:
@@ -364,9 +364,9 @@ components:
           type: string
     Attachment:
       required:
-        - body
-        - contentType
-        - filename
+      - body
+      - contentType
+      - filename
       type: object
       properties:
         contentType:
@@ -383,7 +383,7 @@ components:
       description: A PDF file/attachment
     BodyInformation:
       required:
-        - contentType
+      - contentType
       type: object
       properties:
         contentType:
@@ -397,10 +397,10 @@ components:
       description: The body of the message
     DigitalMailRequest:
       required:
-        - headerSubject
-        - municipalityId
-        - partyId
-        - supportInfo
+      - headerSubject
+      - municipalityId
+      - partyId
+      - supportInfo
       type: object
       properties:
         partyId:
@@ -427,7 +427,7 @@ components:
       description: The body of the digital mail request
     SupportInfo:
       required:
-        - supportText
+      - supportText
       type: object
       properties:
         supportText:
@@ -467,12 +467,12 @@ components:
           $ref: '#/components/schemas/DeliveryStatus'
     Details:
       required:
-        - accountNumber
-        - accountType
-        - amount
-        - dueDate
-        - paymentReference
-        - paymentReferenceType
+      - accountNumber
+      - accountType
+      - amount
+      - dueDate
+      - paymentReference
+      - paymentReferenceType
       type: object
       properties:
         amount:
@@ -490,8 +490,8 @@ components:
           description: The payment reference type
           example: SE_OCR
           enum:
-            - SE_OCR
-            - TENANT_REF
+          - SE_OCR
+          - TENANT_REF
         paymentReference:
           maxLength: 25
           type: string
@@ -502,8 +502,8 @@ components:
           description: The receiving account type
           example: BANKGIRO
           enum:
-            - BANKGIRO
-            - PLUSGIRO
+          - BANKGIRO
+          - PLUSGIRO
         accountNumber:
           type: string
           description: The receiving account (a valid BANKGIRO or PLUSGIRO number)
@@ -511,11 +511,11 @@ components:
       description: Invoice details
     DigitalInvoiceRequest:
       required:
-        - details
-        - files
-        - partyId
-        - subject
-        - type
+      - details
+      - files
+      - partyId
+      - subject
+      - type
       type: object
       properties:
         partyId:
@@ -527,10 +527,10 @@ components:
           type: string
           description: Invoice type
           example: INVOICE
-          enum:
-            - INVOICE
-            - REMINDER
           default: INVOICE
+          enum:
+          - INVOICE
+          - REMINDER
         subject:
           type: string
           description: The invoice subject
@@ -539,6 +539,10 @@ components:
           type: string
           description: Invoice reference
           example: "Faktura #12345"
+        payable:
+          type: boolean
+          description: Whether the invoice is payable
+          default: true
         details:
           $ref: '#/components/schemas/Details'
         files:

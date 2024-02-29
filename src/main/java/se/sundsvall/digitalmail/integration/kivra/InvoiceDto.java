@@ -1,5 +1,7 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
+import static java.util.Optional.ofNullable;
+
 import java.time.LocalDate;
 import java.util.List;
 
@@ -19,6 +21,7 @@ public class InvoiceDto {
     private final InvoiceType type;
     private final String subject;
     private final String reference;
+    private final boolean payable;
     private final Float amount;
     private final LocalDate dueDate;
     private final ReferenceType paymentReferenceType;
@@ -34,6 +37,7 @@ public class InvoiceDto {
         type = invoiceRequest.type();
         subject = invoiceRequest.subject();
         reference = invoiceRequest.reference();
+        payable = ofNullable(invoiceRequest.payable()).orElse(true);
         amount = invoiceRequest.details().amount();
         dueDate = invoiceRequest.details().dueDate();
         paymentReferenceType = invoiceRequest.details().paymentReferenceType();

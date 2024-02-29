@@ -30,12 +30,13 @@ class DigitalInvoiceRequestTests {
         final var file = new File(contentType, body, filename);
 
         final var request = new DigitalInvoiceRequest(partyId, type, subject,
-            reference, details, List.of(file));
+            reference, true, details, List.of(file));
 
         assertThat(request.partyId()).isEqualTo(partyId);
         assertThat(request.type()).isEqualTo(type);
         assertThat(request.subject()).isEqualTo(subject);
         assertThat(request.reference()).isEqualTo(reference);
+        assertThat(request.payable()).isTrue();
         assertThat(request.details()).isEqualTo(details);
         assertThat(request.files()).hasSize(1).satisfies(files -> {
             assertThat(file.getContentType()).isEqualTo(contentType);
