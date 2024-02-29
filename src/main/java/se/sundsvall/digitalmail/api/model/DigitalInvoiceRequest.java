@@ -36,6 +36,9 @@ public record DigitalInvoiceRequest(
         @Schema(description = "Invoice reference", example = "Faktura #12345")
         String reference,
 
+        @Schema(description = "Whether the invoice is payable", defaultValue = "true")
+        Boolean payable,
+
         @NotNull
         @Valid
         @Schema(requiredMode = REQUIRED)

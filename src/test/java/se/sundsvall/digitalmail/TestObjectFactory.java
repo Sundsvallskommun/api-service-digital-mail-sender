@@ -59,6 +59,7 @@ public final class TestObjectFactory {
             INVOICE,
             "someSubject",
             "someReference",
+            true,
             new DigitalInvoiceRequest.Details(
                 123.45f,
                 LocalDate.now(),
