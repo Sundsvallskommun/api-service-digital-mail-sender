@@ -32,13 +32,17 @@ integration:
 # Logging
 logbook:
   body-filters:
-    # Exclude base64-encoded content from incoming requests.
+    # Exclude BASE64-encoded content from requests.
     jsonPath:
       - key: '$.bodyInformation.body'
         value : '[base64]'
       - key: '$.attachments[*].body'
         value : '[base64]'
-    # Exclude base64-encoded content from traffic to/from skatteverket
+      - key: '$.files[*].body'
+        value : '[base64]'
+      - key: '$.parts[*].data'
+        value : '[base64]'
+    # Exclude BASE64-encoded content from traffic to/from skatteverket
     xPath:
       - key: '//*[contains(local-name(), "X509Certificate")]'
         value: '[base64]'
