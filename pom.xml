@@ -20,7 +20,7 @@
         <exposed.app.port>8080</exposed.app.port>
         <published.container.port.test>8740</published.container.port.test>
         <published.container.port.production>8740</published.container.port.production>
-        <commons-io.version>2.16.0</commons-io.version>
+        <commons-io.version>2.16.1</commons-io.version>
         <nu-html-validator.version>18.11.5</nu-html-validator.version>
         <cxf.version>4.0.3</cxf.version>
         <istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
