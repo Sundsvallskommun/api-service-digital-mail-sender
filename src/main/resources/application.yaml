@@ -44,9 +44,11 @@ logbook:
         value : '[base64]'
     # Exclude BASE64-encoded content from traffic to/from skatteverket
     xPath:
-      - key: '//*[contains(local-name(), "X509Certificate")]'
+      - key: '//SignatureValue/text()'
         value: '[base64]'
-      - key: '\\//SignatureValue/text()'
+      - key: '//X509Certificate/text()'
         value: '[base64]'
-      - key: '\\//X509Certificate/text()'
+      - key: '//Message/Attachment[Filename]/Body/text()'
+        value: '[base64]'
+      - key: '//Message/Body/Body/text()'
         value: '[base64]'
