@@ -16,10 +16,7 @@
         <my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
         <kivra-generated-sources-folder>src/main/java</kivra-generated-sources-folder>
         <kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
-        <docker.image.name>ms-digitalmailsender</docker.image.name>
         <exposed.app.port>8080</exposed.app.port>
-        <published.container.port.test>8740</published.container.port.test>
-        <published.container.port.production>8740</published.container.port.production>
         <commons-io.version>2.16.1</commons-io.version>
         <nu-html-validator.version>18.11.5</nu-html-validator.version>
         <cxf.version>4.0.3</cxf.version>
