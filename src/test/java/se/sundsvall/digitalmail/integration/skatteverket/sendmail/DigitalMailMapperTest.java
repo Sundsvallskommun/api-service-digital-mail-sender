@@ -202,9 +202,7 @@ class DigitalMailMapperTest {
         assertThat(messageBody.getContentType()).isEqualTo(TEXT_PLAIN_VALUE);
     }
 
-    //TODO, implement validation of created message, so it works..
-
-    @Disabled
+    @Disabled("Implement validation of created message, so it works..")
     @Test
     void testCreateDeliverSecure_andValidateSignature() throws Exception {
         final var dto = TestObjectFactory.generateDigitalMailRequestDto();
@@ -243,7 +241,7 @@ class DigitalMailMapperTest {
 
         System.out.println(validated);
 
-        //assertThat(validated).isTrue();
+        assertThat(validated).isTrue();
     }
 
     private KeyStore getKeyStore() throws Exception {

@@ -44,16 +44,17 @@ class AvailabilityServiceTest {
 
         final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"));
     
-        assertThat(mailboxes).isNotEmpty();
-        assertThat(mailboxes).singleElement().isNotNull();
+        assertThat(mailboxes).isNotEmpty().singleElement().isNotNull();
     }
     
     @Test
     void testNoMailbox_shouldThrowException() {
         when(mockReachableIntegration.isReachable(any())).thenReturn(List.of());
-    
+
+
+        final var personalNumbers = List.of("personalNumber");
         assertThatExceptionOfType(ThrowableProblem.class)
-                .isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber")));
+                .isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(personalNumbers));
     }
     
     private List<MailboxDto> generateEmptyMailboxResponse() {

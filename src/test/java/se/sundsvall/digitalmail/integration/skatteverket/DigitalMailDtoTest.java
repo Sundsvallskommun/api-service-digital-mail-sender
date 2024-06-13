@@ -4,8 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
@@ -15,14 +13,6 @@ import se.sundsvall.digitalmail.api.model.SupportInfo;
 
 class DigitalMailDtoTest {
 
-    @Test
-    void test() {
-        List<String> list = new ArrayList<>(List.of("a", "b", "c"));
-        list.addAll(Collections.emptyList());
-
-        System.out.println(list);
-    }
-    
     @Test
     void testConstructor() {
         final var request = DigitalMailRequest.builder()

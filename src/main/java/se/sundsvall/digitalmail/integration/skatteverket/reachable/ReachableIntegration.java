@@ -22,7 +22,7 @@ public class ReachableIntegration {
     private final RecipientIntegrationMapper mapper;
     
     ReachableIntegration(
-            @Qualifier("skatteverket-isreachable-webservice-template") final WebServiceTemplate isReachableTemplate,
+            @Qualifier("skatteverketIsReachableWebserviceTemplate") final WebServiceTemplate isReachableTemplate,
             final RecipientIntegrationMapper mapper) {
         this.isReachableTemplate = isReachableTemplate;
         this.mapper = mapper;

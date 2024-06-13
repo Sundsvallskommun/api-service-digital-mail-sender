@@ -33,7 +33,7 @@ class SkatteverketClientConfig {
     }
     
     //Separate the beans since we don't want the "reachable" one to get intercepted for the size-check.
-    @Bean("skatteverket-sendmail-webservice-template")
+    @Bean("skatteverketSendmailWebserviceTemplate")
     WebServiceTemplate notificationWebserviceTemplate() {
         final var builder = new WebServiceTemplateBuilder()
             .withConnectTimeout(Duration.ofMillis(properties.connectTimeout()))
@@ -51,7 +51,7 @@ class SkatteverketClientConfig {
             .build();
     }
     
-    @Bean("skatteverket-isreachable-webservice-template")
+    @Bean("skatteverketIsReachableWebserviceTemplate")
     WebServiceTemplate recipientWebserviceTemplate() {
         final var builder = new WebServiceTemplateBuilder()
             .withConnectTimeout(Duration.ofMillis(properties.connectTimeout()))

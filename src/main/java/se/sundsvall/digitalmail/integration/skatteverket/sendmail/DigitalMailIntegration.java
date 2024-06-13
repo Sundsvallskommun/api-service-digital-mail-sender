@@ -28,7 +28,7 @@ public class DigitalMailIntegration {
     
     @Autowired
     DigitalMailIntegration(
-            @Qualifier("skatteverket-sendmail-webservice-template") final WebServiceTemplate distributeTemplate,
+            @Qualifier("skatteverketSendmailWebserviceTemplate") final WebServiceTemplate distributeTemplate,
             final DigitalMailMapper mapper) {
         this.distributeTemplate = distributeTemplate;
         this.mapper = mapper;
@@ -37,9 +37,9 @@ public class DigitalMailIntegration {
     /**
      * Send a digital mail
      *
-     * @param requestDto
-     * @param serviceAddress
-     * @return
+     * @param requestDto The request to send
+     * @param serviceAddress The address to send the mail to
+     * @return The response from the service
      */
     public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String serviceAddress) {
         LOG.debug("Trying to send secure digital mail.");

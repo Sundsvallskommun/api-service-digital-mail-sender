@@ -3,7 +3,6 @@ package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -25,7 +24,8 @@ import se.gov.minameddelanden.schema.recipient.v3.IsReachable;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 
 @ExtendWith(MockitoExtension.class)
-class ReachableIntegrationTest {
+class
+ReachableIntegrationTest {
     
     @Mock
     private WebServiceTemplate mockReachableTemplate;
@@ -52,7 +52,7 @@ class ReachableIntegrationTest {
         final var response = new IsReachableResponse();
         response.getReturn().add(reachabilityStatus);
 
-        when(mockMapper.getMailboxSettings(eq(response)))
+        when(mockMapper.getMailboxSettings(response))
             .thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));
 
         when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
@@ -64,10 +64,12 @@ class ReachableIntegrationTest {
     
     @Test
     void testCallIsRegistered_whenException_shouldThrowProblem() {
+
+        final var personalNumbers = List.of("personalNumber");
         when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenThrow(new RuntimeException());
 
         assertThatExceptionOfType(ThrowableProblem.class)
-            .isThrownBy(() -> reachableIntegration.isReachable(List.of("somePersonalNumber")))
+            .isThrownBy(() -> reachableIntegration.isReachable(personalNumbers))
             .withMessage("Error while getting digital mailbox from skatteverket");
     }
 }
