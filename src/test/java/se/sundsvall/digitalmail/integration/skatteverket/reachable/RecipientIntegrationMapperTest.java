@@ -5,9 +5,13 @@ import static org.mockito.Mockito.when;
 import static se.sundsvall.digitalmail.integration.skatteverket.reachable.RecipientIntegrationMapper.SENDER_ORG_NR;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -30,54 +34,45 @@ class RecipientIntegrationMapperTest {
 
     @Test
     void testCreateIsRegistered() {
-        var personalNumber = "197001011234";
+        final var personalNumber = "197001011234";
 
-        var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber));
+        final var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber));
 
         assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(SENDER_ORG_NR);
-        assertThat(isReachableRequest.getRecipientId().get(0)).isEqualTo(personalNumber);
+        assertThat(isReachableRequest.getRecipientId().getFirst()).isEqualTo(personalNumber);
     }
     
     @Test
-    void testGetMailboxSettings_shouldReturnRecipientId_WhenPresent() {
+    void testGetMailboxSettingsShouldReturnRecipientIdWhenPresent() {
         when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
 
-        var response = createIsReachableResponse(false, true, true);
+        final var response = createIsReachableResponse(false, true, true);
 
-        var mailboxSettings = mapper.getMailboxSettings(response);
+        final var mailboxSettings = mapper.getMailboxSettings(response);
 
         assertThat(mailboxSettings).hasSize(1);
-        assertThat(mailboxSettings.get(0).serviceAddress()).isEqualTo("http://somewhere.com");
-        assertThat(mailboxSettings.get(0).recipientId()).isEqualTo("recipientId");
+        assertThat(mailboxSettings.getFirst().serviceAddress()).isEqualTo("https://somewhere.com");
+        assertThat(mailboxSettings.getFirst().recipientId()).isEqualTo("recipientId");
     }
-    
-    @Test
-    void testGetMailboxSettings_shouldReturnEmpty_WhenPending() {
-        var response = createIsReachableResponse(true, true, false);
 
-        var mailboxSettings = mapper.getMailboxSettings(response);
+    @ParameterizedTest
+    @MethodSource("provideParametersForGetMailboxSettingsTest")
+    void testGetMailboxSettingsShouldReturnEmpty(final boolean pending, final boolean shouldHaveServiceSupplier, final boolean isAccepted) {
+        final var response = createIsReachableResponse(pending, shouldHaveServiceSupplier, isAccepted);
+
+        final var mailboxSettings = mapper.getMailboxSettings(response);
 
         assertThat(mailboxSettings).isEmpty();
     }
-    
-    @Test
-    void testGetMailboxSettings_shouldReturnEmpty_WhenNoServiceSupplier() {
-        var response = createIsReachableResponse(false, false, false);
 
-        var mailboxSettings = mapper.getMailboxSettings(response);
-
-        assertThat(mailboxSettings).isEmpty();
+    private static Stream<Arguments> provideParametersForGetMailboxSettingsTest() {
+        return Stream.of(
+          Arguments.of(true, true, false),
+          Arguments.of(false, false, false),
+          Arguments.of(false, true, false)
+        );
     }
-    
-    @Test
-    void testGetMailboxSettings_shouldReturnEmpty_whenSenderNotAccepted() {
-        var response = createIsReachableResponse(false, true, false);
 
-        var mailboxSettings = mapper.getMailboxSettings(response);
-
-        assertThat(mailboxSettings).isEmpty();
-    }
-    
     @Test
     void testFindMatchingSupplier() {
         when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("supplier1", "supplier2", "supplier3"));
@@ -89,7 +84,7 @@ class RecipientIntegrationMapperTest {
     }
     
     @Test
-    void testFindShortSupplierName_shouldMapAndReturnShortName() {
+    void testFindShortSupplierNameShouldMapAndReturnShortName() {
         when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Supplier1", "SuPPliEr2"));
 
         assertThat(mapper.getShortSupplierName("Supplier1")).isEqualTo("supplier1");
@@ -101,7 +96,7 @@ class RecipientIntegrationMapperTest {
      * @param pending if pending, the mailbox has not yet been created and should be interpreted as the recipient not having a digital mailbox.
      * @param shouldHaveServiceSupplier No serviceSupplier indicates that the recipient doesn't have a digital mailbox.
      * @param isAccepted is the sender accepted by the recipient
-     * @return
+     * @return a response with the given parameters
      */
     private IsReachableResponse createIsReachableResponse(final boolean pending,
             final boolean shouldHaveServiceSupplier, final boolean isAccepted) {
@@ -111,10 +106,10 @@ class RecipientIntegrationMapperTest {
         accountStatus.setPending(pending);
 
         if (shouldHaveServiceSupplier) {
-            var serviceSupplier = new ServiceSupplier();
+            final var serviceSupplier = new ServiceSupplier();
             serviceSupplier.setId("165568402266");
             serviceSupplier.setName("Kivra");
-            serviceSupplier.setServiceAdress("http://somewhere.com");
+            serviceSupplier.setServiceAdress("https://somewhere.com");
 
             accountStatus.setServiceSupplier(serviceSupplier);
         }

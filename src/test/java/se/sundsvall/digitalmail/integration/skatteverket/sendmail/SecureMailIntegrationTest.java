@@ -36,26 +36,27 @@ class SecureMailIntegrationTest {
     @Test
     void testSuccessfulSentMail_shouldReturnDeliveryResult() {
         when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenReturn(new DeliverSecure());
-        when(mockWebServiceTemplate.marshalSendAndReceive(eq("http://nowhere.com"), any(DeliverSecure.class))).thenReturn(new DeliverSecureResponse());
+        when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenReturn(new DeliverSecureResponse());
         when(mockMapper.createDigitalMailResponse(any(DeliverSecureResponse.class), any(String.class)))
             .thenReturn(new DigitalMailResponse());
 
-        var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().build());
-        digitalMailDto.setPartyId("somePartyId");
+        final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().withPartyId("somePartyId").build());
 
-        final var deliverSecureResponse = mailIntegration.sendDigitalMail(digitalMailDto, "http://nowhere.com");
+        final var deliverSecureResponse = mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com");
         assertThat(deliverSecureResponse).isNotNull();
         
-        verify(mockWebServiceTemplate, times(1)).marshalSendAndReceive(eq("http://nowhere.com"), any(DeliverSecure.class));
+        verify(mockWebServiceTemplate, times(1)).marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class));
     }
     
     @Test
     void testExceptionFromIntegration_shouldThrowProblem() {
+
+        final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().build());
         when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenCallRealMethod();
-        when(mockWebServiceTemplate.marshalSendAndReceive(eq("http://nowhere.com"), any(DeliverSecure.class))).thenThrow(new RuntimeException("error-message"));
+        when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenThrow(new RuntimeException("error-message"));
     
         assertThatExceptionOfType(ThrowableProblem.class)
-            .isThrownBy(() -> mailIntegration.sendDigitalMail(new DigitalMailDto(DigitalMailRequest.builder().build()), "http://nowhere.com"))
+            .isThrownBy(() -> mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com"))
             .withMessage("Couldn't send secure digital mail: error-message");
     }
     
