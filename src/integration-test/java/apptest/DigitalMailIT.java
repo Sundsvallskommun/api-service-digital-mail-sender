@@ -15,26 +15,27 @@ import apptest.extension.ResponseBodyTransformer;
 
 @WireMockAppTestSuite(files = "classpath:/DigitalMailIT/", classes = DigitalMail.class)
 class DigitalMailIT extends AbstractAppTest {
-    
-    private static final String SERVICE_PATH = "/send-digital-mail";
 
-    private final String replacementUrl;
+	private static final String SERVICE_PATH = "/2281/send-digital-mail";
 
-    DigitalMailIT(@Value("${wiremock.server.port}") final int wiremockPort) {
-        replacementUrl = format("http://localhost:%d/deliversecure", wiremockPort);
-    }
+	private final String replacementUrl;
 
-    @Test
-    void test1_successfulRequest() {
-        setupCall()
-            .withExtensions(new ResponseBodyTransformer()
-                .withModifier(body -> body.replace("https://mm.kivra.com/service/v3", replacementUrl)))
-            .withServicePath(SERVICE_PATH)
-            .withRequest("request.json")
-            .withHttpMethod(HttpMethod.POST)
-            .withExpectedResponseStatus(HttpStatus.OK)
-            .withExpectedResponse("expected.json")
-            .sendRequestAndVerifyResponse()
-            .verifyAllStubs();
-    }
+	DigitalMailIT(@Value("${wiremock.server.port}") final int wiremockPort) {
+		replacementUrl = format("http://localhost:%d/deliversecure", wiremockPort);
+	}
+
+	@Test
+	void test1_successfulRequest() {
+		setupCall()
+			.withExtensions(new ResponseBodyTransformer()
+				.withModifier(body -> body.replace("https://mm.kivra.com/service/v3", replacementUrl)))
+			.withServicePath(SERVICE_PATH)
+			.withRequest("request.json")
+			.withHttpMethod(HttpMethod.POST)
+			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponse("expected.json")
+			.sendRequestAndVerifyResponse()
+			.verifyAllStubs();
+	}
+
 }

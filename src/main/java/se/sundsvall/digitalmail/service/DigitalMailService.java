@@ -17,60 +17,65 @@ import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailInt
 @Service
 public class DigitalMailService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DigitalMailService.class);
-    
-    private final PartyClient partyClient;
-    private final DigitalMailIntegration digitalMailIntegration;
-    private final KivraIntegration kivraIntegration;
-    private final AvailabilityService availabilityService;
+	private static final Logger LOGGER = LoggerFactory.getLogger(DigitalMailService.class);
 
-    DigitalMailService(final PartyClient partyClient,
-            final DigitalMailIntegration digitalMailIntegration,
-            final KivraIntegration kivraIntegration,
-            final AvailabilityService availabilityService) {
-        this.partyClient = partyClient;
-        this.digitalMailIntegration = digitalMailIntegration;
-        this.kivraIntegration = kivraIntegration;
-        this.availabilityService = availabilityService;
-    }
-    
-    /**
-     * Send a digital mail to a recipient
-     * @param requestDto containing message and recipient
-     * @return Response whether the sending went ok or not.
-     */
-    public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto) {
-        final var personalNumber = partyClient.getLegalId(requestDto.getPartyId());
-        
-        final var possibleMailbox = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
+	private final PartyClient partyClient;
 
-        // We will always only have one here if no exception has been thrown, then we wouldn't be here
-        final var mailbox = possibleMailbox.get(0);
-        requestDto.setRecipientId(mailbox.recipientId());
-        
-        // Send message, since the serviceAddress may differ we set this as a parameter into the integration.
-        return digitalMailIntegration.sendDigitalMail(requestDto, mailbox.serviceAddress());
-    }
+	private final DigitalMailIntegration digitalMailIntegration;
 
-    public DigitalInvoiceResponse sendDigitalInvoice(final InvoiceDto invoiceDto) {
-        final var ssn = partyClient.getLegalId(invoiceDto.getPartyId());
-        invoiceDto.setSsn(ssn);
+	private final KivraIntegration kivraIntegration;
 
-        var result = kivraIntegration.sendInvoice(invoiceDto);
+	private final AvailabilityService availabilityService;
 
-        return new DigitalInvoiceResponse(invoiceDto.getPartyId(), result);
-    }
+	DigitalMailService(final PartyClient partyClient,
+		final DigitalMailIntegration digitalMailIntegration,
+		final KivraIntegration kivraIntegration,
+		final AvailabilityService availabilityService) {
+		this.partyClient = partyClient;
+		this.digitalMailIntegration = digitalMailIntegration;
+		this.kivraIntegration = kivraIntegration;
+		this.availabilityService = availabilityService;
+	}
 
-    public boolean verifyRecipientHasSomeAvailableMailbox(final String partyId) {
-        try {
-            final var personalNumber = partyClient.getLegalId(partyId);
-            // If this doesn't throw an exception, the recipient has an available mailbox
-            availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
+	/**
+	 * Send a digital mail to a recipient
+	 *
+	 * @param requestDto containing message and recipient
+	 * @return Response whether the sending went ok or not.
+	 */
+	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
+		final var personalNumber = partyClient.getLegalId(municipalityId, requestDto.getPartyId());
 
-            return true;
-        } catch (Exception e) {
-            LOGGER.error("Couldn't get legalId from party", e);
-            return false;
-        }
-    }
+		final var possibleMailbox = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
+
+		// We will always only have one here if no exception has been thrown, then we wouldn't be here
+		final var mailbox = possibleMailbox.getFirst();
+		requestDto.setRecipientId(mailbox.recipientId());
+
+		// Send message, since the serviceAddress may differ we set this as a parameter into the integration.
+		return digitalMailIntegration.sendDigitalMail(requestDto, mailbox.serviceAddress());
+	}
+
+	public DigitalInvoiceResponse sendDigitalInvoice(final InvoiceDto invoiceDto, final String municipalityId) {
+		final var ssn = partyClient.getLegalId(municipalityId, invoiceDto.getPartyId());
+		invoiceDto.setSsn(ssn);
+
+		final var result = kivraIntegration.sendInvoice(invoiceDto);
+
+		return new DigitalInvoiceResponse(invoiceDto.getPartyId(), result);
+	}
+
+	public boolean verifyRecipientHasSomeAvailableMailbox(final String partyId, final String municipalityId) {
+		try {
+			final var personalNumber = partyClient.getLegalId(municipalityId, partyId);
+			// If this doesn't throw an exception, the recipient has an available mailbox
+			availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
+
+			return true;
+		} catch (final Exception e) {
+			LOGGER.error("Couldn't get legalId from party", e);
+			return false;
+		}
+	}
+
 }
