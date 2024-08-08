@@ -35,114 +35,115 @@ import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailInt
 
 @ExtendWith(MockitoExtension.class)
 class DigitalMailServiceTest {
-    
-    @Mock
-    private PartyClient mockPartyClient;
-    
-    @Mock
-    private DigitalMailIntegration mockDigitalMailIntegration;
 
-    @Mock
-    private KivraIntegration mockKivraIntegration;
+	@Mock
+	private PartyClient mockPartyClient;
 
-    @Mock
-    private AvailabilityService mockAvailabilityService;
+	@Mock
+	private DigitalMailIntegration mockDigitalMailIntegration;
 
-    @InjectMocks
-    private DigitalMailService service;
-    
-    @Test
-    void testSendDigitalMail_shouldReturnResponse() {
-        final var request = generateDigitalMailRequestDto();
-        final var mailbox = new MailboxDto("recipientId", "serviceAddress", "kivra");
-        
-        when(mockPartyClient.getLegalId(anyString())).thenReturn("personalNumber");
-        when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList())).thenReturn(List.of(mailbox));
-        when(mockDigitalMailIntegration.sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"))).thenReturn(new DigitalMailResponse());
+	@Mock
+	private KivraIntegration mockKivraIntegration;
 
-        final var digitalMailResponse = service.sendDigitalMail(new DigitalMailDto(request));
-        
-        assertThat(digitalMailResponse).isNotNull();
-        verify(mockPartyClient, times(1)).getLegalId(anyString());
-        verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());
-        verify(mockDigitalMailIntegration, times(1)).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
-    }
-    
-    //Same thing will happen if any integration throws an exception so will only test one.
-    @Test
-    void testSendDigitalMail_partyThrowsException_shouildThrowProblem() {
-        final var request = generateDigitalMailRequestDto();
+	@Mock
+	private AvailabilityService mockAvailabilityService;
 
-        when(mockPartyClient.getLegalId(anyString())).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
-    
-        assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalMail(request));
-        
-        verify(mockPartyClient, times(1)).getLegalId(anyString());
-        verify(mockAvailabilityService, times(0)).getRecipientMailboxesAndCheckAvailability(anyList());
-        verify(mockDigitalMailIntegration, times(0)).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
-    }
+	@InjectMocks
+	private DigitalMailService service;
 
-    @Test
-    void sendDigitalInvoice() {
-        when(mockPartyClient.getLegalId(any(String.class))).thenReturn("somePersonalNumber");
-        when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenReturn(true);
+	@Test
+	void testSendDigitalMail_shouldReturnResponse() {
+		final var request = generateDigitalMailRequestDto();
+		final var mailbox = new MailboxDto("recipientId", "serviceAddress", "kivra");
 
-        final var response = service.sendDigitalInvoice(generateInvoiceDto());
+		when(mockPartyClient.getLegalId(anyString(), anyString())).thenReturn("personalNumber");
+		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList())).thenReturn(List.of(mailbox));
+		when(mockDigitalMailIntegration.sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"))).thenReturn(new DigitalMailResponse());
 
-        assertThat(response).isNotNull();
+		final var digitalMailResponse = service.sendDigitalMail(new DigitalMailDto(request), "");
 
-        verify(mockPartyClient, times(1)).getLegalId(any(String.class));
-        verify(mockKivraIntegration, times(1)).sendInvoice(any(InvoiceDto.class));
-    }
+		assertThat(digitalMailResponse).isNotNull();
+		verify(mockPartyClient, times(1)).getLegalId(anyString(), anyString());
+		verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());
+		verify(mockDigitalMailIntegration, times(1)).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
+	}
 
-    @Test
-    void sendDigitalInvoice_partyThrowsProblem() {
+	//Same thing will happen if any integration throws an exception so will only test one.
+	@Test
+	void testSendDigitalMail_partyThrowsExceptionShouldThrowProblem() {
+		final var request = generateDigitalMailRequestDto();
 
-        final var invoiceDto =generateInvoiceDto();
-        when(mockPartyClient.getLegalId(any(String.class)))
-            .thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
+		when(mockPartyClient.getLegalId(anyString(), anyString())).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
 
-        assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(invoiceDto));
+		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalMail(request, ""));
 
-        verify(mockPartyClient, times(1)).getLegalId(any(String.class));
-        verify(mockKivraIntegration, never()).sendInvoice(any(InvoiceDto.class));
-    }
+		verify(mockPartyClient, times(1)).getLegalId(anyString(), anyString());
+		verify(mockAvailabilityService, times(0)).getRecipientMailboxesAndCheckAvailability(anyList());
+		verify(mockDigitalMailIntegration, times(0)).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
+	}
 
-    @Test
-    void sendDigitalInvoice_kivraIntegrationThrowsProblem() {
-        final var invoiceDto = generateInvoiceDto();
-        when(mockPartyClient.getLegalId(any(String.class))).thenReturn("somePersonalNumber");
-        when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
+	@Test
+	void sendDigitalInvoice() {
+		when(mockPartyClient.getLegalId(any(String.class), any(String.class))).thenReturn("somePersonalNumber");
+		when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenReturn(true);
 
-        assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(invoiceDto));
+		final var response = service.sendDigitalInvoice(generateInvoiceDto(), "");
 
-        verify(mockPartyClient, times(1)).getLegalId(any(String.class));
-        verify(mockKivraIntegration, times(1)).sendInvoice(any(InvoiceDto.class));
-    }
+		assertThat(response).isNotNull();
 
-    @Test
-    void testVerifyRecipientHasSomeAvailableMailbox() {
-        when(mockPartyClient.getLegalId(anyString())).thenReturn("somePersonalNumber");
-        when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList()))
-            .thenReturn(List.of(new MailboxDto("recipientId", "serviceAddress", "kivra")));
+		verify(mockPartyClient, times(1)).getLegalId(any(String.class), any(String.class));
+		verify(mockKivraIntegration, times(1)).sendInvoice(any(InvoiceDto.class));
+	}
 
-        final var result = service.verifyRecipientHasSomeAvailableMailbox("somePartyId");
-        assertThat(result).isTrue();
+	@Test
+	void sendDigitalInvoice_partyThrowsProblem() {
 
-        verify(mockPartyClient, times(1)).getLegalId(anyString());
-        verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());
-    }
+		final var invoiceDto = generateInvoiceDto();
+		when(mockPartyClient.getLegalId(any(String.class), any(String.class)))
+			.thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
 
-    @Test
-    void testVerifyRecipientHasSomeAvailableMailbox_whenNoMailboxesExist() {
-        when(mockPartyClient.getLegalId(anyString())).thenReturn("somePersonalNumber");
-        when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList()))
-            .thenThrow(Problem.valueOf(Status.NOT_FOUND));
+		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(invoiceDto, ""));
 
-        final var result = service.verifyRecipientHasSomeAvailableMailbox("somePartyId");
-        assertThat(result).isFalse();
+		verify(mockPartyClient, times(1)).getLegalId(any(String.class), any(String.class));
+		verify(mockKivraIntegration, never()).sendInvoice(any(InvoiceDto.class));
+	}
 
-        verify(mockPartyClient, times(1)).getLegalId(anyString());
-        verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());
-    }
+	@Test
+	void sendDigitalInvoice_kivraIntegrationThrowsProblem() {
+		final var invoiceDto = generateInvoiceDto();
+		when(mockPartyClient.getLegalId(any(String.class), any(String.class))).thenReturn("somePersonalNumber");
+		when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
+
+		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(invoiceDto, ""));
+
+		verify(mockPartyClient, times(1)).getLegalId(any(String.class), any(String.class));
+		verify(mockKivraIntegration, times(1)).sendInvoice(any(InvoiceDto.class));
+	}
+
+	@Test
+	void testVerifyRecipientHasSomeAvailableMailbox() {
+		when(mockPartyClient.getLegalId(anyString(), anyString())).thenReturn("somePersonalNumber");
+		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList()))
+			.thenReturn(List.of(new MailboxDto("recipientId", "serviceAddress", "kivra")));
+
+		final var result = service.verifyRecipientHasSomeAvailableMailbox("somePartyId", "");
+		assertThat(result).isTrue();
+
+		verify(mockPartyClient, times(1)).getLegalId(anyString(), anyString());
+		verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());
+	}
+
+	@Test
+	void testVerifyRecipientHasSomeAvailableMailbox_whenNoMailboxesExist() {
+		when(mockPartyClient.getLegalId(anyString(), anyString())).thenReturn("somePersonalNumber");
+		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList()))
+			.thenThrow(Problem.valueOf(Status.NOT_FOUND));
+
+		final var result = service.verifyRecipientHasSomeAvailableMailbox("somePartyId", "");
+		assertThat(result).isFalse();
+
+		verify(mockPartyClient, times(1)).getLegalId(anyString(), anyString());
+		verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());
+	}
+
 }
