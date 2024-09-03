@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-		 xmlns="http://maven.apache.org/POM/4.0.0"
-		 xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>6.0.0</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<version>6.0.1</version>
+		<relativePath/>
+		<!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-digital-mail-sender</artifactId>
@@ -153,12 +153,10 @@
 									</bindingFiles>
 									<extraargs>
 										<extraarg>-p</extraarg>
-										<extraarg>
-											http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient
+										<extraarg> http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient
 										</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg>
-											http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3
+										<extraarg> http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3
 										</extraarg>
 										<extraarg>-autoNameResolution</extraarg>
 									</extraargs>
@@ -174,12 +172,10 @@
 									</bindingFiles>
 									<extraargs>
 										<extraarg>-p</extraarg>
-										<extraarg>
-											http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient
+										<extraarg> http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient
 										</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg>
-											http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3
+										<extraarg> http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3
 										</extraarg>
 										<extraarg>-autoNameResolution</extraarg>
 									</extraargs>
