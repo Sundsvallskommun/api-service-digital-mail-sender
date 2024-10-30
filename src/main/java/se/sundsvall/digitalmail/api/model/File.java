@@ -26,16 +26,16 @@ import lombok.Setter;
 @Schema(description = "A PDF file/attachment", name = "Attachment")
 public class File {
 
-    @OneOf(APPLICATION_PDF_VALUE)
-    @Schema(description = "Allowed type is: application/pdf", example = APPLICATION_PDF_VALUE, requiredMode = REQUIRED)
-    private String contentType;
+	@OneOf(APPLICATION_PDF_VALUE)
+	@Schema(description = "Allowed type is: application/pdf", example = APPLICATION_PDF_VALUE, requiredMode = REQUIRED)
+	private String contentType;
 
-    @NotBlank
-    @ValidBase64
-    @Schema(description = "BASE64-encoded body", requiredMode = REQUIRED)
-    private String body;
+	@NotBlank
+	@ValidBase64
+	@Schema(description = "BASE64-encoded body", requiredMode = REQUIRED)
+	private String body;
 
-    @NotBlank
-    @Schema(description = "The name of the file", example = "sample.pdf", requiredMode = REQUIRED)
-    private String filename;
+	@NotBlank
+	@Schema(description = "The name of the file", example = "sample.pdf", requiredMode = REQUIRED)
+	private String filename;
 }

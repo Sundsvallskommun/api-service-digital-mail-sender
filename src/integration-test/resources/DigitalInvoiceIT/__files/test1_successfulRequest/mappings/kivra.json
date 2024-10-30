@@ -1,13 +1,11 @@
 {
-  "request": {
-    "method": "POST",
-    "url": "/kivra/content"
-  },
-  "response": {
-    "headers": {
-      "Content-Type": "application/json"
-    },
-    "bodyFileName": "test1_successfulRequest/response/kivra.json",
-    "status": "201"
-  }
+	"request": {
+		"method": "POST",
+		"url": "/kivra/content"
+	},
+	"response": {
+		"headers": {"Content-Type": "application/json"},
+		"bodyFileName": "test1_successfulRequest/response/kivra.json",
+		"status": "201"
+	}
 }

@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 
 class AccountTypeTests {
 
-    @Test
-    void values() {
-        assertThat(AccountType.values()).containsExactly(BANKGIRO, PLUSGIRO);
+	@Test
+	void values() {
+		assertThat(AccountType.values()).containsExactly(BANKGIRO, PLUSGIRO);
 
-        assertThat(BANKGIRO.getValue()).isEqualTo("1");
-        assertThat(PLUSGIRO.getValue()).isEqualTo("2");
-    }
+		assertThat(BANKGIRO.getValue()).isEqualTo("1");
+		assertThat(PLUSGIRO.getValue()).isEqualTo("2");
+	}
 }

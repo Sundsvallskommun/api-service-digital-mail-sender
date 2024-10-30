@@ -86,7 +86,6 @@ class DigitalMailResourceTest {
 		verify(mockHtmlValidator, never()).validate(any(String.class));
 	}
 
-
 	@Test
 	void sendDigitalInvoice() {
 		final var request = generateInvoiceRequest();
@@ -124,6 +123,5 @@ class DigitalMailResourceTest {
 
 		verify(mockDigitalMailService, times(1)).verifyRecipientHasSomeAvailableMailbox(any(String.class), any(String.class));
 	}
-
 
 }

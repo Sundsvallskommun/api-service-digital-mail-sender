@@ -18,16 +18,18 @@ import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidAccoun
  * The annotated element must be a valid BANKGIRO or PLUSGIRO number.
  */
 @Documented
-@Target({FIELD, CONSTRUCTOR, PARAMETER})
+@Target({
+	FIELD, CONSTRUCTOR, PARAMETER
+})
 @Retention(RUNTIME)
 @Constraint(validatedBy = ValidAccountNumberConstraintValidator.class)
 public @interface ValidAccountNumber {
 
-    String message() default "not a valid account number";
+	String message() default "not a valid account number";
 
-    boolean nullable() default false;
+	boolean nullable() default false;
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 }

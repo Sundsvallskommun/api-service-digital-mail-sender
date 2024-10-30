@@ -25,45 +25,45 @@ import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 
 @ExtendWith(MockitoExtension.class)
 class SecureMailIntegrationTest {
-    
-    @Mock
-    private WebServiceTemplate mockWebServiceTemplate;
-    @Mock
-    private DigitalMailMapper mockMapper;
-    @InjectMocks
-    private DigitalMailIntegration mailIntegration;
 
-    @Test
-    void testSuccessfulSentMail_shouldReturnDeliveryResult() {
-        when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenReturn(new DeliverSecure());
-        when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenReturn(new DeliverSecureResponse());
-        when(mockMapper.createDigitalMailResponse(any(DeliverSecureResponse.class), any(String.class)))
-            .thenReturn(new DigitalMailResponse());
+	@Mock
+	private WebServiceTemplate mockWebServiceTemplate;
+	@Mock
+	private DigitalMailMapper mockMapper;
+	@InjectMocks
+	private DigitalMailIntegration mailIntegration;
 
-        final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().withPartyId("somePartyId").build());
+	@Test
+	void testSuccessfulSentMail_shouldReturnDeliveryResult() {
+		when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenReturn(new DeliverSecure());
+		when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenReturn(new DeliverSecureResponse());
+		when(mockMapper.createDigitalMailResponse(any(DeliverSecureResponse.class), any(String.class)))
+			.thenReturn(new DigitalMailResponse());
 
-        final var deliverSecureResponse = mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com");
-        assertThat(deliverSecureResponse).isNotNull();
-        
-        verify(mockWebServiceTemplate, times(1)).marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class));
-    }
-    
-    @Test
-    void testExceptionFromIntegration_shouldThrowProblem() {
+		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().withPartyId("somePartyId").build());
 
-        final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().build());
-        when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenCallRealMethod();
-        when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenThrow(new RuntimeException("error-message"));
-    
-        assertThatExceptionOfType(ThrowableProblem.class)
-            .isThrownBy(() -> mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com"))
-            .withMessage("Couldn't send secure digital mail: error-message");
-    }
-    
-    @Test
-    void testGetProblemCause_fakingXmlParsingError_shouldReturnProblem() {
-        final var problemCause = mailIntegration.getProblemCause(null); //Couldn't find a better way to produce similar error...
+		final var deliverSecureResponse = mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com");
+		assertThat(deliverSecureResponse).isNotNull();
 
-        assertThat(problemCause.getMessage()).isEqualTo("Couldn't get cause");
-    }
+		verify(mockWebServiceTemplate, times(1)).marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class));
+	}
+
+	@Test
+	void testExceptionFromIntegration_shouldThrowProblem() {
+
+		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().build());
+		when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenCallRealMethod();
+		when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenThrow(new RuntimeException("error-message"));
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com"))
+			.withMessage("Couldn't send secure digital mail: error-message");
+	}
+
+	@Test
+	void testGetProblemCause_fakingXmlParsingError_shouldReturnProblem() {
+		final var problemCause = mailIntegration.getProblemCause(null); // Couldn't find a better way to produce similar error...
+
+		assertThat(problemCause.getMessage()).isEqualTo("Couldn't get cause");
+	}
 }

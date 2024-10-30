@@ -7,15 +7,15 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class SignedXml extends Xml {
 
-    private final XMLSignature signature;
+	private final XMLSignature signature;
 
-    SignedXml(final byte[] bytes, final XMLSignature signature) {
-        super(bytes);
+	SignedXml(final byte[] bytes, final XMLSignature signature) {
+		super(bytes);
 
-        this.signature = signature;
-    }
+		this.signature = signature;
+	}
 
-    public XMLSignature getSignature() {
-        return signature;
-    }
+	public XMLSignature getSignature() {
+		return signature;
+	}
 }

@@ -15,20 +15,20 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 class PaymentMixinTests {
 
-    @Nested
-    @ExtendWith(MockitoExtension.class)
-    class FloatToStringSerializerTests {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class FloatToStringSerializerTests {
 
-        @Mock
-        private JsonGenerator mockJsonGenerator;
+		@Mock
+		private JsonGenerator mockJsonGenerator;
 
-        private final PaymentMixin.FloatToStringSerializer serializer = new PaymentMixin.FloatToStringSerializer();
+		private final PaymentMixin.FloatToStringSerializer serializer = new PaymentMixin.FloatToStringSerializer();
 
-        @Test
-        void serialize() throws IOException {
-            serializer.serialize(2.34f, mockJsonGenerator, null);
+		@Test
+		void serialize() throws IOException {
+			serializer.serialize(2.34f, mockJsonGenerator, null);
 
-            verify(mockJsonGenerator, times(1)).writeString(any(String.class));
-        }
-    }
+			verify(mockJsonGenerator, times(1)).writeString(any(String.class));
+		}
+	}
 }

@@ -10,6 +10,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DigitalMailResponse {
-    
-    private DeliveryStatus deliveryStatus;
+
+	private DeliveryStatus deliveryStatus;
 }

@@ -19,22 +19,22 @@ import generated.com.kivra.ContentUserV2;
 @ExtendWith(MockitoExtension.class)
 class KivraIntegrationTests {
 
-    @Mock
-    private KivraClient mockClient;
+	@Mock
+	private KivraClient mockClient;
 
-    @InjectMocks
-    private KivraIntegration kivraIntegration;
+	@InjectMocks
+	private KivraIntegration kivraIntegration;
 
-    private final InvoiceDto invoiceDto = new InvoiceDto(generateInvoiceRequest());
+	private final InvoiceDto invoiceDto = new InvoiceDto(generateInvoiceRequest());
 
-    @Test
-    void sendContent() {
-        when(mockClient.postContent(any(ContentUserV2.class))).thenReturn(ok(new ContentUserV2()));
+	@Test
+	void sendContent() {
+		when(mockClient.postContent(any(ContentUserV2.class))).thenReturn(ok(new ContentUserV2()));
 
-        final var result = kivraIntegration.sendInvoice(invoiceDto);
+		final var result = kivraIntegration.sendInvoice(invoiceDto);
 
-        assertThat(result).isTrue();
+		assertThat(result).isTrue();
 
-        verify(mockClient, times(1)).postContent(any(ContentUserV2.class));
-    }
+		verify(mockClient, times(1)).postContent(any(ContentUserV2.class));
+	}
 }

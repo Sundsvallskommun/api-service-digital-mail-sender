@@ -9,18 +9,18 @@ import org.springframework.stereotype.Component;
 @EnableConfigurationProperties(KivraIntegrationProperties.class)
 public class KivraIntegration {
 
-    static final String INTEGRATION_NAME = "Kivra";
+	static final String INTEGRATION_NAME = "Kivra";
 
-    private final KivraClient client;
+	private final KivraClient client;
 
-    KivraIntegration(final KivraClient client) {
-        this.client = client;
-    }
+	KivraIntegration(final KivraClient client) {
+		this.client = client;
+	}
 
-    public boolean sendInvoice(final InvoiceDto invoiceDto) {
-        final var content = mapInvoiceToContent(invoiceDto);
-        final var response = client.postContent(content);
+	public boolean sendInvoice(final InvoiceDto invoiceDto) {
+		final var content = mapInvoiceToContent(invoiceDto);
+		final var response = client.postContent(content);
 
-        return response.getStatusCode().is2xxSuccessful();
-    }
+		return response.getStatusCode().is2xxSuccessful();
+	}
 }

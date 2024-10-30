@@ -6,12 +6,12 @@ import org.junit.jupiter.api.Test;
 
 class DigitalInvoiceResponseTests {
 
-    @Test
-    void creationAndGetters() {
-        final var partyId = "somePartyId";
-        final var response = new DigitalInvoiceResponse(partyId, true);
+	@Test
+	void creationAndGetters() {
+		final var partyId = "somePartyId";
+		final var response = new DigitalInvoiceResponse(partyId, true);
 
-        assertThat(response.partyId()).isEqualTo(partyId);
-        assertThat(response.sent()).isTrue();
-    }
+		assertThat(response.partyId()).isEqualTo(partyId);
+		assertThat(response.sent()).isTrue();
+	}
 }

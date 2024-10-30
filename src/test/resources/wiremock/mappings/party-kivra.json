@@ -1,13 +1,11 @@
 {
-    "request": {
-        "method": "GET",
-        "url": "/party/PRIVATE/6a5c3d04-412d-11ec-973a-0242ac130003/legalId"
-    },
-    "response": {
-        "body": "192301010168",
-        "headers": {
-            "Content-Type": "text/plain"
-        },
-        "status": "200"
-    }
+	"request": {
+		"method": "GET",
+		"url": "/party/PRIVATE/6a5c3d04-412d-11ec-973a-0242ac130003/legalId"
+	},
+	"response": {
+		"headers": {"Content-Type": "text/plain"},
+		"body": "192301010168",
+		"status": "200"
+	}
 }

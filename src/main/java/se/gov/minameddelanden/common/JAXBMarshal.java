@@ -9,7 +9,7 @@ import jakarta.xml.bind.JAXBException;
 
 public final class JAXBMarshal {
 
-    private JAXBMarshal() { }
+	private JAXBMarshal() {}
 
 	public static <T> T deserialize(final byte[] bytes, final Class<T> objectClass) throws JAXBException {
 		var jaxbContext = JAXBContext.newInstance(objectClass.getPackage().getName());

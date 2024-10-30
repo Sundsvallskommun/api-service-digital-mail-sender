@@ -68,307 +68,312 @@ import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 @Component
 class DigitalMailMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
+	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
 
-    private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
-    private static final String NAMESPACE_URI = "http://minameddelanden.gov.se/schema/Message/v3";
+	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
+	private static final String NAMESPACE_URI = "http://minameddelanden.gov.se/schema/Message/v3";
 
-    public static final String SENDER_ID = "162120002411";
-    public static final String SENDER_NAME = "Sundsvalls Kommun";
-    public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
+	public static final String SENDER_ID = "162120002411";
+	public static final String SENDER_NAME = "Sundsvalls Kommun";
+	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 
-    private final SkatteverketProperties properties;
-    
-    private final DocumentBuilder documentBuilder;
-    private final Marshaller marshaller;
-    
-    private final KeyStore keyStore;
-    private final X509CertificateWithPrivateKey certificate;
+	private final SkatteverketProperties properties;
 
-    DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, JAXBException, ParserConfigurationException {
-        this.properties = properties;
+	private final DocumentBuilder documentBuilder;
+	private final Marshaller marshaller;
 
-        // Load the KeyStore and get the signing key and certificate.
-        keyStore = KeyStoreUtils.loadKeyStore(Base64.decode(properties.keyStoreAsBase64()), properties.keyStorePassword());
+	private final KeyStore keyStore;
+	private final X509CertificateWithPrivateKey certificate;
 
-        //Read certificate from keystore
-        certificate = setupCertificate();
-        
-        // Create JAXB marshaller
-        final var jaxbContext = JAXBContext.newInstance(SignedDelivery.class, SealedDelivery.class, DeliverSecure.class);
-        marshaller = jaxbContext.createMarshaller();
+	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, JAXBException, ParserConfigurationException {
+		this.properties = properties;
 
-        // Create document builder
-        final var documentBuilderFactory = DocumentBuilderFactory.newInstance();
-        documentBuilderFactory.setNamespaceAware(true);
-        documentBuilder = documentBuilderFactory.newDocumentBuilder();
-    }
+		// Load the KeyStore and get the signing key and certificate.
+		keyStore = KeyStoreUtils.loadKeyStore(Base64.decode(properties.keyStoreAsBase64()), properties.keyStorePassword());
 
-    /**
-     * Reads certificate information from a keystore
-     * @return
-     * @throws KeyStoreException
-     * @throws IOException
-     * @throws UnrecoverableEntryException
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateException
-     */
-    private X509CertificateWithPrivateKey setupCertificate()
-            throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
-        final var privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(
-            getAliasFromKeystore(keyStore, SKATTEVERKET_CERT_NAME),
-            new KeyStore.PasswordProtection(properties.keyStorePassword().toCharArray()));
-        final var cert = (X509Certificate) privateKeyEntry.getCertificate();
-        
-        return new X509CertificateWithPrivateKey(cert, privateKeyEntry.getPrivateKey());
-    }
-    
-    DigitalMailResponse createDigitalMailResponse(final DeliverSecureResponse deliveryResult, final String partyId) {
-        final var digitalMailResponse = new DigitalMailResponse();
-        digitalMailResponse.setDeliveryStatus(DeliveryStatus.builder()
-            .withTransactionId(deliveryResult.getReturn().getTransId())
-            .withDelivered(deliveryResult.getReturn().getStatus().get(0).isDelivered())   // Will always be only one, for now
-            .withPartyId(partyId)
-            .build());
-        return digitalMailResponse;
-    }
-    
-    /**
-     *
-     * @param dto to map to a request
-     * @return
-     */
-    DeliverSecure createDeliverSecure(final DigitalMailDto dto) {
-        final var sealedDelivery = createSealedDelivery(dto);
-        final var deliverSecure = new DeliverSecure();
-        deliverSecure.setDeliverSecure(sealedDelivery);
-        return deliverSecure;
-    }
+		// Read certificate from keystore
+		certificate = setupCertificate();
 
-    /**
-     * The sealed delivery to be inserted into the SealedDelivery-object
-     *
-     * @param dto
-     * @return A Sealed delivery signed by not the sender but us as a mediator.
-     */
-    SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
-        try {
-            //Get the correct certificate
-            //Create the signedDeliveryDocument, inner one.
-            var signedDelivery = createSignedDelivery(dto);
+		// Create JAXB marshaller
+		final var jaxbContext = JAXBContext.newInstance(SignedDelivery.class, SealedDelivery.class, DeliverSecure.class);
+		marshaller = jaxbContext.createMarshaller();
 
-            final var signedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SignedDelivery"), SignedDelivery.class, signedDelivery);
-            final var signedDeliveryDocument = documentBuilder.newDocument();
+		// Create document builder
+		final var documentBuilderFactory = DocumentBuilderFactory.newInstance();
+		documentBuilderFactory.setNamespaceAware(true);
+		documentBuilder = documentBuilderFactory.newDocumentBuilder();
+	}
 
-            marshaller.marshal(signedDeliveryElement, signedDeliveryDocument);
+	/**
+	 * Reads certificate information from a keystore
+	 * 
+	 * @return
+	 * @throws KeyStoreException
+	 * @throws IOException
+	 * @throws UnrecoverableEntryException
+	 * @throws NoSuchAlgorithmException
+	 * @throws CertificateException
+	 */
+	private X509CertificateWithPrivateKey setupCertificate()
+		throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
+		final var privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(
+			getAliasFromKeystore(keyStore, SKATTEVERKET_CERT_NAME),
+			new KeyStore.PasswordProtection(properties.keyStorePassword().toCharArray()));
+		final var cert = (X509Certificate) privateKeyEntry.getCertificate();
 
-            var xml = Xml.fromDOM(signedDeliveryDocument);
-            var signedXml = xml.sign(certificate);
-            signedDelivery = signedXml.toJaxbObject(SignedDelivery.class);
+		return new X509CertificateWithPrivateKey(cert, privateKeyEntry.getPrivateKey());
+	}
 
-            final var seal = new Seal();
-            seal.setSignaturesOK(true);
-            seal.setReceivedTime(createTimestamp());
+	DigitalMailResponse createDigitalMailResponse(final DeliverSecureResponse deliveryResult, final String partyId) {
+		final var digitalMailResponse = new DigitalMailResponse();
+		digitalMailResponse.setDeliveryStatus(DeliveryStatus.builder()
+			.withTransactionId(deliveryResult.getReturn().getTransId())
+			.withDelivered(deliveryResult.getReturn().getStatus().get(0).isDelivered())   // Will always be only one, for now
+			.withPartyId(partyId)
+			.build());
+		return digitalMailResponse;
+	}
 
-            var sealedDelivery = OBJECT_FACTORY.createSealedDelivery();
-            sealedDelivery.setSeal(seal);
-            sealedDelivery.setSignedDelivery(signedDelivery);
+	/**
+	 *
+	 * @param  dto to map to a request
+	 * @return
+	 */
+	DeliverSecure createDeliverSecure(final DigitalMailDto dto) {
+		final var sealedDelivery = createSealedDelivery(dto);
+		final var deliverSecure = new DeliverSecure();
+		deliverSecure.setDeliverSecure(sealedDelivery);
+		return deliverSecure;
+	}
 
-            final var sealedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SealedDelivery"), SealedDelivery.class, sealedDelivery);
-            final var sealedDeliveryDocument = documentBuilder.newDocument();
+	/**
+	 * The sealed delivery to be inserted into the SealedDelivery-object
+	 *
+	 * @param  dto
+	 * @return     A Sealed delivery signed by not the sender but us as a mediator.
+	 */
+	SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
+		try {
+			// Get the correct certificate
+			// Create the signedDeliveryDocument, inner one.
+			var signedDelivery = createSignedDelivery(dto);
 
-            marshaller.marshal(sealedDeliveryElement, sealedDeliveryDocument);
+			final var signedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SignedDelivery"), SignedDelivery.class, signedDelivery);
+			final var signedDeliveryDocument = documentBuilder.newDocument();
 
-            xml = Xml.fromDOM(sealedDeliveryDocument);
-            signedXml = xml.sign(certificate);
-            sealedDelivery = signedXml.toJaxbObject(SealedDelivery.class);
+			marshaller.marshal(signedDeliveryElement, signedDeliveryDocument);
 
-            return sealedDelivery;
-        } catch (JAXBException | DatatypeConfigurationException e ) {
-            throw Problem.builder()
-                .withTitle("Couldn't create a SealedDelivery object to send")
-                .withStatus(Status.INTERNAL_SERVER_ERROR)
-                .withCause((ThrowableProblem) e.getCause())
-                .build();
-        }
-    }
+			var xml = Xml.fromDOM(signedDeliveryDocument);
+			var signedXml = xml.sign(certificate);
+			signedDelivery = signedXml.toJaxbObject(SignedDelivery.class);
 
-    /**
-     * The object to be digitally signed
-     *
-     * @param dto to be translated into a {@link SignedDelivery}
-     * @return A Signed delivery, should be signed by the sender, which in this case is also us.
-     */
-    SignedDelivery createSignedDelivery(final DigitalMailDto dto) {
-        var signedDelivery = OBJECT_FACTORY.createSignedDelivery();
-        signedDelivery.setDelivery(createSecureDelivery(dto));
-        return signedDelivery;
-    }
+			final var seal = new Seal();
+			seal.setSignaturesOK(true);
+			seal.setReceivedTime(createTimestamp());
 
-    XMLGregorianCalendar createTimestamp() throws DatatypeConfigurationException {
-        final var now = new GregorianCalendar();
-        return DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
-    }
-    
-    SecureDelivery createSecureDelivery(final DigitalMailDto dto) {
-        final var secureDelivery = new SecureDelivery();
-        secureDelivery.setHeader(createSecureDeliveryHeader(dto));
-        secureDelivery.getMessage().add(createSecureMessage(dto));
-        return secureDelivery;
-    }
-    
-    SecureMessage createSecureMessage(final DigitalMailDto dto) {
-        final var secureMessage = new SecureMessage();
-        secureMessage.setHeader(createMessageHeader(dto));
-        secureMessage.setBody(createMessageBody(dto));
-        if (isNotEmpty(dto.getAttachments())) {
-            secureMessage.getAttachment().addAll(createAttachments(dto.getAttachments()));
-        }
-        return secureMessage;
-    }
-    
-    List<Attachment> createAttachments(final List<File> attachments) {
-        if (isEmpty(attachments)) {
-            return Collections.emptyList();
-        }
+			var sealedDelivery = OBJECT_FACTORY.createSealedDelivery();
+			sealedDelivery.setSeal(seal);
+			sealedDelivery.setSignedDelivery(signedDelivery);
 
-        return attachments.stream()
-            .map(attachment -> {
-                // We need to decode the base64-encoded string before we convert it to a byte array.
-                final var attachmentBytes = Base64.decode(
-                    attachment.getBody());
+			final var sealedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SealedDelivery"), SealedDelivery.class, sealedDelivery);
+			final var sealedDeliveryDocument = documentBuilder.newDocument();
 
-                final var mailAttachment = new Attachment();
-                mailAttachment.setBody(attachmentBytes);
-                mailAttachment.setContentType(attachment.getContentType());
-                mailAttachment.setFilename(attachment.getFilename());
-                mailAttachment.setChecksum(createMd5Checksum(attachmentBytes));
-                return mailAttachment;
-            })
-            .toList();
-    }
-    
-    String createMd5Checksum(final byte[] attachmentBodyBytes) {
-        try {
-            final var md5 = MessageDigest.getInstance("MD5");
-            md5.update(attachmentBodyBytes);
-            final var digest = md5.digest();
-            return DatatypeConverter.printHexBinary(digest);
-        } catch (NoSuchAlgorithmException e) {
-            throw Problem.builder()
-                .withTitle("Couldn't create MD5-checksum for attachment")
-                .withStatus(Status.INTERNAL_SERVER_ERROR)
-                .withCause(((ThrowableProblem) e.getCause()))
-                .build();
-        }
-    }
-    
-    /**
-     * Creates the &lt;v3:header&gt;-element
-     * @param dto
-     * @return
-     */
-    MessageHeader createMessageHeader(final DigitalMailDto dto) {
-        final var messageHeader = new MessageHeader();
-        messageHeader.setSubject(dto.getHeaderSubject());
-        messageHeader.setSupportinfo(createSupportInfo(dto));
-        messageHeader.setLanguage("svSE");
-        messageHeader.setId(RequestId.get());
-        return messageHeader;
-    }
-    
-     /**
-     * Creates the Supportinfo-element
-     * @param dto
-     * @return
-     */
+			marshaller.marshal(sealedDeliveryElement, sealedDeliveryDocument);
 
-    SupportInfo createSupportInfo(final DigitalMailDto dto) {
-        final var supportInfo = new SupportInfo();
-        supportInfo.setText(dto.getSupportInfo().getSupportText());
-        supportInfo.setURL(dto.getSupportInfo().getContactInformationUrl());
-        supportInfo.setPhoneNumber(dto.getSupportInfo().getContactInformationPhoneNumber());
-        supportInfo.setEmailAdress(dto.getSupportInfo().getContactInformationEmail());
-        return supportInfo;
-    }
-    
-    /**
-     * Creates the body-element
-     * Will create an empty body if no bodyInformation object or body is present.
-     * @param dto to be translated into a {@link MessageBody}
-     * @return A {@link MessageBody}
-     */
-    MessageBody createMessageBody(final DigitalMailDto dto) {
-        final var messageBody = new MessageBody();
+			xml = Xml.fromDOM(sealedDeliveryDocument);
+			signedXml = xml.sign(certificate);
+			sealedDelivery = signedXml.toJaxbObject(SealedDelivery.class);
 
-        //Make sure we actually have a body to send
-        if (dto.getBodyInformation() != null && StringUtils.isNotBlank(dto.getBodyInformation().getBody())) {
-            messageBody.setBody(createBody(dto.getBodyInformation()));
-            messageBody.setContentType(dto.getBodyInformation().getContentType());
-        } else {
-            // Create an "empty" body.
-            messageBody.setBody(new byte[0]);
-            messageBody.setContentType(MediaType.TEXT_PLAIN_VALUE);
-        }
-        
-        return messageBody;
-    }
-    
-    byte[] createBody(final BodyInformation bodyInformation) {
-        if (bodyInformation.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)){
-            // If it's regular text, encode it.
-            return bodyInformation.getBody().getBytes(StandardCharsets.UTF_8);
-        } else {
-            // If it's text/html we need to first decode the content and then "encode" it..
-            return Base64.decode(bodyInformation.getBody());
-        }
-    }
-    
-    SecureDeliveryHeader createSecureDeliveryHeader(final DigitalMailDto dto) {
-        final var secureDeliveryHeader = new SecureDeliveryHeader();
-        secureDeliveryHeader.setSender(createSender());
-        secureDeliveryHeader.setRecipient(dto.getRecipientId());
-        return secureDeliveryHeader;
-    }
-    
-    Sender createSender() {
-        final var sender = new Sender();
-        sender.setId(SENDER_ID);
-        sender.setName(SENDER_NAME);
-        return sender;
-    }
+			return sealedDelivery;
+		} catch (JAXBException | DatatypeConfigurationException e) {
+			throw Problem.builder()
+				.withTitle("Couldn't create a SealedDelivery object to send")
+				.withStatus(Status.INTERNAL_SERVER_ERROR)
+				.withCause((ThrowableProblem) e.getCause())
+				.build();
+		}
+	}
 
-    /**
-     * Retrieve the alias for the key from the keystore.
-     * As we only have one key we get the first one, if we need to get more we need to find it by alias.
-     * @param keyStore
-     * @return
-     * @throws KeyStoreException
-     */
-    String getAliasFromKeystore(final KeyStore keyStore, final String wantedAlias) throws KeyStoreException {
-        final var aliases = keyStore.aliases();
-        
-        var alias = "";
-        var foundAlias = false;
+	/**
+	 * The object to be digitally signed
+	 *
+	 * @param  dto to be translated into a {@link SignedDelivery}
+	 * @return     A Signed delivery, should be signed by the sender, which in this case is also us.
+	 */
+	SignedDelivery createSignedDelivery(final DigitalMailDto dto) {
+		var signedDelivery = OBJECT_FACTORY.createSignedDelivery();
+		signedDelivery.setDelivery(createSecureDelivery(dto));
+		return signedDelivery;
+	}
 
-        // Find the aliases and stop when we get the one we want.
-        while (aliases.hasMoreElements()) {
-            alias = aliases.nextElement();
+	XMLGregorianCalendar createTimestamp() throws DatatypeConfigurationException {
+		final var now = new GregorianCalendar();
+		return DatatypeFactory.newInstance().newXMLGregorianCalendar(now);
+	}
 
-            if(alias.equalsIgnoreCase(wantedAlias)) {
-                foundAlias = true;
-                LOG.info("Found keystore-entry with alias: {}", alias);
-                break;
-            }
-        }
+	SecureDelivery createSecureDelivery(final DigitalMailDto dto) {
+		final var secureDelivery = new SecureDelivery();
+		secureDelivery.setHeader(createSecureDeliveryHeader(dto));
+		secureDelivery.getMessage().add(createSecureMessage(dto));
+		return secureDelivery;
+	}
 
-        if (foundAlias) {
-            return alias;
-        }
+	SecureMessage createSecureMessage(final DigitalMailDto dto) {
+		final var secureMessage = new SecureMessage();
+		secureMessage.setHeader(createMessageHeader(dto));
+		secureMessage.setBody(createMessageBody(dto));
+		if (isNotEmpty(dto.getAttachments())) {
+			secureMessage.getAttachment().addAll(createAttachments(dto.getAttachments()));
+		}
+		return secureMessage;
+	}
 
-        throw Problem.builder()
-            .withTitle("Couldn't find certificate for " + wantedAlias)
-            .withStatus(Status.INTERNAL_SERVER_ERROR)
-            .build();
-    }
+	List<Attachment> createAttachments(final List<File> attachments) {
+		if (isEmpty(attachments)) {
+			return Collections.emptyList();
+		}
+
+		return attachments.stream()
+			.map(attachment -> {
+				// We need to decode the base64-encoded string before we convert it to a byte array.
+				final var attachmentBytes = Base64.decode(
+					attachment.getBody());
+
+				final var mailAttachment = new Attachment();
+				mailAttachment.setBody(attachmentBytes);
+				mailAttachment.setContentType(attachment.getContentType());
+				mailAttachment.setFilename(attachment.getFilename());
+				mailAttachment.setChecksum(createMd5Checksum(attachmentBytes));
+				return mailAttachment;
+			})
+			.toList();
+	}
+
+	String createMd5Checksum(final byte[] attachmentBodyBytes) {
+		try {
+			final var md5 = MessageDigest.getInstance("MD5");
+			md5.update(attachmentBodyBytes);
+			final var digest = md5.digest();
+			return DatatypeConverter.printHexBinary(digest);
+		} catch (NoSuchAlgorithmException e) {
+			throw Problem.builder()
+				.withTitle("Couldn't create MD5-checksum for attachment")
+				.withStatus(Status.INTERNAL_SERVER_ERROR)
+				.withCause(((ThrowableProblem) e.getCause()))
+				.build();
+		}
+	}
+
+	/**
+	 * Creates the &lt;v3:header&gt;-element
+	 * 
+	 * @param  dto
+	 * @return
+	 */
+	MessageHeader createMessageHeader(final DigitalMailDto dto) {
+		final var messageHeader = new MessageHeader();
+		messageHeader.setSubject(dto.getHeaderSubject());
+		messageHeader.setSupportinfo(createSupportInfo(dto));
+		messageHeader.setLanguage("svSE");
+		messageHeader.setId(RequestId.get());
+		return messageHeader;
+	}
+
+	/**
+	 * Creates the Supportinfo-element
+	 * 
+	 * @param  dto
+	 * @return
+	 */
+
+	SupportInfo createSupportInfo(final DigitalMailDto dto) {
+		final var supportInfo = new SupportInfo();
+		supportInfo.setText(dto.getSupportInfo().getSupportText());
+		supportInfo.setURL(dto.getSupportInfo().getContactInformationUrl());
+		supportInfo.setPhoneNumber(dto.getSupportInfo().getContactInformationPhoneNumber());
+		supportInfo.setEmailAdress(dto.getSupportInfo().getContactInformationEmail());
+		return supportInfo;
+	}
+
+	/**
+	 * Creates the body-element
+	 * Will create an empty body if no bodyInformation object or body is present.
+	 * 
+	 * @param  dto to be translated into a {@link MessageBody}
+	 * @return     A {@link MessageBody}
+	 */
+	MessageBody createMessageBody(final DigitalMailDto dto) {
+		final var messageBody = new MessageBody();
+
+		// Make sure we actually have a body to send
+		if (dto.getBodyInformation() != null && StringUtils.isNotBlank(dto.getBodyInformation().getBody())) {
+			messageBody.setBody(createBody(dto.getBodyInformation()));
+			messageBody.setContentType(dto.getBodyInformation().getContentType());
+		} else {
+			// Create an "empty" body.
+			messageBody.setBody(new byte[0]);
+			messageBody.setContentType(MediaType.TEXT_PLAIN_VALUE);
+		}
+
+		return messageBody;
+	}
+
+	byte[] createBody(final BodyInformation bodyInformation) {
+		if (bodyInformation.getContentType().equals(MediaType.TEXT_PLAIN_VALUE)) {
+			// If it's regular text, encode it.
+			return bodyInformation.getBody().getBytes(StandardCharsets.UTF_8);
+		} else {
+			// If it's text/html we need to first decode the content and then "encode" it..
+			return Base64.decode(bodyInformation.getBody());
+		}
+	}
+
+	SecureDeliveryHeader createSecureDeliveryHeader(final DigitalMailDto dto) {
+		final var secureDeliveryHeader = new SecureDeliveryHeader();
+		secureDeliveryHeader.setSender(createSender());
+		secureDeliveryHeader.setRecipient(dto.getRecipientId());
+		return secureDeliveryHeader;
+	}
+
+	Sender createSender() {
+		final var sender = new Sender();
+		sender.setId(SENDER_ID);
+		sender.setName(SENDER_NAME);
+		return sender;
+	}
+
+	/**
+	 * Retrieve the alias for the key from the keystore.
+	 * As we only have one key we get the first one, if we need to get more we need to find it by alias.
+	 * 
+	 * @param  keyStore
+	 * @return
+	 * @throws KeyStoreException
+	 */
+	String getAliasFromKeystore(final KeyStore keyStore, final String wantedAlias) throws KeyStoreException {
+		final var aliases = keyStore.aliases();
+
+		var alias = "";
+		var foundAlias = false;
+
+		// Find the aliases and stop when we get the one we want.
+		while (aliases.hasMoreElements()) {
+			alias = aliases.nextElement();
+
+			if (alias.equalsIgnoreCase(wantedAlias)) {
+				foundAlias = true;
+				LOG.info("Found keystore-entry with alias: {}", alias);
+				break;
+			}
+		}
+
+		if (foundAlias) {
+			return alias;
+		}
+
+		throw Problem.builder()
+			.withTitle("Couldn't find certificate for " + wantedAlias)
+			.withStatus(Status.INTERNAL_SERVER_ERROR)
+			.build();
+	}
 }

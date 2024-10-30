@@ -13,11 +13,11 @@ import java.security.Security;
 @ConfigurationPropertiesScan("se.sundsvall.digitalmail")
 @EnableCaching
 public class DigitalMail {
-    
-    public static void main(String[] args) {
-        SpringApplication.run(DigitalMail.class, args);
-        
-        //Set unlimited strength for cryptographic functions.
-        Security.setProperty("crypto.policy", "unlimited");
-    }
+
+	public static void main(String[] args) {
+		SpringApplication.run(DigitalMail.class, args);
+
+		// Set unlimited strength for cryptographic functions.
+		Security.setProperty("crypto.policy", "unlimited");
+	}
 }

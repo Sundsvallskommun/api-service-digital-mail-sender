@@ -6,11 +6,11 @@ import org.junit.jupiter.api.Test;
 
 class DigitalMailResponseTests {
 
-    @Test
-    void gettersAndSetters() {
-        final var digitalMailResponse = new DigitalMailResponse();
-        digitalMailResponse.setDeliveryStatus(new DeliveryStatus(false, "somePartyId", "someTransactionId"));
+	@Test
+	void gettersAndSetters() {
+		final var digitalMailResponse = new DigitalMailResponse();
+		digitalMailResponse.setDeliveryStatus(new DeliveryStatus(false, "somePartyId", "someTransactionId"));
 
-        assertThat(digitalMailResponse.getDeliveryStatus()).isNotNull();
-    }
+		assertThat(digitalMailResponse.getDeliveryStatus()).isNotNull();
+	}
 }

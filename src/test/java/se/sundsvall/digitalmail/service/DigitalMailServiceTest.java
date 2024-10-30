@@ -68,7 +68,7 @@ class DigitalMailServiceTest {
 		verify(mockDigitalMailIntegration, times(1)).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
 	}
 
-	//Same thing will happen if any integration throws an exception so will only test one.
+	// Same thing will happen if any integration throws an exception so will only test one.
 	@Test
 	void testSendDigitalMail_partyThrowsExceptionShouldThrowProblem() {
 		final var request = generateDigitalMailRequestDto();

@@ -12,17 +12,17 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SupportInfo {
-    
-    @NotBlank
-    @Schema(description = "Information text describing the different ways the recipient may contact the sender.", example = "Kontakta oss via epost eller telefon.", requiredMode = REQUIRED)
-    private String supportText;
-    
-    @Schema(description = "Url where the recipient may find more information.", example = "https://sundsvall.se/")
-    private String contactInformationUrl;
-    
-    @Schema(description = "Phone number the recipient may call to get in contact with the sender.", example = "4660191000")
-    private String contactInformationPhoneNumber;
-    
-    @Schema(description = "Email address the recipient may use to get in contact with the sender.", example = "sundsvalls.kommun@sundsvall.se")
-    private String contactInformationEmail;
+
+	@NotBlank
+	@Schema(description = "Information text describing the different ways the recipient may contact the sender.", example = "Kontakta oss via epost eller telefon.", requiredMode = REQUIRED)
+	private String supportText;
+
+	@Schema(description = "Url where the recipient may find more information.", example = "https://sundsvall.se/")
+	private String contactInformationUrl;
+
+	@Schema(description = "Phone number the recipient may call to get in contact with the sender.", example = "4660191000")
+	private String contactInformationPhoneNumber;
+
+	@Schema(description = "Email address the recipient may use to get in contact with the sender.", example = "sundsvalls.kommun@sundsvall.se")
+	private String contactInformationEmail;
 }

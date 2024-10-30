@@ -11,12 +11,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import generated.com.kivra.ContentUserV2;
 
 @FeignClient(
-    name = INTEGRATION_NAME,
-    url = "${integration.kivra.api-url}",
-    configuration = KivraIntegrationConfiguration.class
-)
+	name = INTEGRATION_NAME,
+	url = "${integration.kivra.api-url}",
+	configuration = KivraIntegrationConfiguration.class)
 interface KivraClient {
 
-    @PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    ResponseEntity<ContentUserV2> postContent(@RequestBody ContentUserV2 content);
+	@PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+	ResponseEntity<ContentUserV2> postContent(@RequestBody ContentUserV2 content);
 }
