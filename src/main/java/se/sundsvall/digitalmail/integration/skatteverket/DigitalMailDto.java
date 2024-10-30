@@ -8,10 +8,10 @@ import lombok.Setter;
 @Getter
 @Setter
 public class DigitalMailDto extends DigitalMailRequest {
-    
-    private String recipientId; //Recipient id from e.g. kivra.
-    
-    public DigitalMailDto(final DigitalMailRequest request) {
-        super(request.getPartyId(), request.getMunicipalityId(), request.getHeaderSubject(), request.getSupportInfo(), request.getAttachments(), request.getBodyInformation());
-    }
+
+	private String recipientId; //Recipient id from e.g. kivra.
+
+	public DigitalMailDto(final DigitalMailRequest request) {
+		super(request.getPartyId(), request.getMunicipalityId(), request.getHeaderSubject(), request.getSupportInfo(), request.getAttachments(), request.getBodyInformation());
+	}
 }

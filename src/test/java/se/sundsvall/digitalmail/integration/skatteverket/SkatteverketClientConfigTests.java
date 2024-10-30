@@ -4,9 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Mockito.when;
 
-import jakarta.xml.soap.MessageFactory;
-import jakarta.xml.soap.SOAPException;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,45 +15,48 @@ import org.springframework.ws.soap.SoapMessage;
 import org.springframework.ws.soap.saaj.SaajSoapMessage;
 import org.zalando.problem.ThrowableProblem;
 
+import jakarta.xml.soap.MessageFactory;
+import jakarta.xml.soap.SOAPException;
+
 class SkatteverketClientConfigTests {
 
-    @Nested
-    @ExtendWith(MockitoExtension.class)
-    class SoapMessageSizeInterceptorTest {
+	@Nested
+	@ExtendWith(MockitoExtension.class)
+	class SoapMessageSizeInterceptorTest {
 
-        @Mock
-        private MessageContext mockContext;
+		@Mock
+		private MessageContext mockContext;
 
-        private SoapMessage soapMessage;
+		private SoapMessage soapMessage;
 
-        private SkatteverketClientConfig.SoapMessageSizeInterceptor interceptor;
+		private SkatteverketClientConfig.SoapMessageSizeInterceptor interceptor;
 
-        @BeforeEach
-        public void setup() throws SOAPException {
-            // Create a simple SOAP message
-            soapMessage = new SaajSoapMessage(MessageFactory.newInstance().createMessage());
-        }
+		@BeforeEach
+		public void setup() throws SOAPException {
+			// Create a simple SOAP message
+			soapMessage = new SaajSoapMessage(MessageFactory.newInstance().createMessage());
+		}
 
-        @Test
-        void testCorrectSize_shouldNotThrowException() {
-            interceptor = new SkatteverketClientConfig.SoapMessageSizeInterceptor(200000L);
+		@Test
+		void testCorrectSize_shouldNotThrowException() {
+			interceptor = new SkatteverketClientConfig.SoapMessageSizeInterceptor(200000L);
 
-            when(mockContext.getRequest()).thenReturn(soapMessage);
+			when(mockContext.getRequest()).thenReturn(soapMessage);
 
-            final var result = interceptor.handleRequest(mockContext);
+			final var result = interceptor.handleRequest(mockContext);
 
-            assertThat(result).isTrue();
-        }
+			assertThat(result).isTrue();
+		}
 
-        @Test
-        void testTooBigMessage_shouldThrowException() {
-            interceptor = new SkatteverketClientConfig.SoapMessageSizeInterceptor(0L);
+		@Test
+		void testTooBigMessage_shouldThrowException() {
+			interceptor = new SkatteverketClientConfig.SoapMessageSizeInterceptor(0L);
 
-            when(mockContext.getRequest()).thenReturn(soapMessage);
+			when(mockContext.getRequest()).thenReturn(soapMessage);
 
-            assertThatExceptionOfType(ThrowableProblem.class)
-                .isThrownBy(() -> interceptor.handleRequest(mockContext))
-                .withMessage("Message is too big to be sent as a digital mail.: Size is: 132 bytes. Max allowed is: 0 bytes.");
-        }
-    }
+			assertThatExceptionOfType(ThrowableProblem.class)
+				.isThrownBy(() -> interceptor.handleRequest(mockContext))
+				.withMessage("Message is too big to be sent as a digital mail.: Size is: 132 bytes. Max allowed is: 0 bytes.");
+		}
+	}
 }

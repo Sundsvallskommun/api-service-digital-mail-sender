@@ -9,7 +9,7 @@ import lombok.Setter;
 @Getter
 public class DeliveryStatus {
 
-    private boolean delivered;
-    private String partyId;
-    private String transactionId;
+	private boolean delivered;
+	private String partyId;
+	private String transactionId;
 }

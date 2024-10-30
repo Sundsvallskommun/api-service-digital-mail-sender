@@ -18,40 +18,40 @@ import feign.codec.ErrorDecoder;
 @Import(FeignConfiguration.class)
 class PartyConfig {
 
-    static final String INTEGRATION_NAME = "PartyClient";
+	static final String INTEGRATION_NAME = "PartyClient";
 
-    private final PartyProperties properties;
-    
-    PartyConfig(final PartyProperties properties) {
-        this.properties = properties;
-    }
-    
-    @Bean
-    FeignBuilderCustomizer feignBuilderCustomizer() {
-        return FeignMultiCustomizer.create()
-            .withErrorDecoder(errorDecoder())
-            .withRequestOptions(feignOptions())
-            .withRetryableOAuth2InterceptorForClientRegistration(clientRegistration())
-            .composeCustomizersToOne();
-    }
+	private final PartyProperties properties;
 
-    private ClientRegistration clientRegistration() {
-        return ClientRegistration.withRegistrationId("party")
-            .tokenUri(properties.oauth2().tokenUrl())
-            .clientId(properties.oauth2().clientId())
-            .clientSecret(properties.oauth2().clientSecret())
-            .authorizationGrantType(new AuthorizationGrantType(properties.oauth2().authorizationGrantType()))
-            .build();
-    }
+	PartyConfig(final PartyProperties properties) {
+		this.properties = properties;
+	}
 
-    private Request.Options feignOptions() {
-        return new Request.Options(
-            properties.connectTimeout().toMillis(), TimeUnit.MILLISECONDS,
-            properties.readTimeout().toMillis(), TimeUnit.MILLISECONDS,
-            true);
-    }
+	@Bean
+	FeignBuilderCustomizer feignBuilderCustomizer() {
+		return FeignMultiCustomizer.create()
+			.withErrorDecoder(errorDecoder())
+			.withRequestOptions(feignOptions())
+			.withRetryableOAuth2InterceptorForClientRegistration(clientRegistration())
+			.composeCustomizersToOne();
+	}
 
-    private ErrorDecoder errorDecoder() {
-        return new ProblemErrorDecoder(INTEGRATION_NAME);
-    }
+	private ClientRegistration clientRegistration() {
+		return ClientRegistration.withRegistrationId("party")
+			.tokenUri(properties.oauth2().tokenUrl())
+			.clientId(properties.oauth2().clientId())
+			.clientSecret(properties.oauth2().clientSecret())
+			.authorizationGrantType(new AuthorizationGrantType(properties.oauth2().authorizationGrantType()))
+			.build();
+	}
+
+	private Request.Options feignOptions() {
+		return new Request.Options(
+			properties.connectTimeout().toMillis(), TimeUnit.MILLISECONDS,
+			properties.readTimeout().toMillis(), TimeUnit.MILLISECONDS,
+			true);
+	}
+
+	private ErrorDecoder errorDecoder() {
+		return new ProblemErrorDecoder(INTEGRATION_NAME);
+	}
 }

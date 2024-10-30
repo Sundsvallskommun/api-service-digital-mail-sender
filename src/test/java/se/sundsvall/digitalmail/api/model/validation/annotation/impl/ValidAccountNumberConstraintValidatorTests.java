@@ -17,49 +17,49 @@ import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumb
 @ExtendWith(MockitoExtension.class)
 class ValidAccountNumberConstraintValidatorTests {
 
-    @Mock
-    private ValidAccountNumber mockAnnotation;
+	@Mock
+	private ValidAccountNumber mockAnnotation;
 
-    @InjectMocks
-    private ValidAccountNumberConstraintValidator validator;
+	@InjectMocks
+	private ValidAccountNumberConstraintValidator validator;
 
-    @ParameterizedTest
-    @ValueSource(strings = {"9911884", "991-1884", "5237-4055", "5989-2810", "670-6493", "5840-6646", "150-6047"})
-    void validAccountNumber(final String value) {
-        validator.initialize(mockAnnotation);
+	@ParameterizedTest
+	@ValueSource(strings = {"9911884", "991-1884", "5237-4055", "5989-2810", "670-6493", "5840-6646", "150-6047"})
+	void validAccountNumber(final String value) {
+		validator.initialize(mockAnnotation);
 
-        assertThat(validator.isValid(value, null)).isTrue();
+		assertThat(validator.isValid(value, null)).isTrue();
 
-        verify(mockAnnotation).nullable();
-    }
+		verify(mockAnnotation).nullable();
+	}
 
-    @ParameterizedTest
-    @ValueSource(strings = {"9911885", "991-1885", "12345x", "invalid"})
-    void invalidAccountNumber(final String value) {
-        validator.initialize(mockAnnotation);
+	@ParameterizedTest
+	@ValueSource(strings = {"9911885", "991-1885", "12345x", "invalid"})
+	void invalidAccountNumber(final String value) {
+		validator.initialize(mockAnnotation);
 
-        assertThat(validator.isValid(value, null)).isFalse();
+		assertThat(validator.isValid(value, null)).isFalse();
 
-        verify(mockAnnotation).nullable();
-    }
+		verify(mockAnnotation).nullable();
+	}
 
-    @Test
-    void nullAccountNumberWhenNullableIsFalse() {
-        validator.initialize(mockAnnotation);
+	@Test
+	void nullAccountNumberWhenNullableIsFalse() {
+		validator.initialize(mockAnnotation);
 
-        assertThat(validator.isValid(null, null)).isFalse();
+		assertThat(validator.isValid(null, null)).isFalse();
 
-        verify(mockAnnotation).nullable();
-    }
+		verify(mockAnnotation).nullable();
+	}
 
-    @Test
-    void nullAccountNumberWhenNullableIsTrue() {
-        when(mockAnnotation.nullable()).thenReturn(true);
+	@Test
+	void nullAccountNumberWhenNullableIsTrue() {
+		when(mockAnnotation.nullable()).thenReturn(true);
 
-        validator.initialize(mockAnnotation);
+		validator.initialize(mockAnnotation);
 
-        assertThat(validator.isValid(null, null)).isTrue();
+		assertThat(validator.isValid(null, null)).isTrue();
 
-        verify(mockAnnotation).nullable();
-    }
+		verify(mockAnnotation).nullable();
+	}
 }

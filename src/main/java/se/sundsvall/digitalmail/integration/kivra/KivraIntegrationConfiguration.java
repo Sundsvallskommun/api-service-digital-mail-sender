@@ -25,38 +25,38 @@ import generated.com.kivra.Payment;
 @Import(FeignConfiguration.class)
 class KivraIntegrationConfiguration {
 
-    private final KivraIntegrationProperties properties;
+	private final KivraIntegrationProperties properties;
 
-    KivraIntegrationConfiguration(final KivraIntegrationProperties properties,
-            final ObjectMapper objectMapper) {
-        this.properties = properties;
+	KivraIntegrationConfiguration(final KivraIntegrationProperties properties,
+		final ObjectMapper objectMapper) {
+		this.properties = properties;
 
-        objectMapper.addMixIn(ContentUserContextInvoice.class, ContentUserContextInvoiceMixin.class);
-        objectMapper.addMixIn(Payment.class, PaymentMixin.class);
-    }
+		objectMapper.addMixIn(ContentUserContextInvoice.class, ContentUserContextInvoiceMixin.class);
+		objectMapper.addMixIn(Payment.class, PaymentMixin.class);
+	}
 
-    @Bean
-    FeignBuilderCustomizer customFeignBuilderCustomizer() {
-        return builder -> {
-            var clientRegistration = ClientRegistration.withRegistrationId(INTEGRATION_NAME)
-                .tokenUri(properties.oauth2().tokenUrl())
-                .clientId(properties.oauth2().clientId())
-                .clientSecret(properties.oauth2().clientSecret())
-                .authorizationGrantType(new AuthorizationGrantType(properties.oauth2().authorizationGrantType()))
-                .build();
-            var oAuth2RequestInterceptor = new OAuth2RequestInterceptor(clientRegistration, emptySet());
+	@Bean
+	FeignBuilderCustomizer customFeignBuilderCustomizer() {
+		return builder -> {
+			var clientRegistration = ClientRegistration.withRegistrationId(INTEGRATION_NAME)
+				.tokenUri(properties.oauth2().tokenUrl())
+				.clientId(properties.oauth2().clientId())
+				.clientSecret(properties.oauth2().clientSecret())
+				.authorizationGrantType(new AuthorizationGrantType(properties.oauth2().authorizationGrantType()))
+				.build();
+			var oAuth2RequestInterceptor = new OAuth2RequestInterceptor(clientRegistration, emptySet());
 
-            builder.requestInterceptor(oAuth2RequestInterceptor)
-                .retryer(new ActionRetryer(oAuth2RequestInterceptor::removeToken, 1))
-                .errorDecoder(new JsonPathErrorDecoder(INTEGRATION_NAME, new JsonPathErrorDecoder.JsonPathSetup("$.long_message")))
-                .options(feignOptions());
-        };
-    }
+			builder.requestInterceptor(oAuth2RequestInterceptor)
+				.retryer(new ActionRetryer(oAuth2RequestInterceptor::removeToken, 1))
+				.errorDecoder(new JsonPathErrorDecoder(INTEGRATION_NAME, new JsonPathErrorDecoder.JsonPathSetup("$.long_message")))
+				.options(feignOptions());
+		};
+	}
 
-    private Request.Options feignOptions() {
-        return new Request.Options(
-            properties.connectTimeout().toMillis(), MILLISECONDS,
-            properties.readTimeout().toMillis(), MILLISECONDS,
-            true);
-    }
+	private Request.Options feignOptions() {
+		return new Request.Options(
+			properties.connectTimeout().toMillis(), MILLISECONDS,
+			properties.readTimeout().toMillis(), MILLISECONDS,
+			true);
+	}
 }
