@@ -9,14 +9,14 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 public interface PaymentMixin {
 
-    @JsonSerialize(using = FloatToStringSerializer.class)
-    Float getTotalOwed();
+	@JsonSerialize(using = FloatToStringSerializer.class)
+	Float getTotalOwed();
 
-    class FloatToStringSerializer extends JsonSerializer<Float> {
+	class FloatToStringSerializer extends JsonSerializer<Float> {
 
-        @Override
-        public void serialize(final Float value, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
-            jsonGenerator.writeString(value.toString());
-        }
-    }
+		@Override
+		public void serialize(final Float value, final JsonGenerator jsonGenerator, final SerializerProvider serializerProvider) throws IOException {
+			jsonGenerator.writeString(value.toString());
+		}
+	}
 }

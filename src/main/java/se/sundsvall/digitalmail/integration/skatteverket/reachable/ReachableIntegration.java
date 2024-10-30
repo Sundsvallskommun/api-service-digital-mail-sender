@@ -21,39 +21,40 @@ import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 public class ReachableIntegration {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReachableIntegration.class);
-    
-    private final WebServiceTemplate isReachableTemplate;
-    private final RecipientIntegrationMapper mapper;
-    
-    ReachableIntegration(
-            @Qualifier("skatteverketIsReachableWebserviceTemplate") final WebServiceTemplate isReachableTemplate,
-            final RecipientIntegrationMapper mapper) {
-        this.isReachableTemplate = isReachableTemplate;
-        this.mapper = mapper;
-    }
-    
-    /**
-     * Fetches a mailbox and if a mailbox is reachable.
-     * @param personalNumbers
-     * @return
-     */
-    public List<MailboxDto> isReachable(final List<String> personalNumbers) {
-        try {
 
-            // Call Skatteverket to see which mailbox(es) (if any) the person has
-            final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers);
+	private final WebServiceTemplate isReachableTemplate;
+	private final RecipientIntegrationMapper mapper;
+
+	ReachableIntegration(
+		@Qualifier("skatteverketIsReachableWebserviceTemplate") final WebServiceTemplate isReachableTemplate,
+		final RecipientIntegrationMapper mapper) {
+		this.isReachableTemplate = isReachableTemplate;
+		this.mapper = mapper;
+	}
+
+	/**
+	 * Fetches a mailbox and if a mailbox is reachable.
+	 *
+	 * @param personalNumbers
+	 * @return
+	 */
+	public List<MailboxDto> isReachable(final List<String> personalNumbers) {
+		try {
+
+			// Call Skatteverket to see which mailbox(es) (if any) the person has
+			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers);
 
 			LOGGER.info("Sending is reachable request");
-            final var isReachableResponse = (IsReachableResponse) isReachableTemplate.marshalSendAndReceive(isReachableRequest);
+			final var isReachableResponse = (IsReachableResponse) isReachableTemplate.marshalSendAndReceive(isReachableRequest);
 
 			LOGGER.info("Mapping and getting mailbox settings");
-            return mapper.getMailboxSettings(isReachableResponse);
-        } catch (Exception e) {
-            throw Problem.builder()
-                .withTitle("Error while getting digital mailbox from skatteverket")
-                .withStatus(INTERNAL_SERVER_ERROR)
-                .withDetail(e.getMessage())
-                .build();
-        }
-    }
+			return mapper.getMailboxSettings(isReachableResponse);
+		} catch (Exception e) {
+			throw Problem.builder()
+				.withTitle("Error while getting digital mailbox from skatteverket")
+				.withStatus(INTERNAL_SERVER_ERROR)
+				.withDetail(e.getMessage())
+				.build();
+		}
+	}
 }

@@ -8,11 +8,11 @@ import org.junit.jupiter.api.Test;
 
 class InvoiceTypeTests {
 
-    @Test
-    void values() {
-        assertThat(InvoiceType.values()).containsExactly(INVOICE, REMINDER);
+	@Test
+	void values() {
+		assertThat(InvoiceType.values()).containsExactly(INVOICE, REMINDER);
 
-        assertThat(INVOICE.getValue()).isEqualTo("invoice");
-        assertThat(REMINDER.getValue()).isEqualTo("invoice.reminder");
-    }
+		assertThat(INVOICE.getValue()).isEqualTo("invoice");
+		assertThat(REMINDER.getValue()).isEqualTo("invoice.reminder");
+	}
 }

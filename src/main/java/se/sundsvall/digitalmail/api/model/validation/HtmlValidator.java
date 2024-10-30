@@ -6,10 +6,9 @@ import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.List;
 
-import org.springframework.stereotype.Component;
-
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.springframework.stereotype.Component;
 
 import jakarta.validation.ValidationException;
 import nu.validator.client.EmbeddedValidator;
@@ -58,6 +57,7 @@ public class HtmlValidator {
 			return errors().isEmpty();
 		}
 
-		record Message(String type, String message) {}
+		record Message(String type, String message) {
+		}
 	}
 }

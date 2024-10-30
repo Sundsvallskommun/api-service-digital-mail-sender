@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 class ReferenceTypeTests {
 
-    @Test
-    void values() {
-        assertThat(ReferenceType.values()).containsExactly(SE_OCR, TENANT_REF);
-    }
+	@Test
+	void values() {
+		assertThat(ReferenceType.values()).containsExactly(SE_OCR, TENANT_REF);
+	}
 }

@@ -3,12 +3,11 @@ package se.sundsvall.digitalmail.api.model;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
-import jakarta.validation.constraints.NotBlank;
-
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -26,16 +25,16 @@ import lombok.Setter;
 @Schema(description = "A PDF file/attachment", name = "Attachment")
 public class File {
 
-    @OneOf(APPLICATION_PDF_VALUE)
-    @Schema(description = "Allowed type is: application/pdf", example = APPLICATION_PDF_VALUE, requiredMode = REQUIRED)
-    private String contentType;
+	@OneOf(APPLICATION_PDF_VALUE)
+	@Schema(description = "Allowed type is: application/pdf", example = APPLICATION_PDF_VALUE, requiredMode = REQUIRED)
+	private String contentType;
 
-    @NotBlank
-    @ValidBase64
-    @Schema(description = "BASE64-encoded body", requiredMode = REQUIRED)
-    private String body;
+	@NotBlank
+	@ValidBase64
+	@Schema(description = "BASE64-encoded body", requiredMode = REQUIRED)
+	private String body;
 
-    @NotBlank
-    @Schema(description = "The name of the file", example = "sample.pdf", requiredMode = REQUIRED)
-    private String filename;
+	@NotBlank
+	@Schema(description = "The name of the file", example = "sample.pdf", requiredMode = REQUIRED)
+	private String filename;
 }

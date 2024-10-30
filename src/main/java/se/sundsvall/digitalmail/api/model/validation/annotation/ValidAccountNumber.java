@@ -9,10 +9,10 @@ import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 
+import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidAccountNumberConstraintValidator;
+
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
-
-import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidAccountNumberConstraintValidator;
 
 /**
  * The annotated element must be a valid BANKGIRO or PLUSGIRO number.
@@ -23,11 +23,11 @@ import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidAccoun
 @Constraint(validatedBy = ValidAccountNumberConstraintValidator.class)
 public @interface ValidAccountNumber {
 
-    String message() default "not a valid account number";
+	String message() default "not a valid account number";
 
-    boolean nullable() default false;
+	boolean nullable() default false;
 
-    Class<?>[] groups() default {};
+	Class<?>[] groups() default {};
 
-    Class<? extends Payload>[] payload() default {};
+	Class<? extends Payload>[] payload() default {};
 }

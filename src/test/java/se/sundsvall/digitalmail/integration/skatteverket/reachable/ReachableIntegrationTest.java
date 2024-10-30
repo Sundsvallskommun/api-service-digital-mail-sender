@@ -26,50 +26,50 @@ import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 @ExtendWith(MockitoExtension.class)
 class
 ReachableIntegrationTest {
-    
-    @Mock
-    private WebServiceTemplate mockReachableTemplate;
-    @Mock
-    private RecipientIntegrationMapper mockMapper;
 
-    @InjectMocks
-    private ReachableIntegration reachableIntegration;
+	@Mock
+	private WebServiceTemplate mockReachableTemplate;
+	@Mock
+	private RecipientIntegrationMapper mockMapper;
 
-    @BeforeEach
-    void setUp() {
-        when(mockMapper.createIsReachableRequest(any())).thenCallRealMethod();
-    }
+	@InjectMocks
+	private ReachableIntegration reachableIntegration;
 
-    //Not really testing much but behavior
-    @Test
-    void testCallIsReachable_whenOk_shouldReturnResponse() {
-        final var accountStatus = new AccountStatus();
-        accountStatus.setRecipientId("recipientId");
+	@BeforeEach
+	void setUp() {
+		when(mockMapper.createIsReachableRequest(any())).thenCallRealMethod();
+	}
 
-        final var reachabilityStatus = new ReachabilityStatus();
-        reachabilityStatus.setAccountStatus(accountStatus);
+	//Not really testing much but behavior
+	@Test
+	void testCallIsReachable_whenOk_shouldReturnResponse() {
+		final var accountStatus = new AccountStatus();
+		accountStatus.setRecipientId("recipientId");
 
-        final var response = new IsReachableResponse();
-        response.getReturn().add(reachabilityStatus);
+		final var reachabilityStatus = new ReachabilityStatus();
+		reachabilityStatus.setAccountStatus(accountStatus);
 
-        when(mockMapper.getMailboxSettings(response))
-            .thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));
+		final var response = new IsReachableResponse();
+		response.getReturn().add(reachabilityStatus);
 
-        when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
-        
-        final var isReachableResponse = reachableIntegration.isReachable(List.of("somePersonalNumber"));
+		when(mockMapper.getMailboxSettings(response))
+			.thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));
 
-        assertThat(isReachableResponse).isNotNull().hasSize(1);
-    }
-    
-    @Test
-    void testCallIsRegistered_whenException_shouldThrowProblem() {
+		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
 
-        final var personalNumbers = List.of("personalNumber");
-        when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenThrow(new RuntimeException());
+		final var isReachableResponse = reachableIntegration.isReachable(List.of("somePersonalNumber"));
 
-        assertThatExceptionOfType(ThrowableProblem.class)
-            .isThrownBy(() -> reachableIntegration.isReachable(personalNumbers))
-            .withMessage("Error while getting digital mailbox from skatteverket");
-    }
+		assertThat(isReachableResponse).isNotNull().hasSize(1);
+	}
+
+	@Test
+	void testCallIsRegistered_whenException_shouldThrowProblem() {
+
+		final var personalNumbers = List.of("personalNumber");
+		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenThrow(new RuntimeException());
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> reachableIntegration.isReachable(personalNumbers))
+			.withMessage("Error while getting digital mailbox from skatteverket");
+	}
 }

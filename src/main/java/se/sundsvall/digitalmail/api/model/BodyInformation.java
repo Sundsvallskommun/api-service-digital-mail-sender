@@ -18,26 +18,26 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor(access = PROTECTED)
 public class BodyInformation {
 
-    @OneOf({ TEXT_PLAIN_VALUE, TEXT_HTML_VALUE})
-    @Schema(description = "The content type for the message, text/plain for only text, text/html for HTML messages.", example = TEXT_HTML_VALUE, requiredMode = REQUIRED)
-    private String contentType;
+	@OneOf({TEXT_PLAIN_VALUE, TEXT_HTML_VALUE})
+	@Schema(description = "The content type for the message, text/plain for only text, text/html for HTML messages.", example = TEXT_HTML_VALUE, requiredMode = REQUIRED)
+	private String contentType;
 
-    @Schema(description = "Plain-text body")
-    private String body;
+	@Schema(description = "Plain-text body")
+	private String body;
 
-    public String getContentType() {
-        return contentType;
-    }
+	public String getContentType() {
+		return contentType;
+	}
 
-    public void setContentType(final String contentType) {
-        this.contentType = contentType;
-    }
+	public void setContentType(final String contentType) {
+		this.contentType = contentType;
+	}
 
-    public String getBody() {
-        return body;
-    }
+	public String getBody() {
+		return body;
+	}
 
-    public void setBody(final String body) {
-        this.body = body;
-    }
+	public void setBody(final String body) {
+		this.body = body;
+	}
 }
