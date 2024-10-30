@@ -127,7 +127,7 @@ class DigitalMailMapper {
         final var digitalMailResponse = new DigitalMailResponse();
         digitalMailResponse.setDeliveryStatus(DeliveryStatus.builder()
             .withTransactionId(deliveryResult.getReturn().getTransId())
-            .withDelivered(deliveryResult.getReturn().getStatus().get(0).isDelivered())   // Will always be only one, for now
+            .withDelivered(deliveryResult.getReturn().getStatus().getFirst().isDelivered())   // Will always be only one, for now
             .withPartyId(partyId)
             .build());
         return digitalMailResponse;
@@ -152,6 +152,7 @@ class DigitalMailMapper {
      * @return A Sealed delivery signed by not the sender but us as a mediator.
      */
     SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
+		LOG.info("Creating sealed delivery");
         try {
             //Get the correct certificate
             //Create the signedDeliveryDocument, inner one.
@@ -235,8 +236,7 @@ class DigitalMailMapper {
         return attachments.stream()
             .map(attachment -> {
                 // We need to decode the base64-encoded string before we convert it to a byte array.
-                final var attachmentBytes = Base64.decode(
-                    attachment.getBody());
+                final var attachmentBytes = Base64.decode(attachment.getBody());
 
                 final var mailAttachment = new Attachment();
                 mailAttachment.setBody(attachmentBytes);
@@ -254,11 +254,11 @@ class DigitalMailMapper {
             md5.update(attachmentBodyBytes);
             final var digest = md5.digest();
             return DatatypeConverter.printHexBinary(digest);
-        } catch (NoSuchAlgorithmException e) {
+        } catch (Exception e) {
+			LOG.error("Couldn't create MD5-checksum for attachment", e);
             throw Problem.builder()
                 .withTitle("Couldn't create MD5-checksum for attachment")
                 .withStatus(Status.INTERNAL_SERVER_ERROR)
-                .withCause(((ThrowableProblem) e.getCause()))
                 .build();
         }
     }
