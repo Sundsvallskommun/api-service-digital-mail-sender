@@ -32,6 +32,13 @@ class RecipientIntegrationMapperTest {
 	@InjectMocks
 	private RecipientIntegrationMapper mapper;
 
+	private static Stream<Arguments> provideParametersForGetMailboxSettingsTest() {
+		return Stream.of(
+			Arguments.of(true, true, false),
+			Arguments.of(false, false, false),
+			Arguments.of(false, true, false));
+	}
+
 	@Test
 	void testCreateIsRegistered() {
 		final var personalNumber = "197001011234";
@@ -63,13 +70,6 @@ class RecipientIntegrationMapperTest {
 		final var mailboxSettings = mapper.getMailboxSettings(response);
 
 		assertThat(mailboxSettings).isEmpty();
-	}
-
-	private static Stream<Arguments> provideParametersForGetMailboxSettingsTest() {
-		return Stream.of(
-			Arguments.of(true, true, false),
-			Arguments.of(false, false, false),
-			Arguments.of(false, true, false));
 	}
 
 	@Test

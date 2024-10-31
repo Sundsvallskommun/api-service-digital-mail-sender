@@ -29,7 +29,7 @@ class RecipientIntegrationMapper {
 	}
 
 	/**
-	 *
+	 * 
 	 * @param  personalNumbers map of personalnumbers with corresponding partyIds
 	 * @return
 	 */
@@ -58,7 +58,7 @@ class RecipientIntegrationMapper {
 	 * - there's not a pending accountregistration (that we have somewhere to send the message)
 	 * - The sender is accepted by the recipient (no difference between disallowing and no mailbox)
 	 * - that there's an existing servicesupplier object.
-	 * 
+	 *
 	 * @param  reachabilityStatus status of the recipient
 	 * @return                    Optional {@link MailboxDto} containing the url and recipientId.
 	 */
@@ -80,7 +80,7 @@ class RecipientIntegrationMapper {
 
 	/**
 	 * Check if the service supplier "name" is one that we support.
-	 * 
+	 *
 	 * @param  supplier
 	 * @return
 	 */

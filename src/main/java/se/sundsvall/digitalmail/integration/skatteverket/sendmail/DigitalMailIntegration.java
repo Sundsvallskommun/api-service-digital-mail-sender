@@ -45,14 +45,18 @@ public class DigitalMailIntegration {
 		LOG.debug("Trying to send secure digital mail.");
 
 		try {
+			LOG.info("Creating deliver secure request");
 			final var deliverSecureRequest = mapper.createDeliverSecure(requestDto);
 
+			LOG.info("Sending deliver secure request");
 			final var deliverSecureResponse = (DeliverSecureResponse) distributeTemplate.marshalSendAndReceive(serviceAddress, deliverSecureRequest);
 
+			LOG.info("Mapping deliver secure response");
 			return mapper.createDigitalMailResponse(deliverSecureResponse, requestDto.getPartyId());
 		} catch (Exception e) {
 			// Might come from interceptor
 			if (e instanceof ThrowableProblem) {
+				LOG.error("Failed to send digital mail", e);
 				throw e;
 			}
 			final var cause = getProblemCause(e);
@@ -73,7 +77,7 @@ public class DigitalMailIntegration {
 		} catch (Exception ex) {
 			LOG.error("Couldn't get cause", e);
 			return Problem.builder()
-				.withDetail("Couldn't get cause")
+				.withDetail("Couldn't get cause").withStatus(INTERNAL_SERVER_ERROR)
 				.build();
 		}
 	}

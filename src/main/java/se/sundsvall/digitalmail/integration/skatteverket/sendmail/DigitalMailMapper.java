@@ -68,14 +68,13 @@ import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 @Component
 class DigitalMailMapper {
 
+	public static final String SENDER_ID = "162120002411";
+	public static final String SENDER_NAME = "Sundsvalls Kommun";
+	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
 
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 	private static final String NAMESPACE_URI = "http://minameddelanden.gov.se/schema/Message/v3";
-
-	public static final String SENDER_ID = "162120002411";
-	public static final String SENDER_NAME = "Sundsvalls Kommun";
-	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 
 	private final SkatteverketProperties properties;
 
@@ -106,7 +105,7 @@ class DigitalMailMapper {
 
 	/**
 	 * Reads certificate information from a keystore
-	 * 
+	 *
 	 * @return
 	 * @throws KeyStoreException
 	 * @throws IOException
@@ -128,14 +127,14 @@ class DigitalMailMapper {
 		final var digitalMailResponse = new DigitalMailResponse();
 		digitalMailResponse.setDeliveryStatus(DeliveryStatus.builder()
 			.withTransactionId(deliveryResult.getReturn().getTransId())
-			.withDelivered(deliveryResult.getReturn().getStatus().get(0).isDelivered())   // Will always be only one, for now
+			.withDelivered(deliveryResult.getReturn().getStatus().getFirst().isDelivered())   // Will always be only one, for now
 			.withPartyId(partyId)
 			.build());
 		return digitalMailResponse;
+
 	}
 
 	/**
-	 *
 	 * @param  dto to map to a request
 	 * @return
 	 */
@@ -153,6 +152,7 @@ class DigitalMailMapper {
 	 * @return     A Sealed delivery signed by not the sender but us as a mediator.
 	 */
 	SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
+		LOG.info("Creating sealed delivery");
 		try {
 			// Get the correct certificate
 			// Create the signedDeliveryDocument, inner one.
@@ -255,18 +255,19 @@ class DigitalMailMapper {
 			md5.update(attachmentBodyBytes);
 			final var digest = md5.digest();
 			return DatatypeConverter.printHexBinary(digest);
-		} catch (NoSuchAlgorithmException e) {
+		} catch (Exception e) {
+			LOG.error("Couldn't create MD5-checksum for attachment", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create MD5-checksum for attachment")
 				.withStatus(Status.INTERNAL_SERVER_ERROR)
-				.withCause(((ThrowableProblem) e.getCause()))
+
 				.build();
 		}
 	}
 
 	/**
 	 * Creates the &lt;v3:header&gt;-element
-	 * 
+	 *
 	 * @param  dto
 	 * @return
 	 */
@@ -281,7 +282,7 @@ class DigitalMailMapper {
 
 	/**
 	 * Creates the Supportinfo-element
-	 * 
+	 *
 	 * @param  dto
 	 * @return
 	 */
@@ -298,7 +299,7 @@ class DigitalMailMapper {
 	/**
 	 * Creates the body-element
 	 * Will create an empty body if no bodyInformation object or body is present.
-	 * 
+	 *
 	 * @param  dto to be translated into a {@link MessageBody}
 	 * @return     A {@link MessageBody}
 	 */
@@ -345,7 +346,7 @@ class DigitalMailMapper {
 	/**
 	 * Retrieve the alias for the key from the keystore.
 	 * As we only have one key we get the first one, if we need to get more we need to find it by alias.
-	 * 
+	 *
 	 * @param  keyStore
 	 * @return
 	 * @throws KeyStoreException

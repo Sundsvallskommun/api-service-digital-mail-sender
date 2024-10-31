@@ -19,10 +19,9 @@ class PaymentMixinTests {
 	@ExtendWith(MockitoExtension.class)
 	class FloatToStringSerializerTests {
 
+		private final PaymentMixin.FloatToStringSerializer serializer = new PaymentMixin.FloatToStringSerializer();
 		@Mock
 		private JsonGenerator mockJsonGenerator;
-
-		private final PaymentMixin.FloatToStringSerializer serializer = new PaymentMixin.FloatToStringSerializer();
 
 		@Test
 		void serialize() throws IOException {

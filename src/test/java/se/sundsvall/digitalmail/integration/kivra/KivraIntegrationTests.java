@@ -19,13 +19,12 @@ import generated.com.kivra.ContentUserV2;
 @ExtendWith(MockitoExtension.class)
 class KivraIntegrationTests {
 
+	private final InvoiceDto invoiceDto = new InvoiceDto(generateInvoiceRequest());
 	@Mock
 	private KivraClient mockClient;
 
 	@InjectMocks
 	private KivraIntegration kivraIntegration;
-
-	private final InvoiceDto invoiceDto = new InvoiceDto(generateInvoiceRequest());
 
 	@Test
 	void sendContent() {
