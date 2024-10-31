@@ -1,12 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns="http://maven.apache.org/POM/4.0.0" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>6.0.2</version>
-		<relativePath/>
+		<version>6.0.3</version>
+		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
 	<groupId>se.sundsvall</groupId>
@@ -14,12 +13,9 @@
 	<version>3.0</version>
 	<name>api-service-digital-mail-sender</name>
 	<properties>
-		<my-messages-generated-sources-folder>
-			${project.build.directory}/my-messages-recipient-sources
-		</my-messages-generated-sources-folder>
+		<my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
 		<kivra-generated-sources-folder>src/min/java</kivra-generated-sources-folder>
 		<kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
-		<exposed.app.port>8080</exposed.app.port>
 		<commons-io.version>2.17.0</commons-io.version>
 		<nu-html-validator.version>18.11.5</nu-html-validator.version>
 		<cxf.version>4.0.3</cxf.version>
@@ -101,21 +97,17 @@
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>
-								${project.basedir}/src/main/resources/contracts/kivra/swagger.yml
-							</inputSpec>
+							<inputSpec>${project.basedir}/src/main/resources/contracts/kivra/swagger.yml</inputSpec>
 							<output>${generated-sources-path}</output>
 							<generatorName>spring</generatorName>
 							<generateApis>false</generateApis>
 							<generateSupportingFiles>false</generateSupportingFiles>
-							<importMappings>File=${kivra-generated-sources-package}.File
-							</importMappings>
+							<importMappings>File=${kivra-generated-sources-package}.File</importMappings>
 							<skipValidateSpec>true</skipValidateSpec>
 							<configOptions>
 								<sourceFolder>${kivra-generated-sources-folder}</sourceFolder>
 								<modelPackage>${kivra-generated-sources-package}</modelPackage>
-								<generatedConstructorWithRequiredArgs>false
-								</generatedConstructorWithRequiredArgs>
+								<generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
 								<generatePom>false</generatePom>
 								<library>spring-boot</library>
 								<dateLibrary>java8</dateLibrary>
@@ -138,53 +130,41 @@
 				<executions>
 					<execution>
 						<id>generate-sources</id>
+						<goals>
+							<goal>wsdl2java</goal>
+						</goals>
 						<phase>generate-sources</phase>
 						<configuration>
 							<sourceRoot>${my-messages-generated-sources-folder}</sourceRoot>
 							<wsdlOptions>
 								<wsdlOption>
-									<wsdl>
-										${project.basedir}/src/main/resources/contracts/my-messages/Recipient.wsdl
-									</wsdl>
+									<wsdl>${project.basedir}/src/main/resources/contracts/my-messages/Recipient.wsdl</wsdl>
 									<bindingFiles>
-										<bindingFile>
-											${project.basedir}/src/main/resources/contracts/my-messages/xjb/bindings.xjb
-										</bindingFile>
+										<bindingFile>${project.basedir}/src/main/resources/contracts/my-messages/xjb/bindings.xjb</bindingFile>
 									</bindingFiles>
 									<extraargs>
 										<extraarg>-p</extraarg>
-										<extraarg> http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient
-										</extraarg>
+										<extraarg>http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg> http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3
-										</extraarg>
+										<extraarg>http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3</extraarg>
 										<extraarg>-autoNameResolution</extraarg>
 									</extraargs>
 								</wsdlOption>
 								<wsdlOption>
-									<wsdl>
-										${project.basedir}/src/main/resources/contracts/my-messages/Service.wsdl
-									</wsdl>
+									<wsdl>${project.basedir}/src/main/resources/contracts/my-messages/Service.wsdl</wsdl>
 									<bindingFiles>
-										<bindingFile>
-											${project.basedir}/src/main/resources/contracts/my-messages/xjb/bindings.xjb
-										</bindingFile>
+										<bindingFile>${project.basedir}/src/main/resources/contracts/my-messages/xjb/bindings.xjb</bindingFile>
 									</bindingFiles>
 									<extraargs>
 										<extraarg>-p</extraarg>
-										<extraarg> http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient
-										</extraarg>
+										<extraarg>http://minameddelanden.gov.se/Recipient=generated.se.gov.minameddelanden.recipient</extraarg>
 										<extraarg>-p</extraarg>
-										<extraarg> http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3
-										</extraarg>
+										<extraarg>http://minameddelanden.gov.se/schema/Common/v3=generated.se.gov.minameddelanden.common.v3</extraarg>
 										<extraarg>-autoNameResolution</extraarg>
 									</extraargs>
 								</wsdlOption>
 							</wsdlOptions>
 						</configuration>
-						<goals>
-							<goal>wsdl2java</goal>
-						</goals>
 					</execution>
 				</executions>
 			</plugin>
@@ -194,10 +174,10 @@
 				<executions>
 					<!-- Add generated sources from skatteverket so they're reacheable. -->
 					<execution>
-						<phase>generate-sources</phase>
 						<goals>
 							<goal>add-source</goal>
 						</goals>
+						<phase>generate-sources</phase>
 						<configuration>
 							<sources>
 								<source>${my-messages-generated-sources-folder}</source>
@@ -213,7 +193,6 @@
 				<configuration>
 					<excludes>
 						<exclude>**/se/sundsvall/digitalmail/DigitalMail*</exclude>
-
 						<!-- Ignore generated sources -->
 						<exclude>**/org/w3/**/*</exclude>
 						<exclude>**/se/gov/minameddelanden/**/*</exclude>

@@ -29,7 +29,9 @@ class HtmlValidatorTests {
 	}
 
 	@ParameterizedTest(name = "[{index}] value=\"{0}\"")
-	@ValueSource(strings = {"", "   "})
+	@ValueSource(strings = {
+		"", "   "
+	})
 	void emptyHtml(final String value) {
 		assertThat(validator.validate(value)).isFalse();
 	}

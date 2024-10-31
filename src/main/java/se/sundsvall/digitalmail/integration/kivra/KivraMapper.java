@@ -14,8 +14,7 @@ final class KivraMapper {
 
 	static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-	private KivraMapper() {
-	}
+	private KivraMapper() {}
 
 	static ContentUserV2 mapInvoiceToContent(final InvoiceDto invoiceDto) {
 		return new ContentUserV2()
@@ -27,8 +26,7 @@ final class KivraMapper {
 				.map(file -> new PartsResponsive()
 					.name(file.getFilename())
 					.contentType(file.getContentType())
-					.data(file.getBody())
-				)
+					.data(file.getBody()))
 				.toList())
 			.paymentMultipleOptions(
 				new PaymentMultipleOptions()

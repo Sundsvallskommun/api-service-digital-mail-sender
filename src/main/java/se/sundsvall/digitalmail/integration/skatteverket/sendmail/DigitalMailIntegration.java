@@ -37,9 +37,9 @@ public class DigitalMailIntegration {
 	/**
 	 * Send a digital mail
 	 *
-	 * @param requestDto The request to send
-	 * @param serviceAddress The address to send the mail to
-	 * @return The response from the service
+	 * @param  requestDto     The request to send
+	 * @param  serviceAddress The address to send the mail to
+	 * @return                The response from the service
 	 */
 	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String serviceAddress) {
 		LOG.debug("Trying to send secure digital mail.");
@@ -77,8 +77,7 @@ public class DigitalMailIntegration {
 		} catch (Exception ex) {
 			LOG.error("Couldn't get cause", e);
 			return Problem.builder()
-				.withDetail("Couldn't get cause")
-				.withStatus(INTERNAL_SERVER_ERROR)
+				.withDetail("Couldn't get cause").withStatus(INTERNAL_SERVER_ERROR)
 				.build();
 		}
 	}

@@ -24,7 +24,9 @@ class ValidAccountNumberConstraintValidatorTests {
 	private ValidAccountNumberConstraintValidator validator;
 
 	@ParameterizedTest
-	@ValueSource(strings = {"9911884", "991-1884", "5237-4055", "5989-2810", "670-6493", "5840-6646", "150-6047"})
+	@ValueSource(strings = {
+		"9911884", "991-1884", "5237-4055", "5989-2810", "670-6493", "5840-6646", "150-6047"
+	})
 	void validAccountNumber(final String value) {
 		validator.initialize(mockAnnotation);
 
@@ -34,7 +36,9 @@ class ValidAccountNumberConstraintValidatorTests {
 	}
 
 	@ParameterizedTest
-	@ValueSource(strings = {"9911885", "991-1885", "12345x", "invalid"})
+	@ValueSource(strings = {
+		"9911885", "991-1885", "12345x", "invalid"
+	})
 	void invalidAccountNumber(final String value) {
 		validator.initialize(mockAnnotation);
 

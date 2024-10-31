@@ -62,7 +62,7 @@ class SecureMailIntegrationTest {
 
 	@Test
 	void testGetProblemCause_fakingXmlParsingError_shouldReturnProblem() {
-		final var problemCause = mailIntegration.getProblemCause(null); //Couldn't find a better way to produce similar error...
+		final var problemCause = mailIntegration.getProblemCause(null); // Couldn't find a better way to produce similar error...
 
 		assertThat(problemCause.getMessage()).isEqualTo("Couldn't get cause");
 	}

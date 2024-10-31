@@ -57,16 +57,18 @@ class DigitalMailResource {
 		summary = "Send a digital mail",
 		responses = {
 			@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
-			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolationProblem.class}))),
+			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {
+				Problem.class, ConstraintViolationProblem.class
+			}))),
 			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = Problem.class))),
 			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
-		}
-	)
+		})
 	@PostMapping(
 		value = "/send-digital-mail",
 		consumes = APPLICATION_JSON_VALUE,
-		produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE}
-	)
+		produces = {
+			APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
+		})
 	ResponseEntity<DigitalMailResponse> sendDigitalMail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final DigitalMailRequest request) {
@@ -90,16 +92,18 @@ class DigitalMailResource {
 		summary = "Send a digital invoice",
 		responses = {
 			@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
-			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {Problem.class, ConstraintViolationProblem.class}))),
+			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {
+				Problem.class, ConstraintViolationProblem.class
+			}))),
 			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = Problem.class))),
 			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
-		}
-	)
+		})
 	@PostMapping(
 		value = "/send-digital-invoice",
 		consumes = APPLICATION_JSON_VALUE,
-		produces = {APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE}
-	)
+		produces = {
+			APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
+		})
 	ResponseEntity<DigitalInvoiceResponse> sendDigitalInvoice(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final DigitalInvoiceRequest request) {

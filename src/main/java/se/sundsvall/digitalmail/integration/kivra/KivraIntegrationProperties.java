@@ -16,18 +16,11 @@ import jakarta.validation.constraints.NotNull;
 @ConfigurationProperties(prefix = "integration.kivra")
 record KivraIntegrationProperties(
 
-	@NotBlank
-	String apiUrl,
+	@NotBlank String apiUrl,
 
-	@NotBlank
-	String tenantKey,
+	@NotBlank String tenantKey,
 
-	@NotNull
-	@Valid
-	OAuth2 oauth2,
+	@NotNull @Valid OAuth2 oauth2,
 
-	@DefaultValue("PT5S")
-	Duration connectTimeout,
-	@DefaultValue("PT15S")
-	Duration readTimeout) {
-}
+	@DefaultValue("PT5S") Duration connectTimeout,
+	@DefaultValue("PT15S") Duration readTimeout) {}

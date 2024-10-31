@@ -1,35 +1,21 @@
 {
-    "request": {
-        "bodyPatterns": [
-            {
-                "matchesXPath": "//*[ns17:recipientId='192301010168']",
-                "xPathNamespaces": {
-                    "ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"
-                }
-            }
-        ],
-        "method": "POST",
-        "url": "/skatteverket"
-    },
-    "response": {
-        "bodyFileName": "../__files/skatteverket-kivra-recipient.xml",
-        "headers": {
-            "Connection": [
-                "keep-alive"
-            ],
-            "Content-Type": [
-                "text/xml;charset=UTF-8"
-            ],
-            "Keep-Alive": [
-                "timeout=60"
-            ],
-            "Transfer-Encoding": [
-                "chunked"
-            ],
-            "Content-Encoding": [
-                ""
-            ]
-        },
-        "status": 200
-    }
+	"request": {
+		"method": "POST",
+		"bodyPatterns": [{
+			"xPathNamespaces": {"ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"},
+			"matchesXPath": "//*[ns17:recipientId='192301010168']"
+		}],
+		"url": "/skatteverket"
+	},
+	"response": {
+		"headers": {
+			"Keep-Alive": ["timeout=60"],
+			"Transfer-Encoding": ["chunked"],
+			"Connection": ["keep-alive"],
+			"Content-Encoding": [""],
+			"Content-Type": ["text/xml;charset=UTF-8"]
+		},
+		"bodyFileName": "../__files/skatteverket-kivra-recipient.xml",
+		"status": 200
+	}
 }

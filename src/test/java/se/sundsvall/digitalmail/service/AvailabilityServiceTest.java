@@ -51,7 +51,6 @@ class AvailabilityServiceTest {
 	void testNoMailbox_shouldThrowException() {
 		when(mockReachableIntegration.isReachable(any())).thenReturn(List.of());
 
-
 		final var personalNumbers = List.of("personalNumber");
 		assertThatExceptionOfType(ThrowableProblem.class)
 			.isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(personalNumbers));

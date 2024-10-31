@@ -13,8 +13,7 @@ import generated.com.kivra.ContentUserV2;
 @FeignClient(
 	name = INTEGRATION_NAME,
 	url = "${integration.kivra.api-url}",
-	configuration = KivraIntegrationConfiguration.class
-)
+	configuration = KivraIntegrationConfiguration.class)
 interface KivraClient {
 
 	@PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

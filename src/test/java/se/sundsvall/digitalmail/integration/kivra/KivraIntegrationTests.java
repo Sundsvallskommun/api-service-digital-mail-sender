@@ -22,6 +22,7 @@ class KivraIntegrationTests {
 	private final InvoiceDto invoiceDto = new InvoiceDto(generateInvoiceRequest());
 	@Mock
 	private KivraClient mockClient;
+
 	@InjectMocks
 	private KivraIntegration kivraIntegration;
 

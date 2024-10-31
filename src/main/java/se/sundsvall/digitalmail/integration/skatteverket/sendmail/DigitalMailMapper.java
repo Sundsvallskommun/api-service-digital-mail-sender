@@ -72,8 +72,10 @@ class DigitalMailMapper {
 	public static final String SENDER_NAME = "Sundsvalls Kommun";
 	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
+
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 	private static final String NAMESPACE_URI = "http://minameddelanden.gov.se/schema/Message/v3";
+
 	private final SkatteverketProperties properties;
 
 	private final DocumentBuilder documentBuilder;
@@ -88,7 +90,7 @@ class DigitalMailMapper {
 		// Load the KeyStore and get the signing key and certificate.
 		keyStore = KeyStoreUtils.loadKeyStore(Base64.decode(properties.keyStoreAsBase64()), properties.keyStorePassword());
 
-		//Read certificate from keystore
+		// Read certificate from keystore
 		certificate = setupCertificate();
 
 		// Create JAXB marshaller
@@ -129,10 +131,11 @@ class DigitalMailMapper {
 			.withPartyId(partyId)
 			.build());
 		return digitalMailResponse;
+
 	}
 
 	/**
-	 * @param dto to map to a request
+	 * @param  dto to map to a request
 	 * @return
 	 */
 	DeliverSecure createDeliverSecure(final DigitalMailDto dto) {
@@ -145,14 +148,14 @@ class DigitalMailMapper {
 	/**
 	 * The sealed delivery to be inserted into the SealedDelivery-object
 	 *
-	 * @param dto
-	 * @return A Sealed delivery signed by not the sender but us as a mediator.
+	 * @param  dto
+	 * @return     A Sealed delivery signed by not the sender but us as a mediator.
 	 */
 	SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
 		LOG.info("Creating sealed delivery");
 		try {
-			//Get the correct certificate
-			//Create the signedDeliveryDocument, inner one.
+			// Get the correct certificate
+			// Create the signedDeliveryDocument, inner one.
 			var signedDelivery = createSignedDelivery(dto);
 
 			final var signedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SignedDelivery"), SignedDelivery.class, signedDelivery);
@@ -194,8 +197,8 @@ class DigitalMailMapper {
 	/**
 	 * The object to be digitally signed
 	 *
-	 * @param dto to be translated into a {@link SignedDelivery}
-	 * @return A Signed delivery, should be signed by the sender, which in this case is also us.
+	 * @param  dto to be translated into a {@link SignedDelivery}
+	 * @return     A Signed delivery, should be signed by the sender, which in this case is also us.
 	 */
 	SignedDelivery createSignedDelivery(final DigitalMailDto dto) {
 		var signedDelivery = OBJECT_FACTORY.createSignedDelivery();
@@ -233,7 +236,8 @@ class DigitalMailMapper {
 		return attachments.stream()
 			.map(attachment -> {
 				// We need to decode the base64-encoded string before we convert it to a byte array.
-				final var attachmentBytes = Base64.decode(attachment.getBody());
+				final var attachmentBytes = Base64.decode(
+					attachment.getBody());
 
 				final var mailAttachment = new Attachment();
 				mailAttachment.setBody(attachmentBytes);
@@ -256,6 +260,7 @@ class DigitalMailMapper {
 			throw Problem.builder()
 				.withTitle("Couldn't create MD5-checksum for attachment")
 				.withStatus(Status.INTERNAL_SERVER_ERROR)
+
 				.build();
 		}
 	}
@@ -263,7 +268,7 @@ class DigitalMailMapper {
 	/**
 	 * Creates the &lt;v3:header&gt;-element
 	 *
-	 * @param dto
+	 * @param  dto
 	 * @return
 	 */
 	MessageHeader createMessageHeader(final DigitalMailDto dto) {
@@ -278,7 +283,7 @@ class DigitalMailMapper {
 	/**
 	 * Creates the Supportinfo-element
 	 *
-	 * @param dto
+	 * @param  dto
 	 * @return
 	 */
 
@@ -295,13 +300,13 @@ class DigitalMailMapper {
 	 * Creates the body-element
 	 * Will create an empty body if no bodyInformation object or body is present.
 	 *
-	 * @param dto to be translated into a {@link MessageBody}
-	 * @return A {@link MessageBody}
+	 * @param  dto to be translated into a {@link MessageBody}
+	 * @return     A {@link MessageBody}
 	 */
 	MessageBody createMessageBody(final DigitalMailDto dto) {
 		final var messageBody = new MessageBody();
 
-		//Make sure we actually have a body to send
+		// Make sure we actually have a body to send
 		if (dto.getBodyInformation() != null && StringUtils.isNotBlank(dto.getBodyInformation().getBody())) {
 			messageBody.setBody(createBody(dto.getBodyInformation()));
 			messageBody.setContentType(dto.getBodyInformation().getContentType());
@@ -342,7 +347,7 @@ class DigitalMailMapper {
 	 * Retrieve the alias for the key from the keystore.
 	 * As we only have one key we get the first one, if we need to get more we need to find it by alias.
 	 *
-	 * @param keyStore
+	 * @param  keyStore
 	 * @return
 	 * @throws KeyStoreException
 	 */

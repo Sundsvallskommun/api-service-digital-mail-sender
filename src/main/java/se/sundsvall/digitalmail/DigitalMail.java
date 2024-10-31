@@ -18,7 +18,7 @@ public class DigitalMail {
 	public static void main(String[] args) {
 		SpringApplication.run(DigitalMail.class, args);
 
-		//Set unlimited strength for cryptographic functions.
+		// Set unlimited strength for cryptographic functions.
 		Security.setProperty("crypto.policy", "unlimited");
 	}
 }

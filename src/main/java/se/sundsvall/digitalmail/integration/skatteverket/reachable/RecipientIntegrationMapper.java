@@ -29,7 +29,8 @@ class RecipientIntegrationMapper {
 	}
 
 	/**
-	 * @param personalNumbers map of personalnumbers with corresponding partyIds
+	 * 
+	 * @param  personalNumbers map of personalnumbers with corresponding partyIds
 	 * @return
 	 */
 	IsReachable createIsReachableRequest(final List<String> personalNumbers) {
@@ -58,8 +59,8 @@ class RecipientIntegrationMapper {
 	 * - The sender is accepted by the recipient (no difference between disallowing and no mailbox)
 	 * - that there's an existing servicesupplier object.
 	 *
-	 * @param reachabilityStatus status of the recipient
-	 * @return Optional {@link MailboxDto} containing the url and recipientId.
+	 * @param  reachabilityStatus status of the recipient
+	 * @return                    Optional {@link MailboxDto} containing the url and recipientId.
 	 */
 	private Optional<MailboxDto> getMailboxSettings(final ReachabilityStatus reachabilityStatus) {
 		if (reachabilityStatus.isSenderAccepted() &&                                                            // Make sure the recipient accepts the sender (Sundsvalls kommun)
@@ -80,7 +81,7 @@ class RecipientIntegrationMapper {
 	/**
 	 * Check if the service supplier "name" is one that we support.
 	 *
-	 * @param supplier
+	 * @param  supplier
 	 * @return
 	 */
 	boolean isSupportedSupplier(final String supplier) {

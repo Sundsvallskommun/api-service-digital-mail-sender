@@ -51,10 +51,8 @@ class DigitalMailRequestTests {
 	@Test
 	void testNoDirtOnCreatedBean() {
 		assertThat(DigitalMailRequest.builder().build()).hasAllNullFieldsOrPropertiesExcept("attachments").satisfies(
-			digitalMailRequest -> assertThat(digitalMailRequest.getAttachments()).isNotNull().isEmpty()
-		);
+			digitalMailRequest -> assertThat(digitalMailRequest.getAttachments()).isNotNull().isEmpty());
 		assertThat(new DigitalMailRequest()).hasAllNullFieldsOrPropertiesExcept("attachments").satisfies(
-			digitalMailRequest -> assertThat(digitalMailRequest.getAttachments()).isNotNull().isEmpty()
-		);
+			digitalMailRequest -> assertThat(digitalMailRequest.getAttachments()).isNotNull().isEmpty());
 	}
 }

@@ -36,8 +36,7 @@ class RecipientIntegrationMapperTest {
 		return Stream.of(
 			Arguments.of(true, true, false),
 			Arguments.of(false, false, false),
-			Arguments.of(false, true, false)
-		);
+			Arguments.of(false, true, false));
 	}
 
 	@Test
@@ -92,10 +91,12 @@ class RecipientIntegrationMapperTest {
 	}
 
 	/**
-	 * @param pending if pending, the mailbox has not yet been created and should be interpreted as the recipient not having a digital mailbox.
-	 * @param shouldHaveServiceSupplier No serviceSupplier indicates that the recipient doesn't have a digital mailbox.
-	 * @param isAccepted is the sender accepted by the recipient
-	 * @return a response with the given parameters
+	 *
+	 * @param  pending                   if pending, the mailbox has not yet been created and should be interpreted as the
+	 *                                   recipient not having a digital mailbox.
+	 * @param  shouldHaveServiceSupplier No serviceSupplier indicates that the recipient doesn't have a digital mailbox.
+	 * @param  isAccepted                is the sender accepted by the recipient
+	 * @return                           a response with the given parameters
 	 */
 	private IsReachableResponse createIsReachableResponse(final boolean pending,
 		final boolean shouldHaveServiceSupplier, final boolean isAccepted) {

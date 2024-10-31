@@ -51,10 +51,13 @@ public class DigitalMailRequest {
 
 	@Override
 	public boolean equals(final Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
 		final DigitalMailRequest that = (DigitalMailRequest) o;
-		return Objects.equals(partyId, that.partyId) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(headerSubject, that.headerSubject) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments, that.attachments) && Objects.equals(bodyInformation, that.bodyInformation);
+		return Objects.equals(partyId, that.partyId) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(headerSubject, that.headerSubject) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments,
+			that.attachments) && Objects.equals(bodyInformation, that.bodyInformation);
 	}
 
 	@Override

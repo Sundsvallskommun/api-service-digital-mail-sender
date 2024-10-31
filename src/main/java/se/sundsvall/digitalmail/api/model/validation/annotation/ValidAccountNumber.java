@@ -18,7 +18,9 @@ import jakarta.validation.Payload;
  * The annotated element must be a valid BANKGIRO or PLUSGIRO number.
  */
 @Documented
-@Target({FIELD, CONSTRUCTOR, PARAMETER})
+@Target({
+	FIELD, CONSTRUCTOR, PARAMETER
+})
 @Retention(RUNTIME)
 @Constraint(validatedBy = ValidAccountNumberConstraintValidator.class)
 public @interface ValidAccountNumber {

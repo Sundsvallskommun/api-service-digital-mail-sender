@@ -22,8 +22,8 @@ public class AvailabilityService {
 	/**
 	 * Fetch a list of possible mailboxes.
 	 * This is a list in case we need to expand upon this in the future.
-	 *
-	 * @param personalNumbers containing all partyIds we should fetch mailboxes for
+	 * 
+	 * @param  personalNumbers containing all partyIds we should fetch mailboxes for
 	 * @return
 	 */
 	public List<MailboxDto> getRecipientMailboxesAndCheckAvailability(final List<String> personalNumbers) {

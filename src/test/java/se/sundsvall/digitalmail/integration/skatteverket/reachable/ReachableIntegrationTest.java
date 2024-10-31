@@ -24,8 +24,7 @@ import se.gov.minameddelanden.schema.recipient.v3.IsReachable;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 
 @ExtendWith(MockitoExtension.class)
-class
-ReachableIntegrationTest {
+class ReachableIntegrationTest {
 
 	@Mock
 	private WebServiceTemplate mockReachableTemplate;
@@ -40,7 +39,7 @@ ReachableIntegrationTest {
 		when(mockMapper.createIsReachableRequest(any())).thenCallRealMethod();
 	}
 
-	//Not really testing much but behavior
+	// Not really testing much but behavior
 	@Test
 	void testCallIsReachable_whenOk_shouldReturnResponse() {
 		final var accountStatus = new AccountStatus();

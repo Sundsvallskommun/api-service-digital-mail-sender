@@ -32,7 +32,7 @@ class SkatteverketClientConfig {
 		this.properties = properties;
 	}
 
-	//Separate the beans since we don't want the "reachable" one to get intercepted for the size-check.
+	// Separate the beans since we don't want the "reachable" one to get intercepted for the size-check.
 	@Bean("skatteverketSendmailWebserviceTemplate")
 	WebServiceTemplate notificationWebserviceTemplate() {
 		final var builder = new WebServiceTemplateBuilder()
@@ -45,7 +45,7 @@ class SkatteverketClientConfig {
 			loadKeyStore(builder);
 		}
 
-		//Since we need to set the url dynamically we won't set the base url here.
+		// Since we need to set the url dynamically we won't set the base url here.
 		return builder
 			.withClientInterceptor(new SoapMessageSizeInterceptor(properties.messageMaxSize()))
 			.build();

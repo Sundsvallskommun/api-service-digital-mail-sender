@@ -40,8 +40,8 @@ public class DigitalMailService {
 	/**
 	 * Send a digital mail to a recipient
 	 *
-	 * @param requestDto containing message and recipient
-	 * @return Response whether the sending went ok or not.
+	 * @param  requestDto containing message and recipient
+	 * @return            Response whether the sending went ok or not.
 	 */
 	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
 		final var personalNumber = partyClient.getLegalId(municipalityId, requestDto.getPartyId());

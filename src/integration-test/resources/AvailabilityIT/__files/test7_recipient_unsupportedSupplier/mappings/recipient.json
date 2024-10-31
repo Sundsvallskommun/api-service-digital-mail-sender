@@ -1,35 +1,21 @@
 {
-  "request": {
-    "bodyPatterns": [
-      {
-        "matchesXPath": "//*[ns17:isReachable]//*[ns17:recipientId='190101010159']",
-        "xPathNamespaces": {
-          "ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"
-        }
-      }
-    ],
-    "method": "POST",
-    "url": "/recipient"
-  },
-  "response": {
-    "bodyFileName": "test7_recipient_unsupportedSupplier/response/recipient.xml",
-    "headers": {
-      "Connection": [
-        "keep-alive"
-      ],
-      "Content-Type": [
-        "text/xml;charset=UTF-8"
-      ],
-      "Keep-Alive": [
-        "timeout=60"
-      ],
-      "Transfer-Encoding": [
-        "chunked"
-      ],
-      "Content-Encoding": [
-        ""
-      ]
-    },
-    "status": 200
-  }
+	"request": {
+		"method": "POST",
+		"bodyPatterns": [{
+			"xPathNamespaces": {"ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"},
+			"matchesXPath": "//*[ns17:isReachable]//*[ns17:recipientId='190101010159']"
+		}],
+		"url": "/recipient"
+	},
+	"response": {
+		"headers": {
+			"Keep-Alive": ["timeout=60"],
+			"Transfer-Encoding": ["chunked"],
+			"Connection": ["keep-alive"],
+			"Content-Encoding": [""],
+			"Content-Type": ["text/xml;charset=UTF-8"]
+		},
+		"bodyFileName": "test7_recipient_unsupportedSupplier/response/recipient.xml",
+		"status": 200
+	}
 }

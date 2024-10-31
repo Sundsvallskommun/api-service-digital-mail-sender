@@ -19,9 +19,7 @@ import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 @Component
 @CircuitBreaker(name = "reachableIntegration")
 public class ReachableIntegration {
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(ReachableIntegration.class);
-
 	private final WebServiceTemplate isReachableTemplate;
 	private final RecipientIntegrationMapper mapper;
 
@@ -35,12 +33,11 @@ public class ReachableIntegration {
 	/**
 	 * Fetches a mailbox and if a mailbox is reachable.
 	 *
-	 * @param personalNumbers
+	 * @param  personalNumbers
 	 * @return
 	 */
 	public List<MailboxDto> isReachable(final List<String> personalNumbers) {
 		try {
-
 			// Call Skatteverket to see which mailbox(es) (if any) the person has
 			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers);
 
