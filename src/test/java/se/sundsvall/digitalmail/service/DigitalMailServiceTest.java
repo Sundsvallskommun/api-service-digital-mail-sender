@@ -25,6 +25,7 @@ import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
 
+import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
@@ -60,8 +61,13 @@ class DigitalMailServiceTest {
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList())).thenReturn(List.of(mailbox));
 		when(mockDigitalMailIntegration.sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"))).thenReturn(new DigitalMailResponse());
 
+		int pdfLength = request.getAttachments().getFirst().getBody().length();  // Save the length of the pdf before compression
+
 		final var digitalMailResponse = service.sendDigitalMail(new DigitalMailDto(request), "");
 
+		int compressedPdfLength = request.getAttachments().getFirst().getBody().length(); // Save the length of the pdf after compression
+
+		assertThat(compressedPdfLength).isLessThan(pdfLength);  // Check that the pdf has been compressed
 		assertThat(digitalMailResponse).isNotNull();
 		verify(mockPartyClient, times(1)).getLegalId(anyString(), anyString());
 		verify(mockAvailabilityService, times(1)).getRecipientMailboxesAndCheckAvailability(anyList());

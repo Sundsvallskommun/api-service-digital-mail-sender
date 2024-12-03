@@ -2,6 +2,7 @@ package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,12 +11,9 @@ import org.springframework.stereotype.Component;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.zalando.problem.Problem;
 import org.zalando.problem.ThrowableProblem;
-
+import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
-
-import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 
 @Component
 @CircuitBreaker(name = "digitalMailIntegration")

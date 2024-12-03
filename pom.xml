@@ -21,6 +21,7 @@
 		<cxf.version>4.0.3</cxf.version>
 		<istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
 		<jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
+		<librepdf.version>2.0.3</librepdf.version>
 		<mockwebserver.version>4.12.0</mockwebserver.version>
 		<zjsonpatch.version>0.4.16</zjsonpatch.version>
 	</properties>
@@ -78,6 +79,13 @@
 			<artifactId>commons-io</artifactId>
 			<version>${commons-io.version}</version>
 		</dependency>
+		<!-- Used for compressing pdfs -->
+		<dependency>
+			<groupId>com.github.librepdf</groupId>
+			<artifactId>openpdf</artifactId>
+			<version>${librepdf.version}</version>
+		</dependency>
+
 		<!-- Test -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
