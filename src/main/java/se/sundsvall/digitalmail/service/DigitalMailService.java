@@ -13,6 +13,7 @@ import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalmail.integration.party.PartyClient;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
+import se.sundsvall.digitalmail.util.PdfCompressor;
 
 @Service
 public class DigitalMailService {
@@ -44,6 +45,7 @@ public class DigitalMailService {
 	 * @return            Response whether the sending went ok or not.
 	 */
 	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
+		PdfCompressor.compress(requestDto.getAttachments());
 		final var personalNumber = partyClient.getLegalId(municipalityId, requestDto.getPartyId());
 
 		final var possibleMailbox = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));

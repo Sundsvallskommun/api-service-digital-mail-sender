@@ -85,4 +85,8 @@ public final class TestObjectFactory {
 			.build();
 	}
 
+	public static String getSamplePdfBase64() {
+		return SAMPLE_PDF_BASE64;
+	}
+
 }
