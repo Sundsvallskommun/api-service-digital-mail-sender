@@ -1,11 +1,9 @@
 package se.gov.minameddelanden.common;
 
-import java.io.ByteArrayInputStream;
-
-import javax.xml.transform.stream.StreamSource;
-
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
+import java.io.ByteArrayInputStream;
+import javax.xml.transform.stream.StreamSource;
 
 public final class JAXBMarshal {
 

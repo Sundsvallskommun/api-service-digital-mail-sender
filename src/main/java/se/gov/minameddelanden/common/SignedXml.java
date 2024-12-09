@@ -1,7 +1,6 @@
 package se.gov.minameddelanden.common;
 
 import javax.xml.crypto.dsig.XMLSignature;
-
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)

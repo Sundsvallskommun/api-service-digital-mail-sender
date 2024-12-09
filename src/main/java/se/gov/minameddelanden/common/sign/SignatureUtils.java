@@ -6,7 +6,6 @@ import static se.gov.minameddelanden.common.XmlUtil.removeXmlNsPrefixes;
 
 import java.util.ArrayList;
 import java.util.regex.Pattern;
-
 import javax.xml.crypto.dsig.CanonicalizationMethod;
 import javax.xml.crypto.dsig.DigestMethod;
 import javax.xml.crypto.dsig.SignatureMethod;
@@ -16,10 +15,8 @@ import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
-
 import org.w3c.dom.Document;
 import org.zalando.problem.Problem;
-
 import se.gov.minameddelanden.common.X509CertificateWithPrivateKey;
 
 public final class SignatureUtils {

@@ -5,12 +5,11 @@ import static lombok.AccessLevel.PROTECTED;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
-import se.sundsvall.dept44.common.validators.annotation.OneOf;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
+import se.sundsvall.dept44.common.validators.annotation.OneOf;
 
 @Schema(description = "The body of the message")
 @Builder(setterPrefix = "with")

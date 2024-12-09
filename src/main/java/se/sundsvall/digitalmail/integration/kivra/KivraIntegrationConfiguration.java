@@ -5,22 +5,20 @@ import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static se.sundsvall.digitalmail.integration.kivra.KivraIntegration.INTEGRATION_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.Request;
+import generated.com.kivra.ContentUserContextInvoice;
+import generated.com.kivra.Payment;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
-
 import se.sundsvall.dept44.configuration.feign.FeignConfiguration;
 import se.sundsvall.dept44.configuration.feign.decoder.JsonPathErrorDecoder;
 import se.sundsvall.dept44.configuration.feign.interceptor.OAuth2RequestInterceptor;
 import se.sundsvall.dept44.configuration.feign.retryer.ActionRetryer;
 import se.sundsvall.digitalmail.integration.kivra.support.ContentUserContextInvoiceMixin;
 import se.sundsvall.digitalmail.integration.kivra.support.PaymentMixin;
-
-import feign.Request;
-import generated.com.kivra.ContentUserContextInvoice;
-import generated.com.kivra.Payment;
 
 @Import(FeignConfiguration.class)
 class KivraIntegrationConfiguration {
