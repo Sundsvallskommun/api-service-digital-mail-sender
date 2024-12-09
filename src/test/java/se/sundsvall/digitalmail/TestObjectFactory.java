@@ -9,9 +9,7 @@ import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
 import org.springframework.http.MediaType;
-
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.File;

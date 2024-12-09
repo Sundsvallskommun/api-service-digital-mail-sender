@@ -6,18 +6,18 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.util.Base64;
 import java.util.List;
-
 import javax.xml.crypto.dsig.XMLSignature;
 import javax.xml.crypto.dsig.XMLSignatureFactory;
 import javax.xml.crypto.dsig.dom.DOMValidateContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
-
 import org.assertj.core.api.SoftAssertions;
 import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
 import org.junit.jupiter.api.Disabled;
@@ -29,14 +29,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.zalando.problem.ThrowableProblem;
-
-import se.sundsvall.digitalmail.DigitalMail;
-import se.sundsvall.digitalmail.TestObjectFactory;
-import se.sundsvall.digitalmail.api.model.BodyInformation;
-import se.sundsvall.digitalmail.api.model.File;
-
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
 import se.gov.minameddelanden.common.sign.X509KeySelector;
 import se.gov.minameddelanden.schema.message.v3.SealedDelivery;
 import se.gov.minameddelanden.schema.message.v3.SignedDelivery;
@@ -44,6 +36,10 @@ import se.gov.minameddelanden.schema.service.DeliveryResult;
 import se.gov.minameddelanden.schema.service.DeliveryStatus;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
+import se.sundsvall.digitalmail.DigitalMail;
+import se.sundsvall.digitalmail.TestObjectFactory;
+import se.sundsvall.digitalmail.api.model.BodyInformation;
+import se.sundsvall.digitalmail.api.model.File;
 
 @ActiveProfiles("junit")
 @SpringBootTest(webEnvironment = RANDOM_PORT, classes = DigitalMail.class)

@@ -1,19 +1,33 @@
 {
 	"request": {
 		"method": "POST",
-		"bodyPatterns": [{
-			"xPathNamespaces": {"ns8": "http://minameddelanden.gov.se/schema/Message/v2"},
-			"matchesXPath": "//*[ns8:Recipient='192301010168']"
-		}],
+		"bodyPatterns": [
+			{
+				"xPathNamespaces": {
+					"ns8": "http://minameddelanden.gov.se/schema/Message/v2"
+				},
+				"matchesXPath": "//*[ns8:Recipient='192301010168']"
+			}
+		],
 		"url": "/deliversecure"
 	},
 	"response": {
 		"headers": {
-			"Keep-Alive": ["timeout=60"],
-			"Transfer-Encoding": ["chunked"],
-			"Connection": ["keep-alive"],
-			"Content-Encoding": [""],
-			"Content-Type": ["text/xml;charset=UTF-8"]
+			"Keep-Alive": [
+				"timeout=60"
+			],
+			"Transfer-Encoding": [
+				"chunked"
+			],
+			"Connection": [
+				"keep-alive"
+			],
+			"Content-Encoding": [
+				""
+			],
+			"Content-Type": [
+				"text/xml;charset=UTF-8"
+			]
 		},
 		"bodyFileName": "../__files/deliverSecure-kivra.xml",
 		"status": 200

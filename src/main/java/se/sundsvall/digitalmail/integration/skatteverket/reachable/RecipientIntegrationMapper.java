@@ -4,16 +4,13 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.stereotype.Component;
-
-import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
-import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
-
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachable;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 import se.gov.minameddelanden.schema.recipient.v3.ObjectFactory;
+import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
+import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @Component
 class RecipientIntegrationMapper {

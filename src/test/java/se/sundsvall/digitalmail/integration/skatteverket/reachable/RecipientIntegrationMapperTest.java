@@ -6,7 +6,6 @@ import static se.sundsvall.digitalmail.integration.skatteverket.reachable.Recipi
 
 import java.util.List;
 import java.util.stream.Stream;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -15,13 +14,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-
-import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
-
 import se.gov.minameddelanden.schema.recipient.AccountStatus;
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.ServiceSupplier;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
+import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @ExtendWith(MockitoExtension.class)
 class RecipientIntegrationMapperTest {

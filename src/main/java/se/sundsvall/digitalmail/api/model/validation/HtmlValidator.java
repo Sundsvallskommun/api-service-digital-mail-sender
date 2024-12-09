@@ -2,16 +2,14 @@ package se.sundsvall.digitalmail.api.model.validation;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import jakarta.validation.ValidationException;
 import java.io.ByteArrayInputStream;
 import java.util.Base64;
 import java.util.List;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import org.springframework.stereotype.Component;
-
-import jakarta.validation.ValidationException;
 import nu.validator.client.EmbeddedValidator;
+import org.springframework.stereotype.Component;
 
 @Component
 public class HtmlValidator {

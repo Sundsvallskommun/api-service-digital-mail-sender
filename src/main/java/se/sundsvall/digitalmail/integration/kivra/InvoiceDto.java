@@ -4,14 +4,12 @@ import static java.util.Optional.ofNullable;
 
 import java.time.LocalDate;
 import java.util.List;
-
+import lombok.Getter;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;
-
-import lombok.Getter;
 
 @Getter
 public class InvoiceDto {

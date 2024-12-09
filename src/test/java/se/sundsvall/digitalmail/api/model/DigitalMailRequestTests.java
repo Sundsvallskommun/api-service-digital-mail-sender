@@ -10,7 +10,6 @@ import static org.hamcrest.Matchers.allOf;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 import java.util.List;
-
 import org.hamcrest.MatcherAssert;
 import org.junit.jupiter.api.Test;
 

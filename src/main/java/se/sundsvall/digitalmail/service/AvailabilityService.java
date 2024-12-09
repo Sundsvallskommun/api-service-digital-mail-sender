@@ -3,10 +3,8 @@ package se.sundsvall.digitalmail.service;
 import static org.zalando.problem.Status.NOT_FOUND;
 
 import java.util.List;
-
 import org.springframework.stereotype.Service;
 import org.zalando.problem.Problem;
-
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.reachable.ReachableIntegration;
 

@@ -5,10 +5,9 @@ import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
 import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.DATE_FORMATTER;
 import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.mapInvoiceToContent;
 
-import org.junit.jupiter.api.Test;
-
 import generated.com.kivra.PaymentMultipleOptions;
 import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
+import org.junit.jupiter.api.Test;
 
 class KivraMapperTests {
 

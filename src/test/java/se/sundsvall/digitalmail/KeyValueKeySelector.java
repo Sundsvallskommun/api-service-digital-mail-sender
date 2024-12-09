@@ -1,5 +1,10 @@
 package se.sundsvall.digitalmail;
 
+import java.security.Key;
+import java.security.KeyException;
+import java.security.PublicKey;
+import java.security.cert.X509Certificate;
+import java.util.List;
 import javax.xml.crypto.AlgorithmMethod;
 import javax.xml.crypto.KeySelector;
 import javax.xml.crypto.KeySelectorException;
@@ -10,11 +15,6 @@ import javax.xml.crypto.dsig.SignatureMethod;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.KeyValue;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
-import java.security.Key;
-import java.security.KeyException;
-import java.security.PublicKey;
-import java.security.cert.X509Certificate;
-import java.util.List;
 
 public class KeyValueKeySelector extends KeySelector {
 	static boolean algEquals(final String algURI, final String algName) {

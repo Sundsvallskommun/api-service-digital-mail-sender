@@ -4,7 +4,9 @@
 		"url": "/kivra/content"
 	},
 	"response": {
-		"headers": {"Content-Type": "application/json"},
+		"headers": {
+			"Content-Type": "application/json"
+		},
 		"bodyFileName": "test1_successfulRequest/response/kivra.json",
 		"status": "201"
 	}
