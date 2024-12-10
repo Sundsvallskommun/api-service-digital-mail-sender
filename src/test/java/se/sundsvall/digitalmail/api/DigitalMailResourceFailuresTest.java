@@ -42,10 +42,10 @@ class DigitalMailResourceFailuresTest {
 
 	private static final String HAS_AVAILABLE_MAILBOX_PATH = "/" + MUNICIPALITY_ID + "/has-available-mailbox/{partyId}";
 
-	@MockBean
+	@MockitoBean
 	private HtmlValidator mockHtmlValidator;
 
-	@MockBean
+	@MockitoBean
 	private DigitalMailService mockDigitalMailService;
 
 	@Autowired
