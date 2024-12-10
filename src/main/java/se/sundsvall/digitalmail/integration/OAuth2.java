@@ -1,8 +1,7 @@
 package se.sundsvall.digitalmail.integration;
 
-import org.springframework.boot.context.properties.bind.DefaultValue;
-
 import jakarta.validation.constraints.NotBlank;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 public record OAuth2(
 

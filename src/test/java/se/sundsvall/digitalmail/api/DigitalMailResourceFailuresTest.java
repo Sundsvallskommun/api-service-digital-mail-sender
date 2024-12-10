@@ -16,17 +16,15 @@ import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequ
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceRequest;
 
 import java.util.UUID;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import org.zalando.problem.violations.Violation;
-
 import se.sundsvall.digitalmail.DigitalMail;
 import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
@@ -44,10 +42,10 @@ class DigitalMailResourceFailuresTest {
 
 	private static final String HAS_AVAILABLE_MAILBOX_PATH = "/" + MUNICIPALITY_ID + "/has-available-mailbox/{partyId}";
 
-	@MockBean
+	@MockitoBean
 	private HtmlValidator mockHtmlValidator;
 
-	@MockBean
+	@MockitoBean
 	private DigitalMailService mockDigitalMailService;
 
 	@Autowired

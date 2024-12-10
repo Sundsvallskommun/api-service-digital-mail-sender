@@ -4,7 +4,9 @@
 		"url": "/party/PRIVATE/b1b46458-7ff0-42d2-b29c-3bf20729cfea/legalId"
 	},
 	"response": {
-		"headers": {"Content-Type": "application/problem+json; charset=utf-8"},
+		"headers": {
+			"Content-Type": "application/problem+json; charset=utf-8"
+		},
 		"jsonBody": {
 			"detail": "No legalId found!",
 			"title": "Not Found",

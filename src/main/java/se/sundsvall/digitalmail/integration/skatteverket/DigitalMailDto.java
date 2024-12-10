@@ -1,9 +1,8 @@
 package se.sundsvall.digitalmail.integration.skatteverket;
 
-import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
-
 import lombok.Getter;
 import lombok.Setter;
+import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 
 @Getter
 @Setter

@@ -1,11 +1,13 @@
 {
 	"reference": "Faktura #12345",
 	"subject": "Faktura från Sundsvalls kommun",
-	"files": [{
-		"filename": "invoice_12345.pdf",
-		"body": "c29tZSBwZGYgZGF0YQo=",
-		"contentType": "application/pdf"
-	}],
+	"files": [
+		{
+			"filename": "invoice_12345.pdf",
+			"body": "c29tZSBwZGYgZGF0YQo=",
+			"contentType": "application/pdf"
+		}
+	],
 	"details": {
 		"amount": 123.45,
 		"dueDate": "2023-10-30",

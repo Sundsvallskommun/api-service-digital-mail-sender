@@ -7,7 +7,6 @@ import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
 
 import java.time.LocalDate;
 import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 class DigitalInvoiceRequestTests {

@@ -3,6 +3,11 @@ package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 
+import jakarta.xml.bind.DatatypeConverter;
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
@@ -15,7 +20,6 @@ import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
-
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -23,7 +27,6 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-
 import org.apache.commons.lang.StringUtils;
 import org.jose4j.base64url.Base64;
 import org.slf4j.Logger;
@@ -33,21 +36,6 @@ import org.springframework.stereotype.Component;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
 import org.zalando.problem.ThrowableProblem;
-
-import se.sundsvall.dept44.requestid.RequestId;
-import se.sundsvall.dept44.util.KeyStoreUtils;
-import se.sundsvall.digitalmail.api.model.BodyInformation;
-import se.sundsvall.digitalmail.api.model.DeliveryStatus;
-import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
-import se.sundsvall.digitalmail.api.model.File;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
-import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
-
-import jakarta.xml.bind.DatatypeConverter;
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import jakarta.xml.bind.JAXBException;
-import jakarta.xml.bind.Marshaller;
 import se.gov.minameddelanden.common.X509CertificateWithPrivateKey;
 import se.gov.minameddelanden.common.Xml;
 import se.gov.minameddelanden.schema.message.Attachment;
@@ -64,6 +52,14 @@ import se.gov.minameddelanden.schema.message.v3.SupportInfo;
 import se.gov.minameddelanden.schema.sender.Sender;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
+import se.sundsvall.dept44.requestid.RequestId;
+import se.sundsvall.dept44.util.KeyStoreUtils;
+import se.sundsvall.digitalmail.api.model.BodyInformation;
+import se.sundsvall.digitalmail.api.model.DeliveryStatus;
+import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
+import se.sundsvall.digitalmail.api.model.File;
+import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @Component
 class DigitalMailMapper {

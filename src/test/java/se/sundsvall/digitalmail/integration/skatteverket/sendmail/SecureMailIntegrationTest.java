@@ -15,13 +15,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.ws.client.core.WebServiceTemplate;
 import org.zalando.problem.ThrowableProblem;
-
+import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
+import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
-
-import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
-import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 
 @ExtendWith(MockitoExtension.class)
 class SecureMailIntegrationTest {
