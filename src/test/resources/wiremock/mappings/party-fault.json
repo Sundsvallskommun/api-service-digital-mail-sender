@@ -4,7 +4,9 @@
 		"url": "/party/PRIVATE/6a5c3d04-412d-11ec-973a-0242ac130004/legalId"
 	},
 	"response": {
-		"headers": {"Content-Type": "text/plain"},
+		"headers": {
+			"Content-Type": "text/plain"
+		},
 		"body": "192301010160",
 		"status": "200"
 	}

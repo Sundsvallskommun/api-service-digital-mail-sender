@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +17,6 @@ import org.springframework.ws.soap.SoapMessage;
 import org.zalando.logbook.Logbook;
 import org.zalando.problem.Problem;
 import org.zalando.problem.Status;
-
 import se.sundsvall.dept44.configuration.webservicetemplate.WebServiceTemplateBuilder;
 
 @Configuration

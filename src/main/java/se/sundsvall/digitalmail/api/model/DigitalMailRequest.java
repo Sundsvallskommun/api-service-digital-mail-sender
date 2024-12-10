@@ -2,22 +2,20 @@ package se.sundsvall.digitalmail.api.model;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-
-import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
-import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
+import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 
 @Getter
 @Setter

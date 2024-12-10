@@ -1,16 +1,13 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
-import java.time.Duration;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.validation.annotation.Validated;
-
-import se.sundsvall.digitalmail.integration.OAuth2;
-
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.Duration;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.context.properties.bind.DefaultValue;
+import org.springframework.validation.annotation.Validated;
+import se.sundsvall.digitalmail.integration.OAuth2;
 
 @Validated
 @ConfigurationProperties(prefix = "integration.kivra")

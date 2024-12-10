@@ -1,7 +1,6 @@
 package se.sundsvall.digitalmail.integration.kivra.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import generated.com.kivra.ContentUserContextInvoicePaymentOrPaymentMultipleOptions;
 
 /**

@@ -3,12 +3,11 @@ package se.sundsvall.digitalmail.integration.kivra;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static se.sundsvall.digitalmail.integration.kivra.KivraIntegration.INTEGRATION_NAME;
 
+import generated.com.kivra.ContentUserV2;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import generated.com.kivra.ContentUserV2;
 
 @FeignClient(
 	name = INTEGRATION_NAME,

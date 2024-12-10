@@ -3,9 +3,6 @@ package se.sundsvall.digitalmail.api.model;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 
-import se.sundsvall.dept44.common.validators.annotation.OneOf;
-import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -13,6 +10,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import se.sundsvall.dept44.common.validators.annotation.OneOf;
+import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
 
 @Setter
 @Getter
