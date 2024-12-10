@@ -17,7 +17,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
@@ -42,10 +42,10 @@ class DigitalMailResourceTest {
 
 	private static final String HAS_AVAILABLE_MAILBOX_PATH = "/" + MUNICIPALITY_ID + "/has-available-mailbox/{partyId}";
 
-	@MockBean
+	@MockitoBean
 	private HtmlValidator mockHtmlValidator;
 
-	@MockBean
+	@MockitoBean
 	private DigitalMailService mockDigitalMailService;
 
 	@Autowired
