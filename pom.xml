@@ -18,7 +18,7 @@
 		<kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
 		<commons-io.version>2.18.0</commons-io.version>
 		<nu-html-validator.version>18.11.5</nu-html-validator.version>
-		<cxf.version>4.0.3</cxf.version>
+		<cxf.version>4.1.0</cxf.version>
 		<istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
 		<jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
 		<librepdf.version>2.0.3</librepdf.version>
