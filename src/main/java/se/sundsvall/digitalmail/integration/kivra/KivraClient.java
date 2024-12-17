@@ -4,6 +4,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static se.sundsvall.digitalmail.integration.kivra.KivraIntegration.INTEGRATION_NAME;
 
 import generated.com.kivra.ContentUserV2;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 	name = INTEGRATION_NAME,
 	url = "${integration.kivra.api-url}",
 	configuration = KivraIntegrationConfiguration.class)
+@CircuitBreaker(name = INTEGRATION_NAME)
 interface KivraClient {
 
 	@PostMapping(value = "/content", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
