@@ -1,10 +1,11 @@
 package se.sundsvall.digitalmail.integration.party;
 
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 import static se.sundsvall.digitalmail.integration.party.PartyConfig.INTEGRATION_NAME;
 
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 	name = INTEGRATION_NAME,
 	url = "${integration.party.api-url}",
 	configuration = PartyConfig.class)
+@CircuitBreaker(name = INTEGRATION_NAME)
 public interface PartyClient {
 
 	/**
@@ -22,7 +24,6 @@ public interface PartyClient {
 	 * @return                personId or organizationId.
 	 */
 	@Cacheable(value = "partyCache")
-	@GetMapping(path = "/{municipalityId}/PRIVATE/{partyId}/legalId", produces = MediaType.TEXT_PLAIN_VALUE)
+	@GetMapping(path = "/{municipalityId}/PRIVATE/{partyId}/legalId", produces = TEXT_PLAIN_VALUE)
 	String getLegalId(@PathVariable("municipalityId") String municipalityId, @PathVariable("partyId") String partyId);
-
 }
