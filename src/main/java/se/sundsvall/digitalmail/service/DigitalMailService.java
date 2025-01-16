@@ -60,9 +60,11 @@ public class DigitalMailService {
 		final var ssn = partyClient.getLegalId(municipalityId, invoiceDto.getPartyId());
 		invoiceDto.setSsn(ssn);
 
-		final var result = kivraIntegration.sendInvoice(invoiceDto);
+		if (kivraIntegration.verifyValidRecipient(ssn)) {
+			return new DigitalInvoiceResponse(invoiceDto.getPartyId(), kivraIntegration.sendInvoice(invoiceDto));
+		}
 
-		return new DigitalInvoiceResponse(invoiceDto.getPartyId(), result);
+		return new DigitalInvoiceResponse(invoiceDto.getPartyId(), false);
 	}
 
 	public boolean verifyRecipientHasSomeAvailableMailbox(final String partyId, final String municipalityId) {

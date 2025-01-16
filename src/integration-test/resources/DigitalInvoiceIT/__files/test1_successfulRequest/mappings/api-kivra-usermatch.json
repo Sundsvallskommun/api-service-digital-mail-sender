@@ -1,13 +1,13 @@
 {
 	"request": {
 		"method": "POST",
-		"url": "/kivra/content"
+		"url": "/kivra/usermatch/ssn"
 	},
 	"response": {
 		"headers": {
 			"Content-Type": "application/json"
 		},
-		"bodyFileName": "test1_successfulRequest/response/kivra.json",
+		"bodyFileName": "test1_successfulRequest/response/api-kivra-usermatch-response.json",
 		"status": "201"
 	}
 }
