@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
 import java.util.List;
 import java.util.Optional;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachable;
@@ -32,15 +33,15 @@ class RecipientIntegrationMapper {
 	 */
 	IsReachable createIsReachableRequest(final List<String> personalNumbers) {
 		final var isReachable = OBJECT_FACTORY.createIsReachable();
-		isReachable.getRecipientId().addAll(personalNumbers);
+		isReachable.getRecipientIds().addAll(personalNumbers);
 		isReachable.setSenderOrgNr(SENDER_ORG_NR);
 		return isReachable;
 	}
 
 	List<MailboxDto> getMailboxSettings(final IsReachableResponse response) {
-		if (response.getReturn() != null && !response.getReturn().isEmpty()) {
+		if (CollectionUtils.isNotEmpty(response.getReturns())) {
 			// There will only be one since we only ever ask for one, get it (for now at least).
-			return response.getReturn().stream()
+			return response.getReturns().stream()
 				.map(this::getMailboxSettings)
 				.filter(Optional::isPresent)
 				.map(Optional::get)
