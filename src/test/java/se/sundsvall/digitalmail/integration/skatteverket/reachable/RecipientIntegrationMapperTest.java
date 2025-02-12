@@ -43,7 +43,7 @@ class RecipientIntegrationMapperTest {
 		final var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber));
 
 		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(SENDER_ORG_NR);
-		assertThat(isReachableRequest.getRecipientId().getFirst()).isEqualTo(personalNumber);
+		assertThat(isReachableRequest.getRecipientIds().getFirst()).isEqualTo(personalNumber);
 	}
 
 	@Test
@@ -116,7 +116,7 @@ class RecipientIntegrationMapperTest {
 		reachabilityStatus.setAccountStatus(accountStatus);
 
 		final var response = new IsReachableResponse();
-		response.getReturn().add(reachabilityStatus);
+		response.getReturns().add(reachabilityStatus);
 
 		return response;
 	}

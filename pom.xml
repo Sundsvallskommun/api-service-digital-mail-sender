@@ -16,11 +16,11 @@
 		<my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
 		<kivra-generated-sources-folder>src/min/java</kivra-generated-sources-folder>
 		<kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
+
 		<commons-io.version>2.18.0</commons-io.version>
 		<nu-html-validator.version>18.11.5</nu-html-validator.version>
-		<cxf.version>4.0.3</cxf.version>
+		<cxf.version>4.1.0</cxf.version>
 		<istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
-		<jakarta.xml.bind-api.version>4.0.1</jakarta.xml.bind-api.version>
 		<librepdf.version>2.0.3</librepdf.version>
 		<mockwebserver.version>4.12.0</mockwebserver.version>
 		<zjsonpatch.version>0.4.16</zjsonpatch.version>

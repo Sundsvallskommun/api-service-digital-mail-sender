@@ -66,7 +66,7 @@ class DigitalMailMapperTest {
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls Kommun");
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo("162120002411");
 
-		final var header = signedDelivery.getDelivery().getMessage().getFirst().getHeader();
+		final var header = signedDelivery.getDelivery().getMessages().getFirst().getHeader();
 
 		softly.assertThat(header.getSubject()).isEqualTo("Some subject");
 		softly.assertThat(header.getLanguage()).isEqualTo("svSE");
@@ -75,7 +75,7 @@ class DigitalMailMapperTest {
 		softly.assertThat(header.getSupportinfo().getURL()).isEqualTo("http://url.com");
 		softly.assertThat(header.getSupportinfo().getText()).isEqualTo("support text");
 
-		final var body = signedDelivery.getDelivery().getMessage().get(0).getBody();
+		final var body = signedDelivery.getDelivery().getMessages().get(0).getBody();
 		softly.assertThat(body.getBody()).isNotNull();
 		softly.assertThat(body.getContentType()).isEqualTo("text/plain");
 	}
@@ -163,7 +163,7 @@ class DigitalMailMapperTest {
 
 		final var deliveryStatus = new DeliveryStatus();
 		deliveryStatus.setDelivered(true);
-		deliveryResult.getStatus().add(deliveryStatus);
+		deliveryResult.getStatuses().add(deliveryStatus);
 
 		final var deliverSecureResponse = new DeliverSecureResponse();
 		deliverSecureResponse.setReturn(deliveryResult);

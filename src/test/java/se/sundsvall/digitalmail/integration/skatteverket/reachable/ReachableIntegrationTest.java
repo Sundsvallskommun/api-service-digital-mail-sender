@@ -46,7 +46,7 @@ class ReachableIntegrationTest {
 		reachabilityStatus.setAccountStatus(accountStatus);
 
 		final var response = new IsReachableResponse();
-		response.getReturn().add(reachabilityStatus);
+		response.getReturns().add(reachabilityStatus);
 
 		when(mockMapper.getMailboxSettings(response))
 			.thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));

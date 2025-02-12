@@ -123,7 +123,7 @@ class DigitalMailMapper {
 		final var digitalMailResponse = new DigitalMailResponse();
 		digitalMailResponse.setDeliveryStatus(DeliveryStatus.builder()
 			.withTransactionId(deliveryResult.getReturn().getTransId())
-			.withDelivered(deliveryResult.getReturn().getStatus().getFirst().isDelivered())   // Will always be only one, for now
+			.withDelivered(deliveryResult.getReturn().getStatuses().getFirst().isDelivered())   // Will always be only one, for now
 			.withPartyId(partyId)
 			.build());
 		return digitalMailResponse;
@@ -210,7 +210,7 @@ class DigitalMailMapper {
 	SecureDelivery createSecureDelivery(final DigitalMailDto dto) {
 		final var secureDelivery = new SecureDelivery();
 		secureDelivery.setHeader(createSecureDeliveryHeader(dto));
-		secureDelivery.getMessage().add(createSecureMessage(dto));
+		secureDelivery.getMessages().add(createSecureMessage(dto));
 		return secureDelivery;
 	}
 
@@ -219,7 +219,7 @@ class DigitalMailMapper {
 		secureMessage.setHeader(createMessageHeader(dto));
 		secureMessage.setBody(createMessageBody(dto));
 		if (isNotEmpty(dto.getAttachments())) {
-			secureMessage.getAttachment().addAll(createAttachments(dto.getAttachments()));
+			secureMessage.getAttachments().addAll(createAttachments(dto.getAttachments()));
 		}
 		return secureMessage;
 	}

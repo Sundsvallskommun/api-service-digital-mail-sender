@@ -6,14 +6,14 @@
         xmlns:recipient="http://minameddelanden.gov.se/schema/Recipient">
 
     <import schemaLocation="Recipient.xsd" namespace="http://minameddelanden.gov.se/schema/Recipient"></import>
-        
-    <simpleType name="PersonalNumber">
+
+    <simpleType name="SignatoryId">
         <restriction base="string">
-            <length value="12"></length>
-            <pattern value="18\d{10}|19\d{10}|20\d{10}"></pattern>
+            <minLength value="2"/>
+            <maxLength value="256"/>
         </restriction>
     </simpleType>
-    
+
     <simpleType name="UserIdentity">
         <restriction base="string">
             <pattern
@@ -26,13 +26,13 @@
 
     <complexType name="Person">
         <sequence>
-            <element name="Id" type="authority:PersonalNumber"
-                         minOccurs="1" maxOccurs="1">
+            <element name="Id" type="authority:SignatoryId"
+                     minOccurs="1" maxOccurs="1">
             </element>
             <element name="Name" type="string" minOccurs="1" maxOccurs="1"></element>
         </sequence>
     </complexType>
-    
+
     <simpleType name="AuthorizationStatus">
         <restriction base="string">
             <!-- Inskickad data är tillräcklig för firmateckning -->
@@ -40,7 +40,7 @@
 
             <!-- Inskickad data måste kompletteras för firmateckning -->
             <enumeration value="Incomplete" />
-    		
+
             <!-- Firmateckningsreglerna går inte att tolka -->
             <enumeration value="RulesNotSupported" />
         </restriction>
@@ -49,17 +49,17 @@
     <complexType name="SignatureAuthorizationResult">
         <sequence>
             <element name="Id" type="recipient:RecipientId"
-                         minOccurs="0" maxOccurs="1" />
+                     minOccurs="0" maxOccurs="1" />
             <element name="SignedBy" type="authority:Person"
-                         minOccurs="0" maxOccurs="unbounded"/>
+                     minOccurs="0" maxOccurs="unbounded"/>
             <element name="Status" type="authority:AuthorizationStatus"
-                         minOccurs="0" maxOccurs="1" />
+                     minOccurs="0" maxOccurs="1" />
             <element name="Timestamp" type="dateTime" minOccurs="0"
-                         maxOccurs="1" />
+                     maxOccurs="1" />
             <element name="Text" type="string" minOccurs="0"
-                         maxOccurs="1" />
+                     maxOccurs="1" />
             <element name="PossibleSigners" type="authority:Person"
-                         minOccurs="0" maxOccurs="unbounded" />
+                     minOccurs="0" maxOccurs="unbounded" />
         </sequence>
     </complexType>
 
@@ -128,7 +128,7 @@
             <enumeration value="EditSettingsConsent"></enumeration>
             <enumeration value="EditSettingsAddressbook"></enumeration>
             <enumeration value="EditSettingsInactivate"></enumeration>
-            
+
             <enumeration value="InitiateConsentAction"></enumeration>
         </restriction>
     </simpleType>
