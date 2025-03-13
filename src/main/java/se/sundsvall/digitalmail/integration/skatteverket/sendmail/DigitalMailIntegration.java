@@ -57,6 +57,9 @@ public class DigitalMailIntegration {
 				LOG.error("Failed to send digital mail", e);
 				throw e;
 			}
+
+			// Needed to get stacktraces
+			LOG.error("Failed to send digital mail", e);
 			final var cause = getProblemCause(e);
 
 			throw Problem.builder()
