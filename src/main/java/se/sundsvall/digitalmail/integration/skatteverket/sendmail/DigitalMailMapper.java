@@ -75,10 +75,27 @@ class DigitalMailMapper {
 	private final SkatteverketProperties properties;
 
 	private final DocumentBuilder documentBuilder;
-	private final Marshaller marshaller;
 
 	private final KeyStore keyStore;
 	private final X509CertificateWithPrivateKey certificate;
+
+	// Since the marshaller is not thread safe we need to create a new one for each thread.
+	private final ThreadLocal<Marshaller> threadLocalMarshaller = ThreadLocal.withInitial(() -> {
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(SignedDelivery.class, SealedDelivery.class, DeliverSecure.class);
+			return jaxbContext.createMarshaller();
+		} catch (JAXBException e) {
+			throw Problem.builder()
+				.withTitle("Failed to create Marshaller")
+				.withStatus(Status.INTERNAL_SERVER_ERROR)
+				.withCause((ThrowableProblem) e.getCause())
+				.build();
+		}
+	});
+
+	private Marshaller getMarshaller() {
+		return threadLocalMarshaller.get();
+	}
 
 	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, JAXBException, ParserConfigurationException {
 		this.properties = properties;
@@ -88,10 +105,6 @@ class DigitalMailMapper {
 
 		// Read certificate from keystore
 		certificate = setupCertificate();
-
-		// Create JAXB marshaller
-		final var jaxbContext = JAXBContext.newInstance(SignedDelivery.class, SealedDelivery.class, DeliverSecure.class);
-		marshaller = jaxbContext.createMarshaller();
 
 		// Create document builder
 		final var documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -157,7 +170,7 @@ class DigitalMailMapper {
 			final var signedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SignedDelivery"), SignedDelivery.class, signedDelivery);
 			final var signedDeliveryDocument = documentBuilder.newDocument();
 
-			marshaller.marshal(signedDeliveryElement, signedDeliveryDocument);
+			getMarshaller().marshal(signedDeliveryElement, signedDeliveryDocument);
 
 			var xml = Xml.fromDOM(signedDeliveryDocument);
 			var signedXml = xml.sign(certificate);
@@ -174,7 +187,7 @@ class DigitalMailMapper {
 			final var sealedDeliveryElement = new JAXBElement<>(new QName(NAMESPACE_URI, "SealedDelivery"), SealedDelivery.class, sealedDelivery);
 			final var sealedDeliveryDocument = documentBuilder.newDocument();
 
-			marshaller.marshal(sealedDeliveryElement, sealedDeliveryDocument);
+			getMarshaller().marshal(sealedDeliveryElement, sealedDeliveryDocument);
 
 			xml = Xml.fromDOM(sealedDeliveryDocument);
 			signedXml = xml.sign(certificate);
@@ -189,6 +202,9 @@ class DigitalMailMapper {
 				.withStatus(Status.INTERNAL_SERVER_ERROR)
 				.withCause((ThrowableProblem) e.getCause())
 				.build();
+		} finally {
+			// Always clean up
+			threadLocalMarshaller.remove();
 		}
 	}
 

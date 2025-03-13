@@ -11,7 +11,7 @@
                     <ns15:ServiceSupplier>
                         <ns15:Id>165568402266</ns15:Id>
                         <ns15:Name>Kivra</ns15:Name>
-                        <ns15:ServiceAdress>http://localhost:8080/deliversecure</ns15:ServiceAdress>
+                        <ns15:ServiceAdress>http://localhost:9090/deliversecure</ns15:ServiceAdress>
                         <ns15:UIAdress>https://www.kivra.com</ns15:UIAdress>
                         <ns15:InternalServiceAdress/>
                     </ns15:ServiceSupplier>
