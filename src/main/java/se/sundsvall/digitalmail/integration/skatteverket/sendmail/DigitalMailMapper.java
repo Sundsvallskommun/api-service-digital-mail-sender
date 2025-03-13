@@ -182,6 +182,8 @@ class DigitalMailMapper {
 
 			return sealedDelivery;
 		} catch (JAXBException | DatatypeConfigurationException e) {
+			// Needed to see stacktraces
+			LOG.error("Failed to create sealed delivery", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create a SealedDelivery object to send")
 				.withStatus(Status.INTERNAL_SERVER_ERROR)
