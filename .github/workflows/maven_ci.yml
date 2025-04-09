@@ -8,10 +8,8 @@ on:
     branches:
       - main
   schedule:
-    # At 03:00 on Sunday (Please note: GitHub actions schedule is in UTC time).
-    - cron: "0 3 * * 0"
-    # At 10:00 on Wednesday UTC.
-    - cron: "0 10 * * 3"
+    # At 14:00 on every day (Please note: GitHub actions schedule is in UTC time).
+    - cron: "0 14 * * *"
 
 jobs:
   shared-workflows:
