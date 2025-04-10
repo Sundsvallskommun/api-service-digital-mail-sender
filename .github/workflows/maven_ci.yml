@@ -8,7 +8,7 @@ on:
     branches:
       - main
   schedule:
-    # At 14:00 on every day (Please note: GitHub actions schedule is in UTC time).
+    # At 11:00 on every day (Please note: GitHub actions schedule is in UTC time).
     - cron: "0 11 * * *"
 
 jobs:
