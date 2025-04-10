@@ -9,7 +9,7 @@ on:
       - main
   schedule:
     # At 14:00 on every day (Please note: GitHub actions schedule is in UTC time).
-    - cron: "0 14 * * *"
+    - cron: "0 11 * * *"
 
 jobs:
   shared-workflows:
