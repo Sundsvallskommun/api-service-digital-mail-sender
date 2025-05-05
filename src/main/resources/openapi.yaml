@@ -1,29 +1,29 @@
 openapi: 3.0.1
 info:
   title: Digital Mail Sender
-  contact: { }
+  contact: {}
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "3.0"
 servers:
-  - url: http://localhost:51136
-    description: Generated server url
+- url: http://localhost:8080
+  description: Generated server url
 paths:
   /{municipalityId}/send-digital-mail:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital mail
       operationId: sendDigitalMail
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       requestBody:
         content:
           application/json:
@@ -46,13 +46,13 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "404":
           description: Not Found
           content:
@@ -74,17 +74,17 @@ paths:
   /{municipalityId}/send-digital-invoice:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital invoice
       operationId: sendDigitalInvoice
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       requestBody:
         content:
           application/json:
@@ -107,13 +107,13 @@ paths:
             application/json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "404":
           description: Not Found
           content:
@@ -135,23 +135,23 @@ paths:
   /{municipalityId}/has-available-mailbox/{partyId}:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Check if a party has a digital mailbox and if said party has chosen
         to receive digital mail
       operationId: hasAvailableMailbox
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: partyId
-          in: path
-          required: true
-          schema:
-            type: string
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: partyId
+        in: path
+        required: true
+        schema:
+          type: string
       responses:
         "200":
           description: Successful Operation (available mailbox(es) found)
@@ -176,7 +176,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -206,18 +206,18 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
     StatusType:
       type: object
       properties:
-        reasonPhrase:
-          type: string
         statusCode:
           type: integer
           format: int32
+        reasonPhrase:
+          type: string
     ConstraintViolationProblem:
       type: object
       properties:
@@ -341,9 +341,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
         suppressed:
           type: array
@@ -387,9 +387,9 @@ components:
           type: string
     Attachment:
       required:
-        - body
-        - contentType
-        - filename
+      - body
+      - contentType
+      - filename
       type: object
       properties:
         contentType:
@@ -397,16 +397,18 @@ components:
           description: "Allowed type is: application/pdf"
           example: application/pdf
         body:
+          minLength: 1
           type: string
           description: BASE64-encoded body
         filename:
+          minLength: 1
           type: string
           description: The name of the file
           example: sample.pdf
       description: A PDF file/attachment
     BodyInformation:
       required:
-        - contentType
+      - contentType
       type: object
       properties:
         contentType:
@@ -420,10 +422,10 @@ components:
       description: The body of the message
     DigitalMailRequest:
       required:
-        - headerSubject
-        - municipalityId
-        - partyId
-        - supportInfo
+      - headerSubject
+      - municipalityId
+      - partyId
+      - supportInfo
       type: object
       properties:
         partyId:
@@ -436,6 +438,7 @@ components:
           description: MunicipalityId
           example: "2281"
         headerSubject:
+          minLength: 1
           type: string
           description: The subject of the digital mail.
           example: Viktig information från Sundsvalls kommun
@@ -450,10 +453,11 @@ components:
       description: The body of the digital mail request
     SupportInfo:
       required:
-        - supportText
+      - supportText
       type: object
       properties:
         supportText:
+          minLength: 1
           type: string
           description: Information text describing the different ways the recipient
             may contact the sender.
@@ -490,12 +494,12 @@ components:
           $ref: "#/components/schemas/DeliveryStatus"
     Details:
       required:
-        - accountNumber
-        - accountType
-        - amount
-        - dueDate
-        - paymentReference
-        - paymentReferenceType
+      - accountNumber
+      - accountType
+      - amount
+      - dueDate
+      - paymentReference
+      - paymentReferenceType
       type: object
       properties:
         amount:
@@ -513,10 +517,11 @@ components:
           description: The payment reference type
           example: SE_OCR
           enum:
-            - SE_OCR
-            - TENANT_REF
+          - SE_OCR
+          - TENANT_REF
         paymentReference:
           maxLength: 25
+          minLength: 1
           type: string
           description: The payment reference number
           example: "426523791"
@@ -525,8 +530,8 @@ components:
           description: The receiving account type
           example: BANKGIRO
           enum:
-            - BANKGIRO
-            - PLUSGIRO
+          - BANKGIRO
+          - PLUSGIRO
         accountNumber:
           type: string
           description: The receiving account (a valid BANKGIRO or PLUSGIRO number)
@@ -534,11 +539,10 @@ components:
       description: Invoice details
     DigitalInvoiceRequest:
       required:
-        - details
-        - files
-        - partyId
-        - subject
-        - type
+      - details
+      - partyId
+      - subject
+      - type
       type: object
       properties:
         partyId:
@@ -552,9 +556,10 @@ components:
           example: INVOICE
           default: INVOICE
           enum:
-            - INVOICE
-            - REMINDER
+          - INVOICE
+          - REMINDER
         subject:
+          minLength: 1
           type: string
           description: The invoice subject
           example: Faktura från Sundsvalls kommun
@@ -569,6 +574,7 @@ components:
         details:
           $ref: "#/components/schemas/Details"
         files:
+          minItems: 1
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
@@ -579,4 +585,4 @@ components:
           type: string
         sent:
           type: boolean
-  securitySchemes: { }
+  securitySchemes: {}
