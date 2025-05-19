@@ -13,8 +13,8 @@
 	<version>3.0</version>
 	<name>api-service-digital-mail-sender</name>
 	<properties>
+		<generated-sources-java-path>src/main/java</generated-sources-java-path>
 		<my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
-		<kivra-generated-sources-folder>src/min/java</kivra-generated-sources-folder>
 		<kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
 
 		<commons-io.version>2.19.0</commons-io.version>
@@ -42,11 +42,23 @@
 		</dependency>
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
-			<artifactId>dept44-starter-test</artifactId>
+			<artifactId>dept44-common-validators</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>se.sundsvall.dept44</groupId>
-			<artifactId>dept44-common-validators</artifactId>
+			<artifactId>dept44-starter-scheduler</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-data-jpa</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-mysql</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
@@ -72,6 +84,10 @@
 					<groupId>net.sf.saxon</groupId>
 					<artifactId>Saxon-HE</artifactId>
 				</exclusion>
+				<exclusion>
+					<groupId>xml-apis</groupId>
+					<artifactId>xml-apis</artifactId>
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -88,8 +104,12 @@
 
 		<!-- Test -->
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
+			<groupId>se.sundsvall.dept44</groupId>
+			<artifactId>dept44-starter-test</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>org.testcontainers</groupId>
+			<artifactId>mariadb</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -113,12 +133,42 @@
 							<importMappings>File=${kivra-generated-sources-package}.File</importMappings>
 							<skipValidateSpec>true</skipValidateSpec>
 							<configOptions>
-								<sourceFolder>${kivra-generated-sources-folder}</sourceFolder>
+								<sourceFolder>${generated-sources-java-path}</sourceFolder>
 								<modelPackage>${kivra-generated-sources-package}</modelPackage>
 								<generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
 								<generatePom>false</generatePom>
 								<library>spring-boot</library>
 								<dateLibrary>java8</dateLibrary>
+								<openApiNullable>false</openApiNullable>
+								<useSwaggerUi>false</useSwaggerUi>
+								<useBeanValidation>true</useBeanValidation>
+								<useSwaggerAnnotations>true</useSwaggerAnnotations>
+								<hideGenerationTimestamp>true</hideGenerationTimestamp>
+								<interfaceOnly>true</interfaceOnly>
+								<useSpringBoot3>true</useSpringBoot3>
+							</configOptions>
+						</configuration>
+					</execution>
+					<execution>
+						<id>messaging-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/contracts/messaging/messaging-api.yml</inputSpec>
+							<output>${generated-sources-path}</output>
+							<generatorName>spring</generatorName>
+							<generateApis>false</generateApis>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<configOptions>
+								<sourceFolder>${generated-sources-java-path}</sourceFolder>
+								<modelPackage>generated.se.sundsvall.messaging</modelPackage>
+								<generateSupportingFiles>false</generateSupportingFiles>
+								<generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+								<generatePom>false</generatePom>
+								<library>spring-boot</library>
+								<dateLibrary>java8</dateLibrary>
+								<apiPackage>generated</apiPackage>
 								<openApiNullable>false</openApiNullable>
 								<useSwaggerUi>false</useSwaggerUi>
 								<useBeanValidation>true</useBeanValidation>
@@ -189,7 +239,7 @@
 						<configuration>
 							<sources>
 								<source>${my-messages-generated-sources-folder}</source>
-								<source>${kivra-generated-sources-folder}/src/main/java</source>
+								<source>${generated-sources-java-path}/src/main/java</source>
 							</sources>
 						</configuration>
 					</execution>
@@ -200,11 +250,11 @@
 				<artifactId>jacoco-maven-plugin</artifactId>
 				<configuration>
 					<excludes>
-						<exclude>**/se/sundsvall/digitalmail/DigitalMail*</exclude>
+						<exclude>**/se/sundsvall/digitalmail/Application*</exclude>
 						<!-- Ignore generated sources -->
 						<exclude>**/org/w3/**/*</exclude>
 						<exclude>**/se/gov/minameddelanden/**/*</exclude>
-						<exclude>**/generated/com/kivra/**</exclude>
+						<exclude>**/generated/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>

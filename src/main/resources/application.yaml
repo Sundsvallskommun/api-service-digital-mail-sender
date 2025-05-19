@@ -1,6 +1,10 @@
-spring:
-  application:
+spring: 
+  application: 
     name: api-digitalmailsender
+  datasource: 
+    driverClassName: org.mariadb.jdbc.Driver
+  flyway: 
+    enabled: false
 
 # OpenAPI
 openapi:
@@ -17,6 +21,7 @@ management:
     health:
       show-details: always
 
+# Integrations
 integration:
   # Skatteverket integration
   skatteverket:
@@ -29,6 +34,13 @@ integration:
       - billo
       - fortnox
 
+# Schedulers
+scheduler:
+  certificateHealth:
+    name: certificate-health
+    lockAtMostFor: PT2M
+    maximumExecutionTime: PT2M
+        
 # Logging
 logbook:
   body-filters:

@@ -8,9 +8,9 @@ import org.junit.jupiter.api.Test;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
-import se.sundsvall.digitalmail.DigitalMail;
+import se.sundsvall.digitalmail.Application;
 
-@WireMockAppTestSuite(files = "classpath:/AvailabilityIT/", classes = DigitalMail.class)
+@WireMockAppTestSuite(files = "classpath:/AvailabilityIT/", classes = Application.class)
 class AvailabilityIT extends AbstractAppTest {
 
 	private static final String SERVICE_PATH = "/2281/has-available-mailbox/6a5c3d04-412d-11ec-973a-0242ac130003";

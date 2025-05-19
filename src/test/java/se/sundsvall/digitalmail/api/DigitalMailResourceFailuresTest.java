@@ -25,13 +25,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import org.zalando.problem.violations.Violation;
-import se.sundsvall.digitalmail.DigitalMail;
+import se.sundsvall.digitalmail.Application;
 import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.service.DigitalMailService;
 
 @ActiveProfiles("junit")
-@SpringBootTest(classes = DigitalMail.class, webEnvironment = RANDOM_PORT)
+@SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 class DigitalMailResourceFailuresTest {
 
 	private static final String MUNICIPALITY_ID = "2281";

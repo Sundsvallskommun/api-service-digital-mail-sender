@@ -1,6 +1,8 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -15,6 +17,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.oauth2.client.ClientAuthorizationException;
+import org.springframework.security.oauth2.core.OAuth2Error;
 
 @ExtendWith(MockitoExtension.class)
 class KivraIntegrationTests {
@@ -63,5 +67,23 @@ class KivraIntegrationTests {
 
 		assertThat(result).isFalse();
 		verify(mockClient).postUserMatchSSN(any(UserMatchV2SSN.class));
+	}
+
+	@Test
+	void healthCheckWhenValidCertificate() {
+		assertDoesNotThrow(() -> kivraIntegration.healthCheck());
+
+		verify(mockClient).getTenantInformation();
+	}
+
+	@Test
+	void healthCheckWhenInalidCertificate() {
+		final var message = "message";
+		when(mockClient.getTenantInformation()).thenThrow(new ClientAuthorizationException(new OAuth2Error("error"), "clientId", message));
+
+		final var e = assertThrows(ClientAuthorizationException.class, () -> kivraIntegration.healthCheck());
+
+		assertThat(e.getMessage()).isEqualTo(message);
+		verify(mockClient).getTenantInformation();
 	}
 }
