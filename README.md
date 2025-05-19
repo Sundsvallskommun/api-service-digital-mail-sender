@@ -144,9 +144,9 @@ integration:
 - ** Configuration of schedulers**
 
 ```yaml
- scheduler:
-   certificateHealth:
-     cron: cron expression when scheduler should run (or "-" to disable it)
+scheduler:
+  certificateHealth:
+    cron: cron expression when scheduler should run (or "-" to disable it)
 ```
 
 ### Database Initialization
