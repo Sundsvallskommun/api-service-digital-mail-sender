@@ -34,11 +34,19 @@ public class KivraIntegration {
 	 *         otherwise.
 	 */
 	public boolean verifyValidRecipient(final String legalId) {
-		var userMatchV2SSN = new UserMatchV2SSN().addListItem(legalId);
-		var response = client.postUserMatchSSN(userMatchV2SSN);
+		final var userMatchV2SSN = new UserMatchV2SSN().addListItem(legalId);
+		final var response = client.postUserMatchSSN(userMatchV2SSN);
 
 		return Optional.ofNullable(response.getBody())
 			.map(body -> body.getList().contains(legalId))
 			.orElse(false);
+	}
+
+	/**
+	 * Method reads basic tenant information and will throw ClientAuthorizationException if certificate is not valid
+	 * when communicating with Kivra https address.
+	 */
+	public void healthCheck() {
+		client.getTenantInformation();
 	}
 }

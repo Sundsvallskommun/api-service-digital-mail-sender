@@ -9,11 +9,11 @@ import org.springframework.http.HttpStatus;
 
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
-import se.sundsvall.digitalmail.DigitalMail;
+import se.sundsvall.digitalmail.Application;
 
 import apptest.extension.ResponseBodyTransformer;
 
-@WireMockAppTestSuite(files = "classpath:/DigitalMailIT/", classes = DigitalMail.class)
+@WireMockAppTestSuite(files = "classpath:/DigitalMailIT/", classes = Application.class)
 class DigitalMailIT extends AbstractAppTest {
 
 	private static final String SERVICE_PATH = "/2281/send-digital-mail";

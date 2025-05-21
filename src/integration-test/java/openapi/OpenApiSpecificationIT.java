@@ -6,8 +6,6 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 import static se.sundsvall.dept44.util.ResourceUtils.asString;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,60 +14,63 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 
-import se.sundsvall.digitalmail.DigitalMail;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
+
+import se.sundsvall.digitalmail.Application;
 
 @ActiveProfiles("junit")
-@SpringBootTest(webEnvironment = RANDOM_PORT, classes = DigitalMail.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = Application.class)
 class OpenApiSpecificationIT {
 
-    private static final YAMLMapper YAML_MAPPER = new YAMLMapper();
+	private static final YAMLMapper YAML_MAPPER = new YAMLMapper();
 
-    @Value("${openapi.name}")
-    private String openApiName;
-    @Value("${openapi.version}")
-    private String openApiVersion;
+	@Value("${openapi.name}")
+	private String openApiName;
+	@Value("${openapi.version}")
+	private String openApiVersion;
 
-    @Value("classpath:/openapi.yaml")
-    private Resource openApiResource;
+	@Value("classpath:/api/openapi.yaml")
+	private Resource openApiResource;
 
-    @Autowired
-    private TestRestTemplate restTemplate;
+	@Autowired
+	private TestRestTemplate restTemplate;
 
-    @Test
-    void compareOpenApiSpecifications() {
-        var existingOpenApiSpecification = asString(openApiResource);
-        var currentOpenApiSpecification = getCurrentOpenApiSpecification();
+	@Test
+	void compareOpenApiSpecifications() {
+		final var existingOpenApiSpecification = asString(openApiResource);
+		final var currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
-        assertThatJson(toJson(existingOpenApiSpecification))
-            .withOptions(IGNORING_ARRAY_ORDER)
-            .whenIgnoringPaths("servers")
-            .isEqualTo(toJson(currentOpenApiSpecification));
-    }
+		assertThatJson(toJson(currentOpenApiSpecification))
+			.withOptions(IGNORING_ARRAY_ORDER)
+			.whenIgnoringPaths("servers")
+			.isEqualTo(toJson(existingOpenApiSpecification));
+	}
 
-    /**
-     * Fetches and returns the current OpenAPI specification in YAML format.
-     *
-     * @return the current OpenAPI specification
-     */
-    private String getCurrentOpenApiSpecification() {
-        var uri = fromPath("/api-docs.yaml")
-            .buildAndExpand(openApiName, openApiVersion)
-            .toUri();
+	/**
+	 * Fetches and returns the current OpenAPI specification in YAML format.
+	 *
+	 * @return the current OpenAPI specification
+	 */
+	private String getCurrentOpenApiSpecification() {
+		final var uri = fromPath("/api-docs.yaml")
+			.buildAndExpand(openApiName, openApiVersion)
+			.toUri();
 
-        return restTemplate.getForObject(uri, String.class);
-    }
+		return restTemplate.getForObject(uri, String.class);
+	}
 
-    /**
-     * Attempts to convert the given YAML (no YAML-check...) to JSON.
-     *
-     * @param yaml the YAML to convert
-     * @return a JSON string
-     */
-    private String toJson(final String yaml) {
-        try {
-            return YAML_MAPPER.readTree(yaml).toString();
-        } catch (JsonProcessingException e) {
-            throw new IllegalStateException("Unable to convert YAML to JSON", e);
-        }
-    }
+	/**
+	 * Attempts to convert the given YAML (no YAML-check...) to JSON.
+	 *
+	 * @param  yaml the YAML to convert
+	 * @return      a JSON string
+	 */
+	private String toJson(final String yaml) {
+		try {
+			return YAML_MAPPER.readTree(yaml).toString();
+		} catch (final JsonProcessingException e) {
+			throw new IllegalStateException("Unable to convert YAML to JSON", e);
+		}
+	}
 }

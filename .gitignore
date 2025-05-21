@@ -35,4 +35,5 @@ build/
 #Other stuff
 .env
 /log
-application-default.yaml
+application-default.*
+/bin/

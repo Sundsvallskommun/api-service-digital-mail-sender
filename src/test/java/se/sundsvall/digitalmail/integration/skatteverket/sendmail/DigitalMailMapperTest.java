@@ -36,13 +36,13 @@ import se.gov.minameddelanden.schema.service.DeliveryResult;
 import se.gov.minameddelanden.schema.service.DeliveryStatus;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
-import se.sundsvall.digitalmail.DigitalMail;
+import se.sundsvall.digitalmail.Application;
 import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.File;
 
 @ActiveProfiles("junit")
-@SpringBootTest(webEnvironment = RANDOM_PORT, classes = DigitalMail.class)
+@SpringBootTest(webEnvironment = RANDOM_PORT, classes = Application.class)
 @ExtendWith(SoftAssertionsExtension.class)
 class DigitalMailMapperTest {
 

@@ -1,3 +1,10 @@
+spring:
+  datasource:
+    driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+    url: jdbc:tc:mariadb:10.6.4:///junit-db
+  flyway:
+    enabled: true
+
 integration:
   # Skatteverket integration
   skatteverket:
@@ -22,3 +29,4 @@ integration:
       token-url: http://url.com/token
       client-id: override
       client-secret: override
+

@@ -21,10 +21,10 @@ public final class EncodingUtils {
 
 	public static byte[] stringToBytes(final String string, final Charset encoding) throws EncodingException {
 		try {
-			var bb = encoding.newEncoder().encode(CharBuffer.wrap(string));
+			final var bb = encoding.newEncoder().encode(CharBuffer.wrap(string));
 
 			return Arrays.copyOf(bb.array(), bb.remaining());
-		} catch (CharacterCodingException e) {
+		} catch (final CharacterCodingException e) {
 			throw new EncodingException(e);
 		}
 	}
@@ -32,11 +32,11 @@ public final class EncodingUtils {
 	public static String bytesToString(final byte[] bytes, final Charset encoding) throws EncodingException {
 		try {
 			return tryBytesToString(bytes, encoding);
-		} catch (MalformedInputException e) {
+		} catch (final MalformedInputException e) {
 			throw wrapCharacterCodingException(bytes, encoding, e, e.getInputLength());
-		} catch (UnmappableCharacterException e) {
+		} catch (final UnmappableCharacterException e) {
 			throw wrapCharacterCodingException(bytes, encoding, e, e.getInputLength());
-		} catch (CharacterCodingException e) {
+		} catch (final CharacterCodingException e) {
 			throw new EncodingException(e);
 		}
 	}
@@ -51,18 +51,18 @@ public final class EncodingUtils {
 	}
 
 	private static String tryBytesToString(final byte[] bytes, final Charset encoding) throws CharacterCodingException {
-		var charBuffer = encoding.newDecoder().decode(ByteBuffer.wrap(bytes));
+		final var charBuffer = encoding.newDecoder().decode(ByteBuffer.wrap(bytes));
 
 		return new String(charBuffer.array(), 0, charBuffer.length());
 	}
 
 	public static String bytesToHexAroundOffset(final byte[] bytes, final int offset, final int around) {
-		var sb = new StringBuilder();
-		for (int i = max(offset - around, 0); i < offset; ++i) {
+		final var sb = new StringBuilder();
+		for (var i = max(offset - around, 0); i < offset; ++i) {
 			sb.append(byteToHex(bytes[i])).append(' ');
 		}
 		sb.append("->").append(byteToHex(bytes[offset])).append("<-");
-		for (int i = offset + 1; i < min(offset + 1 + around, bytes.length); ++i) {
+		for (var i = offset + 1; i < min(offset + 1 + around, bytes.length); ++i) {
 			sb.append(' ').append(byteToHex(bytes[i]));
 		}
 		return sb.toString();
@@ -73,6 +73,8 @@ public final class EncodingUtils {
 	}
 
 	public static class EncodingException extends RuntimeException {
+
+		private static final long serialVersionUID = 8055663349078910772L;
 
 		private EncodingException(String message, CharacterCodingException e) {
 			super(message, e);
