@@ -34,13 +34,20 @@ integration:
       - billo
       - fortnox
 
+# Circuit breaker settings
+resilience4j:
+  circuitbreaker:
+    instances:
+      messaging:
+        ignoreExceptions: se.sundsvall.dept44.exception.ClientProblem
+
 # Schedulers
 scheduler:
-  certificateHealth:
+  certificate-health:
     name: certificate-health
-    lockAtMostFor: PT2M
-    maximumExecutionTime: PT2M
-        
+    lock-at-most-for: PT2M
+    maximum-execution-time: PT2M
+       
 # Logging
 logbook:
   body-filters:

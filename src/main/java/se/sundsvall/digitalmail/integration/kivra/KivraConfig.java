@@ -2,7 +2,6 @@ package se.sundsvall.digitalmail.integration.kivra;
 
 import static java.util.Collections.emptySet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static se.sundsvall.digitalmail.integration.kivra.KivraIntegration.INTEGRATION_NAME;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
@@ -21,11 +20,13 @@ import se.sundsvall.digitalmail.integration.kivra.support.ContentUserContextInvo
 import se.sundsvall.digitalmail.integration.kivra.support.PaymentMixin;
 
 @Import(FeignConfiguration.class)
-class KivraIntegrationConfiguration {
+class KivraConfig {
 
-	private final KivraIntegrationProperties properties;
+	static final String INTEGRATION_NAME = "Kivra";
 
-	KivraIntegrationConfiguration(final KivraIntegrationProperties properties,
+	private final KivraProperties properties;
+
+	KivraConfig(final KivraProperties properties,
 		final ObjectMapper objectMapper) {
 		this.properties = properties;
 
@@ -34,15 +35,15 @@ class KivraIntegrationConfiguration {
 	}
 
 	@Bean
-	FeignBuilderCustomizer customFeignBuilderCustomizer() {
+	FeignBuilderCustomizer feignBuilderCustomizer() {
 		return builder -> {
-			var clientRegistration = ClientRegistration.withRegistrationId(INTEGRATION_NAME)
+			final var clientRegistration = ClientRegistration.withRegistrationId(INTEGRATION_NAME)
 				.tokenUri(properties.oauth2().tokenUrl())
 				.clientId(properties.oauth2().clientId())
 				.clientSecret(properties.oauth2().clientSecret())
 				.authorizationGrantType(new AuthorizationGrantType(properties.oauth2().authorizationGrantType()))
 				.build();
-			var oAuth2RequestInterceptor = new OAuth2RequestInterceptor(clientRegistration, emptySet());
+			final var oAuth2RequestInterceptor = new OAuth2RequestInterceptor(clientRegistration, emptySet());
 
 			builder.requestInterceptor(oAuth2RequestInterceptor)
 				.retryer(new ActionRetryer(oAuth2RequestInterceptor::removeToken, 1))
