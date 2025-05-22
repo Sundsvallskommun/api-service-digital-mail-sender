@@ -101,18 +101,22 @@ public class CertificateHealthScheduler {
 
 	private void sendMail(final String recipient) {
 		final var time = LocalDateTime.now().truncatedTo(MINUTES);
-		messagingIntegation.sendEmail(SUNDSVALL_MUNICIPALITY_ID, toEmailRequest(
+
+		ofNullable(toEmailRequest(
 			recipient,
 			notificationProperties.mail().subject(),
 			MAIL_BODY.formatted(time.format(DATE_AND_TIME_FORMAT)),
 			notificationProperties.mail().sender().emailAddress(),
-			notificationProperties.mail().sender().name()));
+			notificationProperties.mail().sender().name()))
+			.ifPresent(request -> messagingIntegation.sendEmail(SUNDSVALL_MUNICIPALITY_ID, request));
 	}
 
 	private void sendSlack() {
-		messagingIntegation.sendSlack(SUNDSVALL_MUNICIPALITY_ID, toSlackRequest(
-			notificationProperties.slack().channel(),
-			notificationProperties.slack().message(),
-			notificationProperties.slack().token()));
+		ofNullable(
+			toSlackRequest(
+				notificationProperties.slack().channel(),
+				notificationProperties.slack().message(),
+				notificationProperties.slack().token()))
+			.ifPresent(request -> messagingIntegation.sendSlack(SUNDSVALL_MUNICIPALITY_ID, request));
 	}
 }

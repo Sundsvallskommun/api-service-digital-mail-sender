@@ -148,6 +148,19 @@ class CertificateHealthSchedulerTests {
 	}
 
 	@Test
+	void testWhenMappedMailRequestIsNull() {
+		when(notificationPropertiesMock.mail()).thenReturn(mailMock);
+		doThrow(new ClientAuthorizationException(new OAuth2Error("401"), "regid", "some prefix [invalid_token_response] some suffix")).when(kivraIntegrationMock).healthCheck();
+
+		scheduler.execute();
+
+		verify(kivraIntegrationMock).healthCheck();
+		verify(dept44HealthUtilityMock).setHealthIndicatorUnhealthy(SCHEDULER_NAME, "A potential certificate issue has been detected and needs to be investigated");
+		verify(notificationPropertiesMock, times(2)).mail();
+		verify(notificationPropertiesMock).slack();
+	}
+
+	@Test
 	void testCertificateInvalidAndSlackEnabled() {
 		final var channel = "channel";
 		final var message = "message";
@@ -176,14 +189,33 @@ class CertificateHealthSchedulerTests {
 	}
 
 	@Test
+	void testWhenMappedSlackRequestIsNull() {
+		when(notificationPropertiesMock.slack()).thenReturn(slackMock);
+		doThrow(new ClientAuthorizationException(new OAuth2Error("401"), "regid", "some prefix [invalid_token_response] some suffix")).when(kivraIntegrationMock).healthCheck();
+
+		scheduler.execute();
+
+		verify(kivraIntegrationMock).healthCheck();
+		verify(dept44HealthUtilityMock).setHealthIndicatorUnhealthy(SCHEDULER_NAME, "A potential certificate issue has been detected and needs to be investigated");
+		verify(notificationPropertiesMock).mail();
+		verify(notificationPropertiesMock, times(4)).slack();
+
+	}
+
+	@Test
 	void testOnlySendSlackAndEmailOnFirstInvalidCheck() {
 		final var municipalityId = "2281";
-		final var recipient = "recipient";
-
+		final var value = "value";
 		when(notificationPropertiesMock.slack()).thenReturn(slackMock);
+		when(slackMock.channel()).thenReturn(value);
+		when(slackMock.message()).thenReturn(value);
+		when(slackMock.token()).thenReturn(value);
 		when(notificationPropertiesMock.mail()).thenReturn(mailMock);
+		when(mailMock.subject()).thenReturn(value);
+		when(mailMock.recipients()).thenReturn(List.of(value));
 		when(mailMock.sender()).thenReturn(senderMock);
-		when(mailMock.recipients()).thenReturn(List.of(recipient));
+		when(senderMock.emailAddress()).thenReturn(value);
+		when(senderMock.name()).thenReturn(value);
 
 		doThrow(new ClientAuthorizationException(new OAuth2Error("401"), "regid", "some prefix [invalid_token_response] some suffix")).when(kivraIntegrationMock).healthCheck();
 
