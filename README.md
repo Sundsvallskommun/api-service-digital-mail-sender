@@ -118,13 +118,13 @@ spring:
 ```yaml
 integration:
   party:
-    url: http://dependency-service-url
+    api-url: http://dependency-service-url
     oauth2:
       token-url: http://dependecy-token-url
       client-id: some-client-id
       client-secret: some-client-secret
   messaging:
-    url: http://dependency-service-url
+    api-url: http://dependency-service-url
     oauth2:
       token-url: http://dependecy-token-url
       client-id: some-client-id

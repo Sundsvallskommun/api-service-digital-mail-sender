@@ -8,10 +8,8 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.stereotype.Component;
 
 @Component
-@EnableConfigurationProperties(KivraIntegrationProperties.class)
+@EnableConfigurationProperties(KivraProperties.class)
 public class KivraIntegration {
-
-	static final String INTEGRATION_NAME = "Kivra";
 
 	private final KivraClient client;
 

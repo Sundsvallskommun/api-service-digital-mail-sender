@@ -1,9 +1,8 @@
-package se.sundsvall.digitalmail.integration.party;
+package se.sundsvall.digitalmail.integration.messaging;
 
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 import feign.Request;
-import feign.codec.ErrorDecoder;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -14,27 +13,27 @@ import se.sundsvall.dept44.configuration.feign.FeignMultiCustomizer;
 import se.sundsvall.dept44.configuration.feign.decoder.ProblemErrorDecoder;
 
 @Import(FeignConfiguration.class)
-class PartyConfig {
+public class MessagingConfig {
 
-	static final String INTEGRATION_NAME = "PartyClient";
+	static final String INTEGRATION_NAME = "messagingClient";
 
-	private final PartyProperties properties;
+	private final MessagingProperties properties;
 
-	PartyConfig(final PartyProperties properties) {
+	MessagingConfig(MessagingProperties properties) {
 		this.properties = properties;
 	}
 
 	@Bean
 	FeignBuilderCustomizer feignBuilderCustomizer() {
 		return FeignMultiCustomizer.create()
-			.withErrorDecoder(errorDecoder())
+			.withErrorDecoder(new ProblemErrorDecoder(INTEGRATION_NAME))
 			.withRequestOptions(feignOptions())
 			.withRetryableOAuth2InterceptorForClientRegistration(clientRegistration())
 			.composeCustomizersToOne();
 	}
 
 	private ClientRegistration clientRegistration() {
-		return ClientRegistration.withRegistrationId("party")
+		return ClientRegistration.withRegistrationId(INTEGRATION_NAME)
 			.tokenUri(properties.oauth2().tokenUrl())
 			.clientId(properties.oauth2().clientId())
 			.clientSecret(properties.oauth2().clientSecret())
@@ -47,9 +46,5 @@ class PartyConfig {
 			properties.connectTimeout().toMillis(), MILLISECONDS,
 			properties.readTimeout().toMillis(), MILLISECONDS,
 			true);
-	}
-
-	private ErrorDecoder errorDecoder() {
-		return new ProblemErrorDecoder(INTEGRATION_NAME);
 	}
 }

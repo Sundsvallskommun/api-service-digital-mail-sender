@@ -11,7 +11,7 @@ import se.sundsvall.digitalmail.integration.OAuth2;
 
 @Validated
 @ConfigurationProperties(prefix = "integration.kivra")
-record KivraIntegrationProperties(
+record KivraProperties(
 
 	@NotBlank String apiUrl,
 

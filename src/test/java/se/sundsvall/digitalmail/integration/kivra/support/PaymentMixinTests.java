@@ -1,7 +1,6 @@
 package se.sundsvall.digitalmail.integration.kivra.support;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -26,7 +25,7 @@ class PaymentMixinTests {
 		void serialize() throws IOException {
 			serializer.serialize(2.34f, mockJsonGenerator, null);
 
-			verify(mockJsonGenerator, times(1)).writeString(any(String.class));
+			verify(mockJsonGenerator).writeString(anyString());
 		}
 	}
 }

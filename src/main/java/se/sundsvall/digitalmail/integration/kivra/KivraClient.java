@@ -1,7 +1,7 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static se.sundsvall.digitalmail.integration.kivra.KivraIntegration.INTEGRATION_NAME;
+import static se.sundsvall.digitalmail.integration.kivra.KivraConfig.INTEGRATION_NAME;
 
 import generated.com.kivra.ContentUserV2;
 import generated.com.kivra.TenantV2;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(
 	name = INTEGRATION_NAME,
 	url = "${integration.kivra.api-url}",
-	configuration = KivraIntegrationConfiguration.class)
+	configuration = KivraConfig.class)
 @CircuitBreaker(name = INTEGRATION_NAME)
 interface KivraClient {
 
