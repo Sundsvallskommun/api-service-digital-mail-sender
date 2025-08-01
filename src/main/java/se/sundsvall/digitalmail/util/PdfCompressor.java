@@ -1,5 +1,7 @@
 package se.sundsvall.digitalmail.util;
 
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
+
 import com.lowagie.text.Document;
 import com.lowagie.text.pdf.PdfReader;
 import com.lowagie.text.pdf.PdfSmartCopy;
@@ -21,7 +23,7 @@ public final class PdfCompressor {
 
 	public static void compress(final List<File> files) {
 		files.stream().filter(file -> StringUtils.isNotEmpty(file.getBody())).forEach(file -> {
-			LOGGER.info("Trying to compress pdf: {}", file.getFilename());
+			LOGGER.info("Trying to compress pdf: {}", sanitizeForLogging(file.getFilename()));
 
 			var sizeBeforeCompression = file.getBody().length();
 			file.setBody(compress(file.getBody()));
@@ -60,7 +62,7 @@ public final class PdfCompressor {
 			return Base64.getEncoder().encodeToString(result.toByteArray());
 
 		} catch (final Exception e) {
-			LOGGER.warn("A problem occured during compression of PDF: {}", e.getMessage());
+			LOGGER.warn("A problem occurred during compression of PDF: {}", e.getMessage());
 		}
 
 		// If compression fails, return the original content

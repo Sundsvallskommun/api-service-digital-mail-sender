@@ -8,7 +8,7 @@ import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
-import se.sundsvall.digitalmail.integration.party.PartyClient;
+import se.sundsvall.digitalmail.integration.party.PartyIntegration;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
 import se.sundsvall.digitalmail.util.PdfCompressor;
@@ -18,7 +18,7 @@ public class DigitalMailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DigitalMailService.class);
 
-	private final PartyClient partyClient;
+	private final PartyIntegration partyIntegration;
 
 	private final DigitalMailIntegration digitalMailIntegration;
 
@@ -26,11 +26,12 @@ public class DigitalMailService {
 
 	private final AvailabilityService availabilityService;
 
-	DigitalMailService(final PartyClient partyClient,
+	DigitalMailService(
+		final PartyIntegration partyIntegration,
 		final DigitalMailIntegration digitalMailIntegration,
 		final KivraIntegration kivraIntegration,
 		final AvailabilityService availabilityService) {
-		this.partyClient = partyClient;
+		this.partyIntegration = partyIntegration;
 		this.digitalMailIntegration = digitalMailIntegration;
 		this.kivraIntegration = kivraIntegration;
 		this.availabilityService = availabilityService;
@@ -44,7 +45,7 @@ public class DigitalMailService {
 	 */
 	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
 		PdfCompressor.compress(requestDto.getAttachments());
-		final var personalNumber = partyClient.getLegalId(municipalityId, requestDto.getPartyId());
+		final var personalNumber = partyIntegration.getLegalId(municipalityId, requestDto.getPartyId());
 
 		final var possibleMailbox = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
 
@@ -57,7 +58,7 @@ public class DigitalMailService {
 	}
 
 	public DigitalInvoiceResponse sendDigitalInvoice(final InvoiceDto invoiceDto, final String municipalityId) {
-		final var ssn = partyClient.getLegalId(municipalityId, invoiceDto.getPartyId());
+		final var ssn = partyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId());
 		invoiceDto.setSsn(ssn);
 
 		if (kivraIntegration.verifyValidRecipient(ssn)) {
@@ -69,7 +70,7 @@ public class DigitalMailService {
 
 	public boolean verifyRecipientHasSomeAvailableMailbox(final String partyId, final String municipalityId) {
 		try {
-			final var personalNumber = partyClient.getLegalId(municipalityId, partyId);
+			final var personalNumber = partyIntegration.getLegalId(municipalityId, partyId);
 			// If this doesn't throw an exception, the recipient has an available mailbox
 			availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber));
 
