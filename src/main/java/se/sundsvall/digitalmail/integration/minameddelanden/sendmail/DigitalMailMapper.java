@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
+package se.sundsvall.digitalmail.integration.minameddelanden.sendmail;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
@@ -8,18 +8,19 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Base64;
 import java.util.Collections;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
@@ -28,7 +29,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.lang.StringUtils;
-import org.jose4j.base64url.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
@@ -58,26 +58,22 @@ import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.DeliveryStatus;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.File;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
-import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
+import se.sundsvall.digitalmail.integration.minameddelanden.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenProperties;
 
 @Component
 class DigitalMailMapper {
 
-	public static final String SENDER_ID = "162120002411";
-	public static final String SENDER_NAME = "Sundsvalls Kommun";
 	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
 
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 	private static final String NAMESPACE_URI = "http://minameddelanden.gov.se/schema/Message/v3";
 
-	private final SkatteverketProperties properties;
-
 	private final DocumentBuilder documentBuilder;
 
-	private final KeyStore keyStore;
-	private final X509CertificateWithPrivateKey certificate;
+	private final ThreadLocal<MinaMeddelandenProperties.Sender> threadLocalSender = new ThreadLocal<>();
+	private final Map<String, X509CertificateWithPrivateKey> certificateMap = new HashMap<>();
 
 	// Since the marshaller is not thread safe we need to create a new one for each thread.
 	private final ThreadLocal<Marshaller> threadLocalMarshaller = ThreadLocal.withInitial(() -> {
@@ -97,14 +93,16 @@ class DigitalMailMapper {
 		return threadLocalMarshaller.get();
 	}
 
-	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, JAXBException, ParserConfigurationException {
-		this.properties = properties;
-
-		// Load the KeyStore and get the signing key and certificate.
-		keyStore = KeyStoreUtils.loadKeyStore(Base64.decode(properties.keyStoreAsBase64()), properties.keyStorePassword());
-
-		// Read certificate from keystore
-		certificate = setupCertificate();
+	DigitalMailMapper(final MinaMeddelandenProperties properties) throws ParserConfigurationException {
+		properties.senders().forEach(sender -> {
+			try {
+				setupCertificate(sender);
+			} catch (KeyStoreException | UnrecoverableEntryException | NoSuchAlgorithmException e) {
+				LOG.error("Failed to initialize certificate for sender: {}", sender.name());
+				LOG.error(e.getMessage(), e);
+				throw new RuntimeException(e);
+			}
+		});
 
 		// Create document builder
 		final var documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -112,24 +110,14 @@ class DigitalMailMapper {
 		documentBuilder = documentBuilderFactory.newDocumentBuilder();
 	}
 
-	/**
-	 * Reads certificate information from a keystore
-	 *
-	 * @return
-	 * @throws KeyStoreException
-	 * @throws IOException
-	 * @throws UnrecoverableEntryException
-	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateException
-	 */
-	private X509CertificateWithPrivateKey setupCertificate()
-		throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
-		final var privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(
-			getAliasFromKeystore(keyStore, SKATTEVERKET_CERT_NAME),
-			new KeyStore.PasswordProtection(properties.keyStorePassword().toCharArray()));
-		final var cert = (X509Certificate) privateKeyEntry.getCertificate();
+	private void setupCertificate(final MinaMeddelandenProperties.Sender sender) throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
+		var keystore = KeyStoreUtils.loadKeyStore(Base64.getDecoder().decode(sender.keyStoreAsBase64()), sender.keyStorePassword());
+		var privateKeyEntry = (KeyStore.PrivateKeyEntry) keystore.getEntry(
+			getAliasFromKeystore(keystore, sender.alias()),
+			new KeyStore.PasswordProtection(sender.keyStorePassword().toCharArray()));
 
-		return new X509CertificateWithPrivateKey(cert, privateKeyEntry.getPrivateKey());
+		var cert = (X509Certificate) privateKeyEntry.getCertificate();
+		certificateMap.put(sender.name(), new X509CertificateWithPrivateKey(cert, privateKeyEntry.getPrivateKey()));
 	}
 
 	DigitalMailResponse createDigitalMailResponse(final DeliverSecureResponse deliveryResult, final String partyId) {
@@ -140,14 +128,14 @@ class DigitalMailMapper {
 			.withPartyId(partyId)
 			.build());
 		return digitalMailResponse;
-
 	}
 
 	/**
-	 * @param  dto to map to a request
-	 * @return
+	 * @param dto to map to a request
 	 */
-	DeliverSecure createDeliverSecure(final DigitalMailDto dto) {
+	DeliverSecure createDeliverSecure(final MinaMeddelandenProperties.Sender sender, final DigitalMailDto dto) {
+		threadLocalSender.set(sender);
+
 		final var sealedDelivery = createSealedDelivery(dto);
 		final var deliverSecure = new DeliverSecure();
 		deliverSecure.setDeliverSecure(sealedDelivery);
@@ -157,8 +145,7 @@ class DigitalMailMapper {
 	/**
 	 * The sealed delivery to be inserted into the SealedDelivery-object
 	 *
-	 * @param  dto
-	 * @return     A Sealed delivery signed by not the sender but us as a mediator.
+	 * @return A Sealed delivery signed by not the sender but us as a mediator.
 	 */
 	SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
 		LOG.info("Creating sealed delivery");
@@ -173,7 +160,7 @@ class DigitalMailMapper {
 			getMarshaller().marshal(signedDeliveryElement, signedDeliveryDocument);
 
 			var xml = Xml.fromDOM(signedDeliveryDocument);
-			var signedXml = xml.sign(certificate);
+			var signedXml = xml.sign(certificateMap.get(dto.getSender()));
 			signedDelivery = signedXml.toJaxbObject(SignedDelivery.class);
 
 			final var seal = new Seal();
@@ -190,7 +177,7 @@ class DigitalMailMapper {
 			getMarshaller().marshal(sealedDeliveryElement, sealedDeliveryDocument);
 
 			xml = Xml.fromDOM(sealedDeliveryDocument);
-			signedXml = xml.sign(certificate);
+			signedXml = xml.sign(certificateMap.get(dto.getSender()));
 			sealedDelivery = signedXml.toJaxbObject(SealedDelivery.class);
 
 			return sealedDelivery;
@@ -205,6 +192,7 @@ class DigitalMailMapper {
 		} finally {
 			// Always clean up
 			threadLocalMarshaller.remove();
+			threadLocalSender.remove();
 		}
 	}
 
@@ -250,7 +238,7 @@ class DigitalMailMapper {
 		return attachments.stream()
 			.map(attachment -> {
 				// We need to decode the base64-encoded string before we convert it to a byte array.
-				final var attachmentBytes = Base64.decode(
+				final var attachmentBytes = Base64.getDecoder().decode(
 					attachment.getBody());
 
 				final var mailAttachment = new Attachment();
@@ -281,9 +269,6 @@ class DigitalMailMapper {
 
 	/**
 	 * Creates the &lt;v3:header&gt;-element
-	 *
-	 * @param  dto
-	 * @return
 	 */
 	MessageHeader createMessageHeader(final DigitalMailDto dto) {
 		final var messageHeader = new MessageHeader();
@@ -296,9 +281,6 @@ class DigitalMailMapper {
 
 	/**
 	 * Creates the Supportinfo-element
-	 *
-	 * @param  dto
-	 * @return
 	 */
 
 	SupportInfo createSupportInfo(final DigitalMailDto dto) {
@@ -311,8 +293,7 @@ class DigitalMailMapper {
 	}
 
 	/**
-	 * Creates the body-element
-	 * Will create an empty body if no bodyInformation object or body is present.
+	 * Creates the body-element Will create an empty body if no bodyInformation object or body is present.
 	 *
 	 * @param  dto to be translated into a {@link MessageBody}
 	 * @return     A {@link MessageBody}
@@ -339,7 +320,7 @@ class DigitalMailMapper {
 			return bodyInformation.getBody().getBytes(StandardCharsets.UTF_8);
 		} else {
 			// If it's text/html we need to first decode the content and then "encode" it..
-			return Base64.decode(bodyInformation.getBody());
+			return Base64.getDecoder().decode(bodyInformation.getBody());
 		}
 	}
 
@@ -352,18 +333,14 @@ class DigitalMailMapper {
 
 	Sender createSender() {
 		final var sender = new Sender();
-		sender.setId(SENDER_ID);
-		sender.setName(SENDER_NAME);
+		sender.setId(threadLocalSender.get().id());
+		sender.setName(threadLocalSender.get().name());
 		return sender;
 	}
 
 	/**
-	 * Retrieve the alias for the key from the keystore.
-	 * As we only have one key we get the first one, if we need to get more we need to find it by alias.
-	 *
-	 * @param  keyStore
-	 * @return
-	 * @throws KeyStoreException
+	 * Retrieve the alias for the key from the keystore. As we only have one key we get the first one, if we need to get
+	 * more we need to find it by alias.
 	 */
 	String getAliasFromKeystore(final KeyStore keyStore, final String wantedAlias) throws KeyStoreException {
 		final var aliases = keyStore.aliases();

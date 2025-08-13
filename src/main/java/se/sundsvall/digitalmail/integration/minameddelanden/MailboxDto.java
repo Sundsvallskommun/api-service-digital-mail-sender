@@ -1,8 +1,8 @@
-package se.sundsvall.digitalmail.integration.skatteverket;
+package se.sundsvall.digitalmail.integration.minameddelanden;
 
 /**
  * Simple record for sending recipientId, serviceAddress and serviceName back and forth
- * 
+ *
  * @param recipientId
  * @param serviceAddress
  */

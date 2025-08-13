@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.integration.skatteverket;
+package se.sundsvall.digitalmail.integration.minameddelanden;
 
 import lombok.Getter;
 import lombok.Setter;

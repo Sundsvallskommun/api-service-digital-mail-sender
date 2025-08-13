@@ -1,16 +1,16 @@
-package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
+package se.sundsvall.digitalmail.integration.minameddelanden.sendmail;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDto;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateSenderProperties;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.util.Base64;
 import java.util.List;
 import javax.xml.crypto.dsig.XMLSignature;
@@ -36,8 +36,8 @@ import se.gov.minameddelanden.schema.service.DeliveryResult;
 import se.gov.minameddelanden.schema.service.DeliveryStatus;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
+import se.sundsvall.dept44.util.KeyStoreUtils;
 import se.sundsvall.digitalmail.Application;
-import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.File;
 
@@ -49,12 +49,15 @@ class DigitalMailMapperTest {
 	@Autowired
 	private DigitalMailMapper mapper;
 
-	@Value("${integration.skatteverket.key-store-as-base64}")
+	@Value("${integration.minameddelanden.senders[0].key-store-as-base64}")
 	private String keyStoreAsBase64;
+
+	@Value("${integration.minameddelanden.senders[0].key-store-password}")
+	private String keyStorePassword;
 
 	@Test
 	void testCreateDeliverSecure(final SoftAssertions softly) {
-		final var sealedDelivery = mapper.createDeliverSecure(TestObjectFactory.generateDigitalMailRequestDto()).getDeliverSecure();
+		final var sealedDelivery = mapper.createDeliverSecure(generateSenderProperties(), generateDigitalMailRequestDto()).getDeliverSecure();
 		final var seal = sealedDelivery.getSeal();
 		final var signedDelivery = sealedDelivery.getSignedDelivery();
 
@@ -75,7 +78,7 @@ class DigitalMailMapperTest {
 		softly.assertThat(header.getSupportinfo().getURL()).isEqualTo("http://url.com");
 		softly.assertThat(header.getSupportinfo().getText()).isEqualTo("support text");
 
-		final var body = signedDelivery.getDelivery().getMessages().get(0).getBody();
+		final var body = signedDelivery.getDelivery().getMessages().getFirst().getBody();
 		softly.assertThat(body.getBody()).isNotNull();
 		softly.assertThat(body.getContentType()).isEqualTo("text/plain");
 	}
@@ -118,18 +121,18 @@ class DigitalMailMapperTest {
 
 	@Test
 	void testGetAliasFromKeystore() throws Exception {
-		final var keyStore = getKeyStore();
-		final var alias = mapper.getAliasFromKeystore(keyStore, DigitalMailMapper.SKATTEVERKET_CERT_NAME);
+		var keystore = KeyStoreUtils.loadKeyStore(Base64.getDecoder().decode(keyStoreAsBase64), keyStorePassword);
+		final var alias = mapper.getAliasFromKeystore(keystore, DigitalMailMapper.SKATTEVERKET_CERT_NAME);
 
 		assertThat(alias).isEqualTo("skatteverket");
 	}
 
 	@Test
-	void testGetAliasFromKeystore_shouldThrowException_whenNotFound() throws Exception {
-		final var keyStore = getKeyStore();
+	void testGetAliasFromKeystore_shouldThrowException_whenNotFound() {
+		var keystore = KeyStoreUtils.loadKeyStore(Base64.getDecoder().decode(keyStoreAsBase64), keyStorePassword);
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> mapper.getAliasFromKeystore(keyStore, "notFound"))
+			.isThrownBy(() -> mapper.getAliasFromKeystore(keystore, "notFound"))
 			.withMessage("Couldn't find certificate for notFound");
 	}
 
@@ -147,13 +150,20 @@ class DigitalMailMapperTest {
 
 		final var attachments = mapper.createAttachments(List.of(attachment, attachment2));
 
-		assertThat(new String(attachments.get(0).getBody(), StandardCharsets.UTF_8)).isEqualTo("body");
-		assertThat(attachments.get(0).getContentType()).isEqualTo(MediaType.APPLICATION_PDF_VALUE);
-		assertThat(attachments.get(0).getFilename()).isEqualTo("filename.pdf");
+		assertThat(new String(attachments.getFirst().getBody(), StandardCharsets.UTF_8)).isEqualTo("body");
+		assertThat(attachments.getFirst().getContentType()).isEqualTo(MediaType.APPLICATION_PDF_VALUE);
+		assertThat(attachments.getFirst().getFilename()).isEqualTo("filename.pdf");
 
 		assertThat(new String(attachments.get(1).getBody(), StandardCharsets.UTF_8)).isEqualTo("body2");
 		assertThat(attachments.get(1).getContentType()).isEqualTo(MediaType.APPLICATION_PDF_VALUE);
 		assertThat(attachments.get(1).getFilename()).isEqualTo("filename2.pdf");
+	}
+
+	@Test
+	void testCreateAttachments_EmptyAttachments() {
+		final var attachments = mapper.createAttachments(List.of());
+
+		assertThat(attachments).isEmpty();
 	}
 
 	@Test
@@ -176,7 +186,7 @@ class DigitalMailMapperTest {
 
 	@Test
 	void testEmptyMessageBodyInformation_shouldGenerateEmptyBody() {
-		final var digitalMailRequestDto = TestObjectFactory.generateDigitalMailRequestDto();
+		final var digitalMailRequestDto = generateDigitalMailRequestDto();
 		digitalMailRequestDto.setBodyInformation(null);
 
 		final var messageBody = mapper.createMessageBody(digitalMailRequestDto);
@@ -187,7 +197,7 @@ class DigitalMailMapperTest {
 
 	@Test
 	void testEmptyBody_shouldGenerateEmptyBody() {
-		final var digitalMailRequestDto = TestObjectFactory.generateDigitalMailRequestDto();
+		final var digitalMailRequestDto = generateDigitalMailRequestDto();
 		digitalMailRequestDto.setBodyInformation(BodyInformation.builder()
 			.withBody("")
 			.build());
@@ -201,8 +211,9 @@ class DigitalMailMapperTest {
 	@Disabled("Implement validation of created message, so it works..")
 	@Test
 	void testCreateDeliverSecure_andValidateSignature() throws Exception {
-		final var dto = TestObjectFactory.generateDigitalMailRequestDto();
-		final var deliverSecure = mapper.createDeliverSecure(dto);
+		final var dto = generateDigitalMailRequestDto();
+		final var senderProperties = generateSenderProperties();
+		final var deliverSecure = mapper.createDeliverSecure(senderProperties, dto);
 		final var sealedDelivery = deliverSecure.getDeliverSecure();
 
 		final var documentFactory = DocumentBuilderFactory.newInstance();
@@ -240,9 +251,4 @@ class DigitalMailMapperTest {
 		assertThat(validated).isTrue();
 	}
 
-	private KeyStore getKeyStore() throws Exception {
-		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		keyStore.load(new ByteArrayInputStream(Base64.getDecoder().decode(keyStoreAsBase64.getBytes())), "changeit".toCharArray());
-		return keyStore;
-	}
 }

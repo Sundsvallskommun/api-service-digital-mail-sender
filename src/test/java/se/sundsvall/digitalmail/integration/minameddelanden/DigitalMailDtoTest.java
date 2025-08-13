@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.integration.skatteverket;
+package se.sundsvall.digitalmail.integration.minameddelanden;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;

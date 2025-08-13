@@ -1,19 +1,18 @@
-package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
+package se.sundsvall.digitalmail.integration.minameddelanden.sendmail;
 
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-import org.springframework.ws.client.core.WebServiceTemplate;
 import org.zalando.problem.Problem;
 import org.zalando.problem.ThrowableProblem;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenClientFactory;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenProperties;
 
 @Component
 @CircuitBreaker(name = "digitalMailIntegration")
@@ -21,14 +20,13 @@ public class DigitalMailIntegration {
 
 	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailIntegration.class);
 
-	private final WebServiceTemplate distributeTemplate;
+	private final MinaMeddelandenClientFactory clientFactory;
 	private final DigitalMailMapper mapper;
 
-	@Autowired
 	DigitalMailIntegration(
-		@Qualifier("skatteverketSendmailWebserviceTemplate") final WebServiceTemplate distributeTemplate,
+		final MinaMeddelandenClientFactory clientFactory,
 		final DigitalMailMapper mapper) {
-		this.distributeTemplate = distributeTemplate;
+		this.clientFactory = clientFactory;
 		this.mapper = mapper;
 	}
 
@@ -39,15 +37,16 @@ public class DigitalMailIntegration {
 	 * @param  serviceAddress The address to send the mail to
 	 * @return                The response from the service
 	 */
-	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String serviceAddress) {
+	public DigitalMailResponse sendDigitalMail(final MinaMeddelandenProperties.Sender senderProperties, final DigitalMailDto requestDto, final String serviceAddress) {
 		LOG.debug("Trying to send secure digital mail.");
 
 		try {
 			LOG.info("Creating deliver secure request");
-			final var deliverSecureRequest = mapper.createDeliverSecure(requestDto);
+			final var deliverSecureRequest = mapper.createDeliverSecure(senderProperties, requestDto);
+			final var sendMailServiceTemplate = clientFactory.getSendMailWebServiceTemplate(senderProperties.name());
 
 			LOG.info("Sending deliver secure request");
-			final var deliverSecureResponse = (DeliverSecureResponse) distributeTemplate.marshalSendAndReceive(serviceAddress, deliverSecureRequest);
+			final var deliverSecureResponse = (DeliverSecureResponse) sendMailServiceTemplate.marshalSendAndReceive(serviceAddress, deliverSecureRequest);
 
 			LOG.info("Mapping deliver secure response");
 			return mapper.createDigitalMailResponse(deliverSecureResponse, requestDto.getPartyId());
