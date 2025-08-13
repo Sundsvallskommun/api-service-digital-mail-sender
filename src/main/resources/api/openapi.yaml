@@ -1,13 +1,13 @@
-openapi: 3.0.1 
+openapi: 3.0.1
 info:
   title: Digital Mail Sender
   contact: { }
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "3.0"
+  version: "3.1"
 servers:
-  - url: http://localhost:54952
+  - url: http://localhost:63991
     description: Generated server url
 paths:
   /{municipalityId}/send-digital-mail:
@@ -206,9 +206,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
     StatusType:
       type: object
@@ -341,9 +341,9 @@ components:
             type: object
         status:
           $ref: "#/components/schemas/StatusType"
-        title:
-          type: string
         detail:
+          type: string
+        title:
           type: string
         suppressed:
           type: array
@@ -428,6 +428,10 @@ components:
         - supportInfo
       type: object
       properties:
+        sender:
+          type: string
+          description: "The sender of the digital mail, e.g. 'Sundsvalls kommun'"
+          example: Sundsvalls kommun
         partyId:
           type: string
           description: partyId for the person or organization the digital mail should

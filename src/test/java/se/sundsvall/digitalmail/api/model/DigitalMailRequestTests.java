@@ -27,24 +27,40 @@ class DigitalMailRequestTests {
 
 	@Test
 	void gettersAndSetters() {
+		final var sender = "someSender";
 		final var partyId = "somePartyId";
 		final var municipalityId = "someMunicipalityId";
 		final var headerSubject = "someSubject";
 
+		final var bodyInformation = BodyInformation.builder()
+			.withBody("someBody")
+			.withContentType(TEXT_PLAIN_VALUE)
+			.build();
+
+		final var supportInfo = SupportInfo.builder()
+			.withSupportText("someSupportText")
+			.withContactInformationEmail("someContactInformationEmail")
+			.withContactInformationUrl("http://someContactInformationUrl")
+			.withContactInformationPhoneNumber("someContactInformationPhoneNumber")
+			.build();
+
 		final var digitalMailRequest = new DigitalMailRequest();
+		digitalMailRequest.setSender(sender);
 		digitalMailRequest.setPartyId(partyId);
 		digitalMailRequest.setMunicipalityId(municipalityId);
 		digitalMailRequest.setHeaderSubject(headerSubject);
-		digitalMailRequest.setSupportInfo(new SupportInfo());
-		digitalMailRequest.setBodyInformation(BodyInformation.builder().withContentType(TEXT_PLAIN_VALUE).build());
+		digitalMailRequest.setSupportInfo(supportInfo);
+		digitalMailRequest.setBodyInformation(bodyInformation);
 		digitalMailRequest.setAttachments(List.of(new File(), new File()));
 
+		assertThat(digitalMailRequest.getSender()).isEqualTo(sender);
 		assertThat(digitalMailRequest.getPartyId()).isEqualTo(partyId);
 		assertThat(digitalMailRequest.getMunicipalityId()).isEqualTo(municipalityId);
 		assertThat(digitalMailRequest.getHeaderSubject()).isEqualTo(headerSubject);
-		assertThat(digitalMailRequest.getSupportInfo()).isNotNull();
-		assertThat(digitalMailRequest.getBodyInformation()).isNotNull();
+		assertThat(digitalMailRequest.getSupportInfo()).isEqualTo(supportInfo);
+		assertThat(digitalMailRequest.getBodyInformation()).isEqualTo(bodyInformation);
 		assertThat(digitalMailRequest.getAttachments()).isNotNull().hasSize(2);
+		assertThat(digitalMailRequest).hasNoNullFieldsOrProperties();
 	}
 
 	@Test

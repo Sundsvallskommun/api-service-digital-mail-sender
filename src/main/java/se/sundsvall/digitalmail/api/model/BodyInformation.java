@@ -8,13 +8,17 @@ import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 
 @Schema(description = "The body of the message")
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
 @AllArgsConstructor(access = PROTECTED)
+@Getter
+@Setter
 public class BodyInformation {
 
 	@OneOf({
@@ -26,19 +30,4 @@ public class BodyInformation {
 	@Schema(description = "Plain-text body")
 	private String body;
 
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(final String contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getBody() {
-		return body;
-	}
-
-	public void setBody(final String body) {
-		this.body = body;
-	}
 }

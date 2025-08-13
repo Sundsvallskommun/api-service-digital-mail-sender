@@ -13,7 +13,7 @@ class SupportInfoTests {
 		final var contactInformationUrl = "someUrl";
 		final var contactInformationPhoneNumber = "somePhoneNumber";
 
-		final var supportInfo = new SupportInfo();
+		final var supportInfo = SupportInfo.builder().build();
 		supportInfo.setSupportText(supportText);
 		supportInfo.setContactInformationEmail(contactInformationEmail);
 		supportInfo.setContactInformationUrl(contactInformationUrl);

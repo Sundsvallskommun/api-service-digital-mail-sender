@@ -3,7 +3,6 @@ package se.sundsvall.digitalmail.util;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.lowagie.text.pdf.PdfReader;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -18,7 +17,7 @@ class PdfCompressorTest {
 	private static final String INVALID_PDF_FILE_NAME = "invalid.pdf";
 
 	@Test
-	void testPdfFileShouldBeCompressed() throws IOException {
+	void testPdfFileShouldBeCompressed() {
 		var file = TestObjectFactory.getSamplePdfBase64();
 		var files = List.of(new File(CONTENT_TYPE, file, VALID_PDF_FILE_NAME));
 
@@ -42,7 +41,7 @@ class PdfCompressorTest {
 	}
 
 	@Test
-	void testCompressTwoFiles_oneFails_shouldCompressTheOther() throws IOException {
+	void testCompressTwoFiles_oneFails_shouldCompressTheOther() {
 		var validPdf = TestObjectFactory.getSamplePdfBase64();
 		var invalidPdf = "This is not a pdf";
 		var validFile = new File(CONTENT_TYPE, validPdf, VALID_PDF_FILE_NAME);

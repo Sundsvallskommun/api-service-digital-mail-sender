@@ -1,5 +1,6 @@
 package se.sundsvall.digitalmail.api.model;
 
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.NOT_REQUIRED;
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,6 +26,9 @@ import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 @Schema(description = "The body of the digital mail request")
 public class DigitalMailRequest {
 
+	@Schema(description = "The sender of the digital mail, e.g. 'Sundsvalls kommun'", example = "Sundsvalls kommun", requiredMode = NOT_REQUIRED)
+	private String sender;
+
 	@ValidUuid
 	@Schema(description = "partyId for the person or organization the digital mail should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED)
 	private String partyId;
@@ -48,25 +52,10 @@ public class DigitalMailRequest {
 	private BodyInformation bodyInformation;
 
 	@Override
-	public boolean equals(final Object o) {
-		if (this == o)
-			return true;
-		if (o == null || getClass() != o.getClass())
-			return false;
-		final DigitalMailRequest that = (DigitalMailRequest) o;
-		return Objects.equals(partyId, that.partyId) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(headerSubject, that.headerSubject) && Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments,
-			that.attachments) && Objects.equals(bodyInformation, that.bodyInformation);
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash(partyId, municipalityId, headerSubject, supportInfo, attachments, bodyInformation);
-	}
-
-	@Override
 	public String toString() {
 		return "DigitalMailRequest{" +
-			"partyId='" + partyId + '\'' +
+			"sender='" + sender + '\'' +
+			", partyId='" + partyId + '\'' +
 			", municipalityId='" + municipalityId + '\'' +
 			", headerSubject='" + headerSubject + '\'' +
 			", supportInfo=" + supportInfo +
@@ -75,4 +64,17 @@ public class DigitalMailRequest {
 			'}';
 	}
 
+	@Override
+	public boolean equals(Object o) {
+		if (o == null || getClass() != o.getClass())
+			return false;
+		DigitalMailRequest that = (DigitalMailRequest) o;
+		return Objects.equals(sender, that.sender) && Objects.equals(partyId, that.partyId) && Objects.equals(municipalityId, that.municipalityId) && Objects.equals(headerSubject, that.headerSubject)
+			&& Objects.equals(supportInfo, that.supportInfo) && Objects.equals(attachments, that.attachments) && Objects.equals(bodyInformation, that.bodyInformation);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(sender, partyId, municipalityId, headerSubject, supportInfo, attachments, bodyInformation);
+	}
 }
