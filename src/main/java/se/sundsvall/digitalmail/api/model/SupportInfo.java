@@ -4,10 +4,12 @@ import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Schema(description = "Contains contact information and where the recipient may turn to for questions.", requiredMode = REQUIRED)
+@Builder(setterPrefix = "with")
 @Getter
 @Setter
 public class SupportInfo {

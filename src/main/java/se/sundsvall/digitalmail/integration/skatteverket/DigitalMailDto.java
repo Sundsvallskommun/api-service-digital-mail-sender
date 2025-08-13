@@ -11,6 +11,6 @@ public class DigitalMailDto extends DigitalMailRequest {
 	private String recipientId; // Recipient id from e.g. kivra.
 
 	public DigitalMailDto(final DigitalMailRequest request) {
-		super(request.getPartyId(), request.getMunicipalityId(), request.getHeaderSubject(), request.getSupportInfo(), request.getAttachments(), request.getBodyInformation());
+		super(request.getSender(), request.getPartyId(), request.getMunicipalityId(), request.getHeaderSubject(), request.getSupportInfo(), request.getAttachments(), request.getBodyInformation());
 	}
 }

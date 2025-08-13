@@ -24,11 +24,12 @@ public final class TestObjectFactory {
 	private TestObjectFactory() {}
 
 	public static DigitalMailDto generateDigitalMailRequestDto() {
-		var supportInfo = new SupportInfo();
-		supportInfo.setContactInformationEmail("email@somewhere.com");
-		supportInfo.setContactInformationPhoneNumber("0701234567");
-		supportInfo.setSupportText("support text");
-		supportInfo.setContactInformationUrl("http://url.com");
+		var supportInfo = SupportInfo.builder()
+			.withSupportText("support text")
+			.withContactInformationEmail("email@somewhere.com")
+			.withContactInformationPhoneNumber("0701234567")
+			.withContactInformationUrl("http://url.com")
+			.build();
 
 		var mailRequest = DigitalMailDto.builder()
 			.withPartyId(UUID.randomUUID().toString())

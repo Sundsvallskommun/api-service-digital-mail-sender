@@ -13,20 +13,30 @@ class DigitalMailDtoTest {
 
 	@Test
 	void testConstructor() {
+		final var bodyInformation = BodyInformation.builder()
+			.withContentType(TEXT_PLAIN_VALUE)
+			.build();
+
+		final var supportInfo = SupportInfo.builder()
+			.withSupportText("supportText")
+			.build();
+
 		final var request = DigitalMailRequest.builder()
+			.withSender("sender")
 			.withPartyId("partyId")
 			.withHeaderSubject("Subject")
-			.withSupportInfo(new SupportInfo())
+			.withSupportInfo(supportInfo)
 			.withAttachments(new ArrayList<>())
-			.withBodyInformation(BodyInformation.builder().withContentType(TEXT_PLAIN_VALUE).build())
+			.withBodyInformation(bodyInformation)
 			.build();
 
 		final var dto = new DigitalMailDto(request);
 
+		assertThat(dto.getSender()).isEqualTo("sender");
 		assertThat(dto.getPartyId()).isEqualTo("partyId");
 		assertThat(dto.getHeaderSubject()).isEqualTo("Subject");
-		assertThat(dto.getSupportInfo()).isNotNull();
-		assertThat(dto.getAttachments()).isNotNull();
-		assertThat(dto.getBodyInformation()).isNotNull();
+		assertThat(dto.getSupportInfo()).isEqualTo(supportInfo);
+		assertThat(dto.getBodyInformation()).isEqualTo(bodyInformation);
+		assertThat(dto.getAttachments()).isNotNull().isEmpty();
 	}
 }
