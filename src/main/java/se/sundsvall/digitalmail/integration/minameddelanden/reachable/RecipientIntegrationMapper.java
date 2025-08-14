@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.integration.skatteverket.reachable;
+package se.sundsvall.digitalmail.integration.minameddelanden.reachable;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
@@ -10,31 +10,24 @@ import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachable;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 import se.gov.minameddelanden.schema.recipient.v3.ObjectFactory;
-import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
-import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
+import se.sundsvall.digitalmail.integration.minameddelanden.MailboxDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenProperties;
 
 @Component
 class RecipientIntegrationMapper {
 
-	static final String SENDER_ORG_NR = "162120002411"; // We will always send as sundsvalls kommun.
-
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
-	private final SkatteverketProperties skatteverketProperties;
+	private final MinaMeddelandenProperties minaMeddelandenProperties;
 
-	RecipientIntegrationMapper(final SkatteverketProperties skatteverketProperties) {
-		this.skatteverketProperties = skatteverketProperties;
+	RecipientIntegrationMapper(final MinaMeddelandenProperties minaMeddelandenProperties) {
+		this.minaMeddelandenProperties = minaMeddelandenProperties;
 	}
 
-	/**
-	 * 
-	 * @param  personalNumbers map of personalnumbers with corresponding partyIds
-	 * @return
-	 */
-	IsReachable createIsReachableRequest(final List<String> personalNumbers) {
+	IsReachable createIsReachableRequest(final MinaMeddelandenProperties.Sender senderProperties, final String legalId) {
 		final var isReachable = OBJECT_FACTORY.createIsReachable();
-		isReachable.getRecipientIds().addAll(personalNumbers);
-		isReachable.setSenderOrgNr(SENDER_ORG_NR);
+		isReachable.getRecipientIds().add(legalId);
+		isReachable.setSenderOrgNr(senderProperties.id());
 		return isReachable;
 	}
 
@@ -47,15 +40,13 @@ class RecipientIntegrationMapper {
 				.map(Optional::get)
 				.toList();
 		}
-
 		return List.of();
 	}
 
 	/**
-	 * Check that:
-	 * - there's not a pending accountregistration (that we have somewhere to send the message)
-	 * - The sender is accepted by the recipient (no difference between disallowing and no mailbox)
-	 * - that there's an existing servicesupplier object.
+	 * Check that: - there's not a pending accountregistration (that we have somewhere to send the message) - The sender is
+	 * accepted by the recipient (no difference between disallowing and no mailbox) - that there's an existing
+	 * servicesupplier object.
 	 *
 	 * @param  reachabilityStatus status of the recipient
 	 * @return                    Optional {@link MailboxDto} containing the url and recipientId.
@@ -67,10 +58,10 @@ class RecipientIntegrationMapper {
 			isSupportedSupplier(reachabilityStatus.getAccountStatus().getServiceSupplier().getName()) &&    // Check that we support the supplier
 			isNotBlank(reachabilityStatus.getAccountStatus().getServiceSupplier().getServiceAdress())) {    // Make sure we have an address to send something to.
 			final var recipientId = reachabilityStatus.getAccountStatus().getRecipientId();
-			final var serviceAdress = reachabilityStatus.getAccountStatus().getServiceSupplier().getServiceAdress();
+			final var serviceAddress = reachabilityStatus.getAccountStatus().getServiceSupplier().getServiceAdress();
 			final var serviceName = getShortSupplierName(reachabilityStatus.getAccountStatus().getServiceSupplier().getName());
 
-			return Optional.of(new MailboxDto(recipientId, serviceAdress, serviceName));
+			return Optional.of(new MailboxDto(recipientId, serviceAddress, serviceName));
 		}
 
 		return Optional.empty();
@@ -78,12 +69,9 @@ class RecipientIntegrationMapper {
 
 	/**
 	 * Check if the service supplier "name" is one that we support.
-	 *
-	 * @param  supplier
-	 * @return
 	 */
 	boolean isSupportedSupplier(final String supplier) {
-		return skatteverketProperties.supportedSuppliers().stream()
+		return minaMeddelandenProperties.supportedSuppliers().stream()
 			.anyMatch(supportedSupplier -> supplier.toLowerCase().contains(supportedSupplier.toLowerCase()));
 	}
 
@@ -93,7 +81,7 @@ class RecipientIntegrationMapper {
 	 * @return the "short" name or the provided supplier as a fallback
 	 */
 	String getShortSupplierName(final String supplier) {
-		return skatteverketProperties.supportedSuppliers().stream()
+		return minaMeddelandenProperties.supportedSuppliers().stream()
 			.filter(supportedSupplier -> supplier.toLowerCase().contains(supportedSupplier.toLowerCase()))
 			.findFirst()
 			.map(String::toLowerCase)

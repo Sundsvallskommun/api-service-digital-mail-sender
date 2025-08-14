@@ -1,8 +1,8 @@
-package se.sundsvall.digitalmail.integration.skatteverket.reachable;
+package se.sundsvall.digitalmail.integration.minameddelanden.reachable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalmail.integration.skatteverket.reachable.RecipientIntegrationMapper.SENDER_ORG_NR;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateSenderProperties;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -18,13 +18,13 @@ import se.gov.minameddelanden.schema.recipient.AccountStatus;
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.ServiceSupplier;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
-import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenProperties;
 
 @ExtendWith(MockitoExtension.class)
 class RecipientIntegrationMapperTest {
 
 	@Mock
-	private SkatteverketProperties mockSkatteverketProperties;
+	private MinaMeddelandenProperties mockMinaMeddelandenProperties;
 
 	@InjectMocks
 	private RecipientIntegrationMapper mapper;
@@ -39,16 +39,17 @@ class RecipientIntegrationMapperTest {
 	@Test
 	void testCreateIsRegistered() {
 		final var personalNumber = "197001011234";
+		final var senderProperties = generateSenderProperties();
 
-		final var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber));
+		final var isReachableRequest = mapper.createIsReachableRequest(senderProperties, personalNumber);
 
-		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(SENDER_ORG_NR);
+		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(senderProperties.id());
 		assertThat(isReachableRequest.getRecipientIds().getFirst()).isEqualTo(personalNumber);
 	}
 
 	@Test
 	void testGetMailboxSettingsShouldReturnRecipientIdWhenPresent() {
-		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
+		when(mockMinaMeddelandenProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
 
 		final var response = createIsReachableResponse(false, true, true);
 
@@ -71,7 +72,7 @@ class RecipientIntegrationMapperTest {
 
 	@Test
 	void testFindMatchingSupplier() {
-		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("supplier1", "supplier2", "supplier3"));
+		when(mockMinaMeddelandenProperties.supportedSuppliers()).thenReturn(List.of("supplier1", "supplier2", "supplier3"));
 
 		assertThat(mapper.isSupportedSupplier("supplier1")).isTrue();
 		assertThat(mapper.isSupportedSupplier("supplier2")).isTrue();
@@ -81,14 +82,13 @@ class RecipientIntegrationMapperTest {
 
 	@Test
 	void testFindShortSupplierNameShouldMapAndReturnShortName() {
-		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Supplier1", "SuPPliEr2"));
+		when(mockMinaMeddelandenProperties.supportedSuppliers()).thenReturn(List.of("Supplier1", "SuPPliEr2"));
 
 		assertThat(mapper.getShortSupplierName("Supplier1")).isEqualTo("supplier1");
 		assertThat(mapper.getShortSupplierName("SuPPliEr2")).isEqualTo("supplier2");
 	}
 
 	/**
-	 *
 	 * @param  pending                   if pending, the mailbox has not yet been created and should be interpreted as the
 	 *                                   recipient not having a digital mailbox.
 	 * @param  shouldHaveServiceSupplier No serviceSupplier indicates that the recipient doesn't have a digital mailbox.

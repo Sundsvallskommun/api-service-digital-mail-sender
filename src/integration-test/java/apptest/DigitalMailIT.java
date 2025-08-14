@@ -2,16 +2,14 @@ package apptest;
 
 import static java.lang.String.format;
 
+import apptest.extension.ResponseBodyTransformer;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
-
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalmail.Application;
-
-import apptest.extension.ResponseBodyTransformer;
 
 @WireMockAppTestSuite(files = "classpath:/DigitalMailIT/", classes = Application.class)
 class DigitalMailIT extends AbstractAppTest {

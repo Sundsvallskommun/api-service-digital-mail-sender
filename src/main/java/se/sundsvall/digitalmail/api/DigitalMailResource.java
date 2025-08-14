@@ -32,7 +32,7 @@ import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.DigitalMailDto;
 import se.sundsvall.digitalmail.service.DigitalMailService;
 
 @RestController

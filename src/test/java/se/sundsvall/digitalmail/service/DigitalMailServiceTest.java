@@ -3,7 +3,6 @@ package se.sundsvall.digitalmail.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -11,8 +10,10 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.sundsvall.digitalmail.Constants.DEFAULT_SENDER_NAME;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDto;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateSenderProperties;
 
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
@@ -27,10 +28,12 @@ import org.zalando.problem.ThrowableProblem;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
+import se.sundsvall.digitalmail.integration.minameddelanden.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.MailboxDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenProperties;
+import se.sundsvall.digitalmail.integration.minameddelanden.reachable.ReachableIntegration;
+import se.sundsvall.digitalmail.integration.minameddelanden.sendmail.DigitalMailIntegration;
 import se.sundsvall.digitalmail.integration.party.PartyIntegration;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
-import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
-import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
 
 @ExtendWith(MockitoExtension.class)
 class DigitalMailServiceTest {
@@ -45,24 +48,33 @@ class DigitalMailServiceTest {
 	private KivraIntegration mockKivraIntegration;
 
 	@Mock
-	private AvailabilityService mockAvailabilityService;
+	private ReachableIntegration mockReachableIntegration;
+
+	@Mock
+	private MinaMeddelandenProperties mockProperties;
+
+	@Mock
+	private MinaMeddelandenProperties.Sender mockSenderProperties;
 
 	@InjectMocks
 	private DigitalMailService service;
 
 	@AfterEach
 	void afterEach() {
-		verifyNoMoreInteractions(mockPartyIntegration, mockDigitalMailIntegration, mockKivraIntegration, mockAvailabilityService);
+		verifyNoMoreInteractions(mockPartyIntegration, mockDigitalMailIntegration, mockKivraIntegration, mockReachableIntegration);
 	}
 
 	@Test
 	void testSendDigitalMail_shouldReturnResponse() {
 		final var request = generateDigitalMailRequestDto();
 		final var mailbox = new MailboxDto("recipientId", "serviceAddress", "kivra");
+		final var personalNumber = "personalNumber";
 
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn("personalNumber");
-		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList())).thenReturn(List.of(mailbox));
-		when(mockDigitalMailIntegration.sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"))).thenReturn(new DigitalMailResponse());
+		when(mockProperties.senders()).thenReturn(List.of(mockSenderProperties));
+		when(mockSenderProperties.name()).thenReturn(DEFAULT_SENDER_NAME);
+		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(personalNumber);
+		when(mockReachableIntegration.isReachable(mockSenderProperties, personalNumber)).thenReturn(List.of(mailbox));
+		when(mockDigitalMailIntegration.sendDigitalMail(eq(mockSenderProperties), any(DigitalMailDto.class), eq("serviceAddress"))).thenReturn(new DigitalMailResponse());
 
 		final var pdfLength = request.getAttachments().getFirst().getBody().length();  // Save the length of the pdf before compression
 
@@ -73,22 +85,25 @@ class DigitalMailServiceTest {
 		assertThat(compressedPdfLength).isLessThan(pdfLength);  // Check that the pdf has been compressed
 		assertThat(digitalMailResponse).isNotNull();
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
-		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList());
-		verify(mockDigitalMailIntegration).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
+		verify(mockReachableIntegration).isReachable(eq(mockSenderProperties), anyString());
+		verify(mockDigitalMailIntegration).sendDigitalMail(eq(mockSenderProperties), any(DigitalMailDto.class), eq("serviceAddress"));
 	}
 
 	// Same thing will happen if any integration throws an exception so will only test one.
 	@Test
 	void testSendDigitalMail_partyThrowsExceptionShouldThrowProblem() {
 		final var request = generateDigitalMailRequestDto();
+		final var senderProperties = generateSenderProperties();
 
+		when(mockProperties.senders()).thenReturn(List.of(mockSenderProperties));
+		when(mockSenderProperties.name()).thenReturn(DEFAULT_SENDER_NAME);
 		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
 
 		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalMail(request, ""));
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
-		verify(mockAvailabilityService, never()).getRecipientMailboxesAndCheckAvailability(anyList());
-		verify(mockDigitalMailIntegration, never()).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
+		verify(mockReachableIntegration, never()).isReachable(eq(senderProperties), anyString());
+		verify(mockDigitalMailIntegration, never()).sendDigitalMail(eq(senderProperties), any(DigitalMailDto.class), eq("serviceAddress"));
 	}
 
 	/**
@@ -161,28 +176,40 @@ class DigitalMailServiceTest {
 
 	@Test
 	void testVerifyRecipientHasSomeAvailableMailbox() {
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn("somePersonalNumber");
-		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList()))
+		var legalId = "legalId";
+		var partyId = "somePartyId";
+		var municipalityId = "2281";
+
+		when(mockProperties.senders()).thenReturn(List.of(mockSenderProperties));
+		when(mockSenderProperties.name()).thenReturn(DEFAULT_SENDER_NAME);
+		when(mockPartyIntegration.getLegalId(municipalityId, partyId)).thenReturn(legalId);
+		when(mockReachableIntegration.isReachable(mockSenderProperties, legalId))
 			.thenReturn(List.of(new MailboxDto("recipientId", "serviceAddress", "kivra")));
 
-		final var result = service.verifyRecipientHasSomeAvailableMailbox("somePartyId", "");
+		final var result = service.verifyRecipientHasSomeAvailableMailbox(partyId, municipalityId);
 		assertThat(result).isTrue();
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
-		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList());
+		verify(mockReachableIntegration).isReachable(mockSenderProperties, legalId);
 	}
 
 	@Test
 	void testVerifyRecipientHasSomeAvailableMailbox_whenNoMailboxesExist() {
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn("somePersonalNumber");
-		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList()))
+		var legalId = "legalId";
+		var partyId = "somePartyId";
+		var municipalityId = "2281";
+
+		when(mockProperties.senders()).thenReturn(List.of(mockSenderProperties));
+		when(mockSenderProperties.name()).thenReturn(DEFAULT_SENDER_NAME);
+		when(mockPartyIntegration.getLegalId(municipalityId, partyId)).thenReturn(legalId);
+		when(mockReachableIntegration.isReachable(mockSenderProperties, legalId))
 			.thenThrow(Problem.valueOf(Status.NOT_FOUND));
 
-		final var result = service.verifyRecipientHasSomeAvailableMailbox("somePartyId", "");
+		final var result = service.verifyRecipientHasSomeAvailableMailbox(partyId, municipalityId);
 		assertThat(result).isFalse();
 
-		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
-		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList());
+		verify(mockPartyIntegration).getLegalId(municipalityId, partyId);
+		verify(mockReachableIntegration).isReachable(mockSenderProperties, legalId);
 	}
 
 }

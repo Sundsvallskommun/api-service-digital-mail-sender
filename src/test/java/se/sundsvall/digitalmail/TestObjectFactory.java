@@ -2,6 +2,7 @@ package se.sundsvall.digitalmail;
 
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
+import static se.sundsvall.digitalmail.Constants.DEFAULT_SENDER_NAME;
 import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
 import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
 import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
@@ -15,7 +16,8 @@ import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.api.model.SupportInfo;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.minameddelanden.configuration.MinaMeddelandenProperties;
 
 public final class TestObjectFactory {
 
@@ -32,6 +34,7 @@ public final class TestObjectFactory {
 			.build();
 
 		var mailRequest = DigitalMailDto.builder()
+			.withSender("Sundsvalls Kommun")
 			.withPartyId(UUID.randomUUID().toString())
 			.withHeaderSubject("Some subject")
 			.withMunicipalityId("2281")
@@ -46,6 +49,10 @@ public final class TestObjectFactory {
 		var mailRequestDto = new DigitalMailDto(mailRequest);
 		mailRequestDto.setRecipientId("recipientId");
 		return mailRequestDto;
+	}
+
+	public static MinaMeddelandenProperties.Sender generateSenderProperties() {
+		return new MinaMeddelandenProperties.Sender(DEFAULT_SENDER_NAME, "162120002411", "", "", "");
 	}
 
 	public static DigitalMailDto generateDigitalMailRequestDtoWithHtmlBody() {
