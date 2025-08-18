@@ -1,7 +1,6 @@
 package se.sundsvall.digitalmail.api;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
@@ -63,9 +62,7 @@ class DigitalMailResource {
 	@PostMapping(
 		value = "/send-digital-mail",
 		consumes = APPLICATION_JSON_VALUE,
-		produces = {
-			APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-		})
+		produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<DigitalMailResponse> sendDigitalMail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final DigitalMailRequest request) {
@@ -98,9 +95,7 @@ class DigitalMailResource {
 	@PostMapping(
 		value = "/send-digital-invoice",
 		consumes = APPLICATION_JSON_VALUE,
-		produces = {
-			APPLICATION_JSON_VALUE, APPLICATION_PROBLEM_JSON_VALUE
-		})
+		produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<DigitalInvoiceResponse> sendDigitalInvoice(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final DigitalInvoiceRequest request) {
@@ -118,11 +113,10 @@ class DigitalMailResource {
 	@PostMapping(value = "/has-available-mailbox/{partyId}")
 	ResponseEntity<Void> hasAvailableMailbox(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
-		@PathVariable("partyId") @ValidUuid final String partyId) {
+		@PathVariable @ValidUuid final String partyId) {
 		if (digitalMailService.verifyRecipientHasSomeAvailableMailbox(partyId, municipalityId)) {
 			return ok().build();
 		}
 		return notFound().build();
 	}
-
 }

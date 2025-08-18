@@ -2,15 +2,15 @@ package se.sundsvall.digitalmail.util;
 
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
-import com.lowagie.text.Document;
-import com.lowagie.text.pdf.PdfReader;
-import com.lowagie.text.pdf.PdfSmartCopy;
-import com.lowagie.text.pdf.PdfStream;
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import org.apache.commons.lang.StringUtils;
+import org.openpdf.text.Document;
+import org.openpdf.text.pdf.PdfReader;
+import org.openpdf.text.pdf.PdfSmartCopy;
+import org.openpdf.text.pdf.PdfStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.sundsvall.digitalmail.api.model.File;
