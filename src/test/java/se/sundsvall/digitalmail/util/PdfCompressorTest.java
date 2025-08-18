@@ -2,12 +2,12 @@ package se.sundsvall.digitalmail.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.lowagie.text.pdf.PdfReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.openpdf.text.pdf.PdfReader;
 import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.File;
 
