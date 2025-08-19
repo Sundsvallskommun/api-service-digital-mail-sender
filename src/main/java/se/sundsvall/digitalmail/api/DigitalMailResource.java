@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.api;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
@@ -38,6 +39,26 @@ import se.sundsvall.digitalmail.service.DigitalMailService;
 @Validated
 @RequestMapping(value = "/{municipalityId}")
 @Tag(name = "Digital Mail")
+@ApiResponse(responseCode = "200",
+	description = "Successful Operation",
+	useReturnTypeSchema = true)
+@ApiResponse(responseCode = "400",
+	description = "Bad Request",
+	content = @Content(
+		mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+		schema = @Schema(oneOf = {
+			Problem.class, ConstraintViolationProblem.class
+		})))
+@ApiResponse(responseCode = "404",
+	description = "Not Found",
+	content = @Content(
+		mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+		schema = @Schema(implementation = Problem.class)))
+@ApiResponse(responseCode = "500",
+	description = "Internal Server Error",
+	content = @Content(
+		mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+		schema = @Schema(implementation = Problem.class)))
 class DigitalMailResource {
 
 	private final DigitalMailService digitalMailService;
@@ -49,16 +70,7 @@ class DigitalMailResource {
 		this.htmlValidator = htmlValidator;
 	}
 
-	@Operation(
-		summary = "Send a digital mail",
-		responses = {
-			@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
-			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {
-				Problem.class, ConstraintViolationProblem.class
-			}))),
-			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = Problem.class))),
-			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
-		})
+	@Operation(summary = "Send a digital mail")
 	@PostMapping(
 		value = "/send-digital-mail",
 		consumes = APPLICATION_JSON_VALUE,
@@ -82,16 +94,7 @@ class DigitalMailResource {
 		return ok(response);
 	}
 
-	@Operation(
-		summary = "Send a digital invoice",
-		responses = {
-			@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
-			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(oneOf = {
-				Problem.class, ConstraintViolationProblem.class
-			}))),
-			@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(schema = @Schema(implementation = Problem.class))),
-			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
-		})
+	@Operation(summary = "Send a digital invoice")
 	@PostMapping(
 		value = "/send-digital-invoice",
 		consumes = APPLICATION_JSON_VALUE,
@@ -102,14 +105,7 @@ class DigitalMailResource {
 		return ok(digitalMailService.sendDigitalInvoice(new InvoiceDto(request), municipalityId));
 	}
 
-	@Operation(
-		summary = "Check if a party has a digital mailbox and if said party has chosen to receive digital mail",
-		responses = {
-			@ApiResponse(responseCode = "200", description = "Successful Operation (available mailbox(es) found)"),
-			@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(schema = @Schema(implementation = Problem.class))),
-			@ApiResponse(responseCode = "404", description = "Not Found (no available mailbox(es) found)", content = @Content(schema = @Schema(implementation = Problem.class))),
-			@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(schema = @Schema(implementation = Problem.class)))
-		})
+	@Operation(summary = "Check if a party has a digital mailbox and if said party has chosen to receive digital mail")
 	@PostMapping(value = "/has-available-mailbox/{partyId}")
 	ResponseEntity<Void> hasAvailableMailbox(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
