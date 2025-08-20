@@ -5,11 +5,70 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "3.0"
+  version: "3.1"
 servers:
-  - url: http://localhost:57323
+  - url: http://127.0.0.1:8080
     description: Generated server url
 paths:
+  /{municipalityId}/{organizationNumber}/mailboxes:
+    post:
+      tags:
+        - Digital Mail
+      summary: "Retrieve a list of mailboxes. Contains partyId, supplier and if the\
+        \ mailbox is reachable for the given organization."
+      operationId: hasAvailableMailboxes
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: organizationNumber
+          in: path
+          description: The organization number of the intended sending organization
+          required: true
+          schema:
+            type: string
+          example: 5561234567
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mailbox"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "404":
+          description: Not Found
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/send-digital-mail:
     post:
       tags:
@@ -108,8 +167,9 @@ paths:
     post:
       tags:
         - Digital Mail
-      summary: Check if a party has a digital mailbox and if said party has chosen
-        to receive digital mail
+      summary: "**DEPRECATED** will be removed in a future version, use hasAvailableMailboxes\
+        \ instead. Check if a party has a digital mailbox and if said party has chosen\
+        \ to receive digital mail"
       operationId: hasAvailableMailbox
       parameters:
         - name: municipalityId
@@ -147,6 +207,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+      deprecated: true
   /api-docs:
     get:
       tags:
@@ -165,99 +226,6 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
-    Attachment:
-      required:
-        - body
-        - contentType
-        - filename
-      type: object
-      properties:
-        contentType:
-          type: string
-          description: "Allowed type is: application/pdf"
-          example: application/pdf
-        body:
-          minLength: 1
-          type: string
-          description: BASE64-encoded body
-        filename:
-          minLength: 1
-          type: string
-          description: The name of the file
-          example: sample.pdf
-      description: A PDF file/attachment
-    BodyInformation:
-      required:
-        - contentType
-      type: object
-      properties:
-        contentType:
-          type: string
-          description: "The content type for the message, text/plain for only text,\
-            \ text/html for HTML messages."
-          example: text/html
-        body:
-          type: string
-          description: Plain-text body
-      description: The body of the message
-    DigitalMailRequest:
-      required:
-        - headerSubject
-        - municipalityId
-        - partyId
-        - supportInfo
-      type: object
-      properties:
-        partyId:
-          type: string
-          description: partyId for the person or organization the digital mail should
-            be sent to
-          example: 6a5c3d04-412d-11ec-973a-0242ac130003
-        municipalityId:
-          type: string
-          description: MunicipalityId
-          example: "2281"
-        headerSubject:
-          minLength: 1
-          type: string
-          description: The subject of the digital mail.
-          example: Viktig information från Sundsvalls kommun
-        supportInfo:
-          $ref: "#/components/schemas/SupportInfo"
-        attachments:
-          type: array
-          items:
-            $ref: "#/components/schemas/Attachment"
-        bodyInformation:
-          $ref: "#/components/schemas/BodyInformation"
-      description: The body of the digital mail request
-    SupportInfo:
-      required:
-        - supportText
-      type: object
-      properties:
-        supportText:
-          minLength: 1
-          type: string
-          description: Information text describing the different ways the recipient
-            may contact the sender.
-          example: Kontakta oss via epost eller telefon.
-        contactInformationUrl:
-          type: string
-          description: Url where the recipient may find more information.
-          example: https://sundsvall.se/
-        contactInformationPhoneNumber:
-          type: string
-          description: Phone number the recipient may call to get in contact with
-            the sender.
-          example: "4660191000"
-        contactInformationEmail:
-          type: string
-          description: Email address the recipient may use to get in contact with
-            the sender.
-          example: sundsvalls.kommun@sundsvall.se
-      description: Contains contact information and where the recipient may turn to
-        for questions.
     Problem:
       type: object
       properties:
@@ -452,6 +420,112 @@ components:
           type: string
         message:
           type: string
+    Mailbox:
+      type: object
+      properties:
+        partyId:
+          type: string
+          description: partyId for the person the mailbox belongs to
+        supplier:
+          type: string
+          description: "Name of the mailbox, e.g. Kivra"
+        reachable:
+          type: boolean
+          description: If it's possible to send messages to this mailbox
+      description: Response model for a mailbox
+    Attachment:
+      required:
+        - body
+        - contentType
+        - filename
+      type: object
+      properties:
+        contentType:
+          type: string
+          description: "Allowed type is: application/pdf"
+          example: application/pdf
+        body:
+          minLength: 1
+          type: string
+          description: BASE64-encoded body
+        filename:
+          minLength: 1
+          type: string
+          description: The name of the file
+          example: sample.pdf
+      description: A PDF file/attachment
+    BodyInformation:
+      required:
+        - contentType
+      type: object
+      properties:
+        contentType:
+          type: string
+          description: "The content type for the message, text/plain for only text,\
+            \ text/html for HTML messages."
+          example: text/html
+        body:
+          type: string
+          description: Plain-text body
+      description: The body of the message
+    DigitalMailRequest:
+      required:
+        - headerSubject
+        - municipalityId
+        - partyId
+        - supportInfo
+      type: object
+      properties:
+        partyId:
+          type: string
+          description: partyId for the person or organization the digital mail should
+            be sent to
+          example: 6a5c3d04-412d-11ec-973a-0242ac130003
+        municipalityId:
+          type: string
+          description: MunicipalityId
+          example: "2281"
+        headerSubject:
+          minLength: 1
+          type: string
+          description: The subject of the digital mail.
+          example: Viktig information från Sundsvalls kommun
+        supportInfo:
+          $ref: "#/components/schemas/SupportInfo"
+        attachments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Attachment"
+        bodyInformation:
+          $ref: "#/components/schemas/BodyInformation"
+      description: The body of the digital mail request
+    SupportInfo:
+      required:
+        - supportText
+      type: object
+      properties:
+        supportText:
+          minLength: 1
+          type: string
+          description: Information text describing the different ways the recipient
+            may contact the sender.
+          example: Kontakta oss via epost eller telefon.
+        contactInformationUrl:
+          type: string
+          description: Url where the recipient may find more information.
+          example: https://sundsvall.se/
+        contactInformationPhoneNumber:
+          type: string
+          description: Phone number the recipient may call to get in contact with
+            the sender.
+          example: "4660191000"
+        contactInformationEmail:
+          type: string
+          description: Email address the recipient may use to get in contact with
+            the sender.
+          example: sundsvalls.kommun@sundsvall.se
+      description: Contains contact information and where the recipient may turn to
+        for questions.
     DeliveryStatus:
       type: object
       properties:

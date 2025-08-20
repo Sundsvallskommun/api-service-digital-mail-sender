@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
+import se.sundsvall.digitalmail.api.model.Mailbox;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalmail.integration.party.PartyIntegration;
@@ -81,4 +82,8 @@ public class DigitalMailService {
 		}
 	}
 
+	// TODO Will be implemented in a future task
+	public List<Mailbox> getRecipientsHaveAvailableMailbox(final List<String> partyIds, final String municipalityId, final String organizationNumber) {
+		return List.of();
+	}
 }

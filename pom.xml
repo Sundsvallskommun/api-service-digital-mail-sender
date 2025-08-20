@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>se.sundsvall</groupId>
 	<artifactId>api-service-digital-mail-sender</artifactId>
-	<version>3.0</version>
+	<version>3.1</version>
 	<name>api-service-digital-mail-sender</name>
 	<properties>
 		<generated-sources-java-path>src/main/java</generated-sources-java-path>
