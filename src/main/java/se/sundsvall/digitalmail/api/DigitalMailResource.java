@@ -14,7 +14,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
+import java.util.List;
 import java.util.Optional;
+import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -25,11 +28,13 @@ import org.springframework.web.bind.annotation.RestController;
 import org.zalando.problem.Problem;
 import org.zalando.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.common.validators.annotation.ValidMunicipalityId;
+import se.sundsvall.dept44.common.validators.annotation.ValidOrganizationNumber;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
+import se.sundsvall.digitalmail.api.model.Mailbox;
 import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
@@ -105,7 +110,24 @@ class DigitalMailResource {
 		return ok(digitalMailService.sendDigitalInvoice(new InvoiceDto(request), municipalityId));
 	}
 
-	@Operation(summary = "Check if a party has a digital mailbox and if said party has chosen to receive digital mail")
+	// A Post instead of GET since we may have a long list of partyIds, and GET has a limit on the URL length.
+	@Operation(summary = "Retrieve a list of mailboxes. Contains partyId, supplier and if the mailbox is reachable for the given organization.")
+	@PostMapping(
+		value = "/{organizationNumber}/mailboxes",
+		consumes = APPLICATION_JSON_VALUE,
+		produces = APPLICATION_JSON_VALUE)
+	ResponseEntity<List<Mailbox>> hasAvailableMailboxes(
+		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
+		@Parameter(name = "organizationNumber", description = "The organization number of the intended sending organization", example = "5561234567") @ValidOrganizationNumber @PathVariable final String organizationNumber,
+		@RequestBody @UniqueElements @NotEmpty final List<@ValidUuid String> partyIds) {
+		return ok(digitalMailService.getRecipientsHaveAvailableMailbox(partyIds, municipalityId, organizationNumber));
+	}
+
+	/**
+	 * @deprecated use {@link #hasAvailableMailboxes(String, String, List)} instead.
+	 */
+	@Operation(summary = "**DEPRECATED** will be removed in a future version, use hasAvailableMailboxes instead. Check if a party has a digital mailbox and if said party has chosen to receive digital mail", deprecated = true)
+	@Deprecated(since = "2025-08-20", forRemoval = true)
 	@PostMapping(value = "/has-available-mailbox/{partyId}")
 	ResponseEntity<Void> hasAvailableMailbox(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
