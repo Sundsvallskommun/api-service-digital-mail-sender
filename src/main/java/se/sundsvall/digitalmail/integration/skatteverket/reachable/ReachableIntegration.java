@@ -30,22 +30,23 @@ public class ReachableIntegration {
 	/**
 	 * Fetches a mailbox and if a mailbox is reachable.
 	 *
-	 * @param  personalNumbers
-	 * @return
+	 * @param  personalNumbers    All personal numbers to fetch mailboxes for
+	 * @param  organizationNumber The organization number of the sender
+	 * @return                    List of MailboxDto containing the mailboxes for the given personal numbers
 	 */
-	public List<MailboxDto> isReachable(final List<String> personalNumbers) {
+	public List<MailboxDto> isReachable(final List<String> personalNumbers, String organizationNumber) {
 		try {
 			// Call Skatteverket to see which mailbox(es) (if any) the person has
-			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers);
+			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, organizationNumber);
 
 			LOGGER.info("Sending is reachable request");
 			final var isReachableResponse = (IsReachableResponse) isReachableTemplate.marshalSendAndReceive(isReachableRequest);
 
 			LOGGER.info("Mapping and getting mailbox settings");
-			return mapper.getMailboxSettings(isReachableResponse);
+			return mapper.toMailboxDtoList(isReachableResponse);
 		} catch (Exception e) {
 			throw Problem.builder()
-				.withTitle("Error while getting digital mailbox from skatteverket")
+				.withTitle("Error while getting digital mailboxes from skatteverket")
 				.withStatus(INTERNAL_SERVER_ERROR)
 				.withDetail(e.getMessage())
 				.build();

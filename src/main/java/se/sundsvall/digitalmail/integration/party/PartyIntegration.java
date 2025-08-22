@@ -1,5 +1,6 @@
 package se.sundsvall.digitalmail.integration.party;
 
+import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
@@ -13,7 +14,7 @@ public class PartyIntegration {
 	}
 
 	@Cacheable(value = "partyCache")
-	public String getLegalId(final String municipalityId, final String partyId) {
+	public Optional<String> getLegalId(final String municipalityId, final String partyId) {
 		return partyClient.getLegalId(municipalityId, partyId);
 	}
 

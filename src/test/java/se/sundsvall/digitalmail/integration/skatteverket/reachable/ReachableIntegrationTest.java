@@ -3,6 +3,8 @@ package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -33,7 +35,7 @@ class ReachableIntegrationTest {
 
 	@BeforeEach
 	void setUp() {
-		when(mockMapper.createIsReachableRequest(any())).thenCallRealMethod();
+		when(mockMapper.createIsReachableRequest(any(), any())).thenCallRealMethod();
 	}
 
 	// Not really testing much but behavior
@@ -48,14 +50,19 @@ class ReachableIntegrationTest {
 		final var response = new IsReachableResponse();
 		response.getReturns().add(reachabilityStatus);
 
-		when(mockMapper.getMailboxSettings(response))
-			.thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));
+		when(mockMapper.toMailboxDtoList(response))
+			.thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName", true)));
 
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
 
-		final var isReachableResponse = reachableIntegration.isReachable(List.of("somePersonalNumber"));
+		final var isReachableResponse = reachableIntegration.isReachable(List.of("somePersonalNumbers"), "2120002411");
 
 		assertThat(isReachableResponse).isNotNull().hasSize(1);
+
+		verify(mockMapper).createIsReachableRequest(any(), any());
+		verify(mockReachableTemplate).marshalSendAndReceive(any(IsReachable.class));
+		verify(mockMapper).toMailboxDtoList(response);
+		verifyNoMoreInteractions(mockMapper, mockReachableTemplate);
 	}
 
 	@Test
@@ -65,7 +72,11 @@ class ReachableIntegrationTest {
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenThrow(new RuntimeException());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> reachableIntegration.isReachable(personalNumbers))
-			.withMessage("Error while getting digital mailbox from skatteverket");
+			.isThrownBy(() -> reachableIntegration.isReachable(personalNumbers, "2120002411"))
+			.withMessage("Error while getting digital mailboxes from skatteverket");
+
+		verify(mockMapper).createIsReachableRequest(any(), any());
+		verify(mockReachableTemplate).marshalSendAndReceive(any(IsReachable.class));
+		verifyNoMoreInteractions(mockMapper, mockReachableTemplate);
 	}
 }

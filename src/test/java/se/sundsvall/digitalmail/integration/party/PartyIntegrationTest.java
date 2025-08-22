@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,11 +33,11 @@ class PartyIntegrationTest {
 		var municipalityId = "2281";
 		var legalId = "1234567890";
 
-		when(partyClient.getLegalId(municipalityId, partyId)).thenReturn(legalId);
+		when(partyClient.getLegalId(municipalityId, partyId)).thenReturn(Optional.of(legalId));
 
 		var result = partyIntegration.getLegalId(municipalityId, partyId);
 
-		assertThat(result).isEqualTo(legalId);
+		assertThat(result.get()).contains(legalId);
 		verify(partyClient).getLegalId(municipalityId, partyId);
 	}
 }

@@ -3,6 +3,7 @@ package se.sundsvall.digitalmail.api;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
@@ -41,11 +42,9 @@ class DigitalMailResourceTest {
 
 	private static final String ORGANIZATION_NUMBER = "2120001472";
 
-	private static final String SEND_DIGITAL_MAIL_PATH = "/" + MUNICIPALITY_ID + "/send-digital-mail";
+	private static final String SEND_DIGITAL_MAIL_PATH = "/" + MUNICIPALITY_ID + "/{organizationNumber}/send-digital-mail";
 
 	private static final String SEND_DIGITAL_INVOICE_PATH = "/" + MUNICIPALITY_ID + "/send-digital-invoice";
-
-	private static final String HAS_AVAILABLE_MAILBOX_PATH = "/" + MUNICIPALITY_ID + "/has-available-mailbox/{partyId}";
 
 	private static final String HAS_AVAILABLE_MAILBOXES_PATH = "/" + MUNICIPALITY_ID + "/{organizationNumber}/mailboxes";
 
@@ -74,10 +73,10 @@ class DigitalMailResourceTest {
 				.build())
 			.build();
 
-		when(mockDigitalMailService.sendDigitalMail(any(DigitalMailDto.class), any(String.class))).thenReturn(response);
+		when(mockDigitalMailService.sendDigitalMail(any(DigitalMailDto.class), anyString(), anyString())).thenReturn(response);
 
 		final var result = webTestClient.post()
-			.uri(SEND_DIGITAL_MAIL_PATH)
+			.uri(SEND_DIGITAL_MAIL_PATH, ORGANIZATION_NUMBER)
 			.contentType(APPLICATION_JSON)
 			.body(fromValue(request))
 			.exchange()
@@ -94,7 +93,7 @@ class DigitalMailResourceTest {
 			assertThat(resultDeliverystatus.getTransactionId()).isEqualTo(response.getDeliveryStatus().getTransactionId());
 		});
 
-		verify(mockDigitalMailService).sendDigitalMail(any(DigitalMailDto.class), any(String.class));
+		verify(mockDigitalMailService).sendDigitalMail(any(DigitalMailDto.class), anyString(), anyString());
 		verifyNoInteractions(mockHtmlValidator);
 	}
 
@@ -103,7 +102,7 @@ class DigitalMailResourceTest {
 		final var request = generateInvoiceRequest();
 		final var response = new DigitalInvoiceResponse(request.partyId(), true);
 
-		when(mockDigitalMailService.sendDigitalInvoice(any(InvoiceDto.class), any(String.class))).thenReturn(response);
+		when(mockDigitalMailService.sendDigitalInvoice(any(InvoiceDto.class), anyString())).thenReturn(response);
 
 		final var result = webTestClient.post()
 			.uri(SEND_DIGITAL_INVOICE_PATH)
@@ -120,7 +119,7 @@ class DigitalMailResourceTest {
 		assertThat(result.partyId()).isEqualTo(response.partyId());
 		assertThat(result.sent()).isEqualTo(response.sent());
 
-		verify(mockDigitalMailService, times(1)).sendDigitalInvoice(any(InvoiceDto.class), any(String.class));
+		verify(mockDigitalMailService, times(1)).sendDigitalInvoice(any(InvoiceDto.class), anyString());
 		verifyNoInteractions(mockHtmlValidator);
 	}
 
@@ -130,7 +129,7 @@ class DigitalMailResourceTest {
 		final var supplier = "Kivra";
 		final var mailbox = Mailbox.builder().withReachable(true).withSupplier(supplier).withPartyId(partyId).build();
 
-		when(mockDigitalMailService.getRecipientsHaveAvailableMailbox(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(List.of(mailbox));
+		when(mockDigitalMailService.getRecipientsMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(List.of(mailbox));
 
 		var response = webTestClient.post()
 			.uri(HAS_AVAILABLE_MAILBOXES_PATH, ORGANIZATION_NUMBER)
@@ -147,21 +146,7 @@ class DigitalMailResourceTest {
 			.containsExactly(
 				tuple(partyId, true, supplier));
 
-		verify(mockDigitalMailService, times(1)).getRecipientsHaveAvailableMailbox(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
-		verifyNoInteractions(mockHtmlValidator);
-	}
-
-	@Test
-	void hasAvailableMailbox() {
-		when(mockDigitalMailService.verifyRecipientHasSomeAvailableMailbox(any(String.class), any(String.class))).thenReturn(true);
-
-		webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOX_PATH, UUID.randomUUID().toString())
-			.exchange()
-			.expectStatus().isOk()
-			.expectBody().isEmpty();
-
-		verify(mockDigitalMailService, times(1)).verifyRecipientHasSomeAvailableMailbox(any(String.class), any(String.class));
+		verify(mockDigitalMailService, times(1)).getRecipientsMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 		verifyNoInteractions(mockHtmlValidator);
 	}
 }

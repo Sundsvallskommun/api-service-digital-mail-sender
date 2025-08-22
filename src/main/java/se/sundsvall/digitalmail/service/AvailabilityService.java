@@ -19,13 +19,14 @@ public class AvailabilityService {
 
 	/**
 	 * Fetch a list of possible mailboxes.
-	 * This is a list in case we need to expand upon this in the future.
-	 * 
-	 * @param  personalNumbers containing all partyIds we should fetch mailboxes for
-	 * @return
+	 * Throws a problem in case no mailboxes are found for the given partyIds.
+	 *
+	 * @param  personalNumbers    containing all partyIds we should fetch mailboxes for
+	 * @param  organizationNumber the organization number of the sender
+	 * @return                    List of MailboxDto containing the mailboxes for the given partyIds
 	 */
-	public List<MailboxDto> getRecipientMailboxesAndCheckAvailability(final List<String> personalNumbers) {
-		final var mailboxes = reachableIntegration.isReachable(personalNumbers);
+	public List<MailboxDto> getRecipientMailboxesAndCheckAvailability(final List<String> personalNumbers, String organizationNumber) {
+		final var mailboxes = reachableIntegration.isReachable(personalNumbers, organizationNumber);
 
 		// Check if we didn't get any mailboxes at all
 		if (mailboxes.isEmpty()) {

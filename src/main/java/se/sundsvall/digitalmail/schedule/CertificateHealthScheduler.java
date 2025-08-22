@@ -90,7 +90,6 @@ public class CertificateHealthScheduler {
 	private void sendNotifications() {
 		if (nonNull(notificationProperties.mail())) {
 			ofNullable(notificationProperties.mail().recipients()).orElse(emptyList())
-				.stream()
 				.forEach(this::sendMail);
 		}
 

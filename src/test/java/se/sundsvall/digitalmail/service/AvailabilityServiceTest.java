@@ -3,7 +3,10 @@ package se.sundsvall.digitalmail.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -27,9 +30,9 @@ class AvailabilityServiceTest {
 
 	@Test
 	void testPresentMailbox_shouldReturnMailbox() {
-		when(mockReachableIntegration.isReachable(any())).thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));
+		when(mockReachableIntegration.isReachable(anyList(), anyString())).thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName", true)));
 
-		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"));
+		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"), ORGANIZATION_NUMBER);
 
 		assertThat(mailboxes).isNotEmpty();
 	}
@@ -38,20 +41,20 @@ class AvailabilityServiceTest {
 	void testEmptyOptionalMailbox_shouldOnlyReturnPresentMailboxes() {
 		final var response = Stream.concat(generateEmptyMailboxResponse().stream(), generatePresentMailboxResponse().stream()).toList();
 
-		when(mockReachableIntegration.isReachable(any())).thenReturn(response);
+		when(mockReachableIntegration.isReachable(any(), anyString())).thenReturn(response);
 
-		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"));
+		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"), ORGANIZATION_NUMBER);
 
 		assertThat(mailboxes).isNotEmpty().singleElement().isNotNull();
 	}
 
 	@Test
 	void testNoMailbox_shouldThrowException() {
-		when(mockReachableIntegration.isReachable(any())).thenReturn(List.of());
+		when(mockReachableIntegration.isReachable(any(), anyString())).thenReturn(List.of());
 
 		final var personalNumbers = List.of("personalNumber");
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(personalNumbers));
+			.isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(personalNumbers, ORGANIZATION_NUMBER));
 	}
 
 	private List<MailboxDto> generateEmptyMailboxResponse() {
@@ -59,7 +62,7 @@ class AvailabilityServiceTest {
 	}
 
 	private List<MailboxDto> generatePresentMailboxResponse() {
-		final var mailbox = new MailboxDto("recipientId", "serviceAddress", "serviceName");
+		final var mailbox = new MailboxDto("recipientId", "serviceAddress", "serviceName", true);
 
 		return List.of(mailbox);
 	}
