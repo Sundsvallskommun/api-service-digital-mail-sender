@@ -2,7 +2,7 @@ package se.sundsvall.digitalmail.api;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -43,13 +43,11 @@ class DigitalMailResourceFailuresTest {
 
 	private static final String ORGANIZATION_NUMBER = "2120002411";
 
-	private static final String SEND_DIGITAL_MAIL_PATH = "/" + MUNICIPALITY_ID + "/send-digital-mail";
+	private static final String SEND_DIGITAL_MAIL_PATH = "/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/send-digital-mail";
 
 	private static final String SEND_DIGITAL_INVOICE_PATH = "/" + MUNICIPALITY_ID + "/send-digital-invoice";
 
-	private static final String HAS_AVAILABLE_MAILBOX_PATH = "/" + MUNICIPALITY_ID + "/has-available-mailbox/{partyId}";
-
-	private static final String HAS_AVAILABLE_MAILBOXES_PATH = "/" + MUNICIPALITY_ID + "/{organizationNumber}/mailboxes";
+	private static final String HAS_AVAILABLE_MAILBOXES_PATH = "/" + MUNICIPALITY_ID + "/" + ORGANIZATION_NUMBER + "/mailboxes";
 
 	@MockitoBean
 	private HtmlValidator mockHtmlValidator;
@@ -69,7 +67,7 @@ class DigitalMailResourceFailuresTest {
 	void sendDigitalMailWithInvalidHtmlThrowsProblem() {
 		final var request = generateDigitalMailRequestDtoWithHtmlBody();
 
-		when(mockHtmlValidator.validate(any(String.class))).thenReturn(false);
+		when(mockHtmlValidator.validate(anyString())).thenReturn(false);
 
 		final var result = webTestClient.post()
 			.uri(SEND_DIGITAL_MAIL_PATH)
@@ -85,7 +83,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(result).isNotNull();
 
 		verifyNoInteractions(mockDigitalMailService);
-		verify(mockHtmlValidator).validate(any(String.class));
+		verify(mockHtmlValidator).validate(anyString());
 	}
 
 	@Test
@@ -108,6 +106,30 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
 		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
 			.containsExactlyInAnyOrder(tuple("sendDigitalMail.municipalityId", "not a valid municipality ID"));
+
+		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
+	}
+
+	@Test
+	void sendDigitalMailWithInvalidOrganizationNumber() {
+
+		final var request = generateDigitalMailRequestDtoWithHtmlBody();
+
+		final var problem = webTestClient.post()
+			.uri(SEND_DIGITAL_MAIL_PATH.replace(ORGANIZATION_NUMBER, "invalid"))
+			.contentType(APPLICATION_JSON)
+			.body(fromValue(request))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectHeader().contentType(APPLICATION_PROBLEM_JSON)
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult();
+
+		assertThat(problem.getResponseBody()).isNotNull();
+		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
+		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
+			.containsExactlyInAnyOrder(tuple("sendDigitalMail.organizationNumber", "must match the regular expression ^([1235789][\\d][2-9]\\d{7})$"));
 
 		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
 	}
@@ -136,62 +158,9 @@ class DigitalMailResourceFailuresTest {
 	}
 
 	@Test
-	void hasAvailableMailboxWhenRecipientHasNone() {
-		when(mockDigitalMailService.verifyRecipientHasSomeAvailableMailbox(any(String.class), any(String.class))).thenReturn(false);
-
-		webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOX_PATH, UUID.randomUUID().toString())
-			.exchange()
-			.expectStatus().isNotFound()
-			.expectBody().isEmpty();
-
-		verify(mockDigitalMailService).verifyRecipientHasSomeAvailableMailbox(any(String.class), any(String.class));
-		verifyNoInteractions(mockHtmlValidator);
-	}
-
-	@Test
-	void hasAvailableMailboxWithInvalidPartyId() {
-		final var problem = webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOX_PATH, "not-a-uuid")
-			.exchange()
-			.expectStatus().isBadRequest()
-			.expectHeader().contentType(APPLICATION_PROBLEM_JSON)
-			.expectBody(ConstraintViolationProblem.class)
-			.returnResult()
-			.getResponseBody();
-
-		assertThat(problem).isNotNull();
-		assertThat(problem.getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getTitle()).isEqualTo("Constraint Violation");
-		assertThat(problem.getViolations()).extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("hasAvailableMailbox.partyId", "not a valid UUID"));
-
-		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
-	}
-
-	@Test
-	void setHasAvailableMailboxWithInvalidMunicipalityId() {
-		final var problem = webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOX_PATH.replace(MUNICIPALITY_ID, "22-81"), UUID.randomUUID().toString())
-			.exchange()
-			.expectStatus().isBadRequest()
-			.expectHeader().contentType(APPLICATION_PROBLEM_JSON)
-			.expectBody(ConstraintViolationProblem.class)
-			.returnResult();
-
-		assertThat(problem.getResponseBody()).isNotNull();
-		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
-		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
-			.containsExactlyInAnyOrder(tuple("hasAvailableMailbox.municipalityId", "not a valid municipality ID"));
-
-		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
-	}
-
-	@Test
 	void hasAvailableMailboxesWithInvalidMunicipalityId() {
 		final var problem = webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOXES_PATH.replace(MUNICIPALITY_ID, "invalid"), ORGANIZATION_NUMBER)
+			.uri(HAS_AVAILABLE_MAILBOXES_PATH.replace(MUNICIPALITY_ID, "invalid"))
 			.bodyValue(List.of(UUID.randomUUID().toString()))
 			.exchange()
 			.expectStatus().isBadRequest()
@@ -211,7 +180,7 @@ class DigitalMailResourceFailuresTest {
 	@Test
 	void hasAvailableMailboxesWithFaultyOrganizationNumber() {
 		final var problem = webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOXES_PATH, "invalid")
+			.uri(HAS_AVAILABLE_MAILBOXES_PATH.replace(ORGANIZATION_NUMBER, "invalid"))
 			.bodyValue(List.of(UUID.randomUUID().toString()))
 			.exchange()
 			.expectStatus().isBadRequest()
@@ -232,7 +201,7 @@ class DigitalMailResourceFailuresTest {
 	@MethodSource("invalidPartyIdsProvider")
 	void hasAvailableMailboxesWithInvalidPartyIds(final List<String> partyIds, String field, String message) {
 		final var problem = webTestClient.post()
-			.uri(HAS_AVAILABLE_MAILBOXES_PATH, ORGANIZATION_NUMBER)
+			.uri(HAS_AVAILABLE_MAILBOXES_PATH)
 			.bodyValue(partyIds)
 			.exchange()
 			.expectStatus().isBadRequest()

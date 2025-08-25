@@ -31,7 +31,7 @@ class SkatteverketClientConfigTests {
 		private SkatteverketClientConfig.SoapMessageSizeInterceptor interceptor;
 
 		@BeforeEach
-		public void setup() throws SOAPException {
+		void setup() throws SOAPException {
 			// Create a simple SOAP message
 			soapMessage = new SaajSoapMessage(MessageFactory.newInstance().createMessage());
 		}

@@ -3,7 +3,6 @@ package se.sundsvall.digitalmail.api;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
-import static org.springframework.http.ResponseEntity.notFound;
 import static org.springframework.http.ResponseEntity.ok;
 import static org.zalando.problem.Status.BAD_REQUEST;
 
@@ -77,11 +76,12 @@ class DigitalMailResource {
 
 	@Operation(summary = "Send a digital mail")
 	@PostMapping(
-		value = "/send-digital-mail",
+		value = "/{organizationNumber}/send-digital-mail",
 		consumes = APPLICATION_JSON_VALUE,
 		produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<DigitalMailResponse> sendDigitalMail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
+		@Parameter(name = "organizationNumber", description = "The organization number of the sending organization", example = "5561234567") @ValidOrganizationNumber @PathVariable final String organizationNumber,
 		@Valid @RequestBody final DigitalMailRequest request) {
 
 		// Validate body as HTML if content type is text/html
@@ -95,8 +95,7 @@ class DigitalMailResource {
 					.build();
 			});
 
-		final var response = digitalMailService.sendDigitalMail(new DigitalMailDto(request), municipalityId);
-		return ok(response);
+		return ok(digitalMailService.sendDigitalMail(new DigitalMailDto(request), municipalityId, organizationNumber));
 	}
 
 	@Operation(summary = "Send a digital invoice")
@@ -120,21 +119,6 @@ class DigitalMailResource {
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Parameter(name = "organizationNumber", description = "The organization number of the intended sending organization", example = "5561234567") @ValidOrganizationNumber @PathVariable final String organizationNumber,
 		@RequestBody @UniqueElements @NotEmpty final List<@ValidUuid String> partyIds) {
-		return ok(digitalMailService.getRecipientsHaveAvailableMailbox(partyIds, municipalityId, organizationNumber));
-	}
-
-	/**
-	 * @deprecated use {@link #hasAvailableMailboxes(String, String, List)} instead.
-	 */
-	@Operation(summary = "**DEPRECATED** will be removed in a future version, use hasAvailableMailboxes instead. Check if a party has a digital mailbox and if said party has chosen to receive digital mail", deprecated = true)
-	@Deprecated(since = "2025-08-20", forRemoval = true)
-	@PostMapping(value = "/has-available-mailbox/{partyId}")
-	ResponseEntity<Void> hasAvailableMailbox(
-		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
-		@PathVariable @ValidUuid final String partyId) {
-		if (digitalMailService.verifyRecipientHasSomeAvailableMailbox(partyId, municipalityId)) {
-			return ok().build();
-		}
-		return notFound().build();
+		return ok(digitalMailService.getMailboxes(partyIds, municipalityId, organizationNumber));
 	}
 }

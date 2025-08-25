@@ -3,6 +3,7 @@ package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -35,7 +36,7 @@ class SecureMailIntegrationTest {
 	void testSuccessfulSentMail_shouldReturnDeliveryResult() {
 		when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenReturn(new DeliverSecure());
 		when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenReturn(new DeliverSecureResponse());
-		when(mockMapper.createDigitalMailResponse(any(DeliverSecureResponse.class), any(String.class)))
+		when(mockMapper.createDigitalMailResponse(any(DeliverSecureResponse.class), anyString()))
 			.thenReturn(new DigitalMailResponse());
 
 		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().withPartyId("somePartyId").build());

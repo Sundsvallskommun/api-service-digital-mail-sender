@@ -1,10 +1,18 @@
 package se.sundsvall.digitalmail.integration.skatteverket;
 
-/**
- * Simple record for sending recipientId, serviceAddress and serviceName back and forth
- * 
- * @param recipientId
- * @param serviceAddress
- */
-public record MailboxDto(String recipientId, String serviceAddress, String serviceName) {
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder(setterPrefix = "with")
+public class MailboxDto {
+
+	private String recipientId;
+	private String serviceAddress;
+	private String serviceName;
+	private boolean validMailbox;
 }

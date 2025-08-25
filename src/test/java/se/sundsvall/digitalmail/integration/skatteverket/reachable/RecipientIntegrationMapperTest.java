@@ -1,11 +1,14 @@
 package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalmail.integration.skatteverket.reachable.RecipientIntegrationMapper.SENDER_ORG_NR;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -18,6 +21,7 @@ import se.gov.minameddelanden.schema.recipient.AccountStatus;
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.ServiceSupplier;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
+import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,44 +33,32 @@ class RecipientIntegrationMapperTest {
 	@InjectMocks
 	private RecipientIntegrationMapper mapper;
 
-	private static Stream<Arguments> provideParametersForGetMailboxSettingsTest() {
-		return Stream.of(
-			Arguments.of(true, true, false),
-			Arguments.of(false, false, false),
-			Arguments.of(false, true, false));
-	}
-
 	@Test
 	void testCreateIsRegistered() {
 		final var personalNumber = "197001011234";
+		final var organizationNumber = "2120002411";
 
-		final var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber));
+		final var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber), organizationNumber);
 
-		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(SENDER_ORG_NR);
+		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(organizationNumber);
 		assertThat(isReachableRequest.getRecipientIds().getFirst()).isEqualTo(personalNumber);
+
+		verifyNoInteractions(mockSkatteverketProperties);
 	}
 
 	@Test
-	void testGetMailboxSettingsShouldReturnRecipientIdWhenPresent() {
+	void testToMailboxDtoListShouldReturnRecipientIdWhenPresent() {
 		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
 
 		final var response = createIsReachableResponse(false, true, true);
 
-		final var mailboxSettings = mapper.getMailboxSettings(response);
+		final var mailboxSettings = mapper.toMailboxDtoList(response);
 
 		assertThat(mailboxSettings).hasSize(1);
-		assertThat(mailboxSettings.getFirst().serviceAddress()).isEqualTo("https://somewhere.com");
-		assertThat(mailboxSettings.getFirst().recipientId()).isEqualTo("recipientId");
-	}
+		assertThat(mailboxSettings.getFirst().getServiceAddress()).isEqualTo("https://somewhere.com");
+		assertThat(mailboxSettings.getFirst().getRecipientId()).isEqualTo("recipientId");
 
-	@ParameterizedTest
-	@MethodSource("provideParametersForGetMailboxSettingsTest")
-	void testGetMailboxSettingsShouldReturnEmpty(final boolean pending, final boolean shouldHaveServiceSupplier, final boolean isAccepted) {
-		final var response = createIsReachableResponse(pending, shouldHaveServiceSupplier, isAccepted);
-
-		final var mailboxSettings = mapper.getMailboxSettings(response);
-
-		assertThat(mailboxSettings).isEmpty();
+		verify(mockSkatteverketProperties).supportedSuppliers();
 	}
 
 	@Test
@@ -77,6 +69,8 @@ class RecipientIntegrationMapperTest {
 		assertThat(mapper.isSupportedSupplier("supplier2")).isTrue();
 		assertThat(mapper.isSupportedSupplier("supplier3")).isTrue();
 		assertThat(mapper.isSupportedSupplier("unknownSupplier")).isFalse();
+
+		verify(mockSkatteverketProperties, times(4)).supportedSuppliers();
 	}
 
 	@Test
@@ -85,6 +79,49 @@ class RecipientIntegrationMapperTest {
 
 		assertThat(mapper.getShortSupplierName("Supplier1")).isEqualTo("supplier1");
 		assertThat(mapper.getShortSupplierName("SuPPliEr2")).isEqualTo("supplier2");
+
+		verify(mockSkatteverketProperties, times(2)).supportedSuppliers();
+	}
+
+	@Test
+	void testToMailboxDtoListShouldReturnEmptyListWhenEmptyResponse() {
+		final var response = new IsReachableResponse();
+		final var mailboxSettings = mapper.toMailboxDtoList(response);
+
+		assertThat(mailboxSettings).isEmpty();
+
+		verifyNoInteractions(mockSkatteverketProperties);
+	}
+
+	@Test
+	void testToMailboxDtoListWhenNotSupportedServiceSupplier() {
+		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("anotherSupplier"));
+		final var mailboxSettings = mapper.toMailboxDtoList(createIsReachableResponse(false, true, true));
+
+		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
+			.containsExactlyInAnyOrder(
+				Tuple.tuple("recipientId", null, null, false));
+
+		verify(mockSkatteverketProperties).supportedSuppliers();
+	}
+
+	@ParameterizedTest
+	@MethodSource("reachableResponseProvider")
+	void testToMailboxSettingsWhenInvalidMailbox(IsReachableResponse response) {
+		final var mailboxSettings = mapper.toMailboxDtoList(response);
+
+		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
+			.containsExactlyInAnyOrder(
+				Tuple.tuple("recipientId", null, null, false));
+
+		verifyNoInteractions(mockSkatteverketProperties);
+	}
+
+	private static Stream<Arguments> reachableResponseProvider() {
+		return Stream.of(
+			Arguments.of(createIsReachableResponse(false, true, false)),   // Doesn't accept the sender
+			Arguments.of(createIsReachableResponse(true, true, false)),    // Pending mailbox
+			Arguments.of(createIsReachableResponse(false, false, true)));  // No service supplier
 	}
 
 	/**
@@ -95,7 +132,7 @@ class RecipientIntegrationMapperTest {
 	 * @param  isAccepted                is the sender accepted by the recipient
 	 * @return                           a response with the given parameters
 	 */
-	private IsReachableResponse createIsReachableResponse(final boolean pending,
+	private static IsReachableResponse createIsReachableResponse(final boolean pending,
 		final boolean shouldHaveServiceSupplier, final boolean isAccepted) {
 
 		final var accountStatus = new AccountStatus();

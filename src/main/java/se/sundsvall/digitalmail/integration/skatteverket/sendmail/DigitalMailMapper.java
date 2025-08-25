@@ -8,14 +8,12 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.security.KeyStore;
 import java.security.KeyStoreException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableEntryException;
-import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Collections;
 import java.util.GregorianCalendar;
@@ -97,7 +95,7 @@ class DigitalMailMapper {
 		return threadLocalMarshaller.get();
 	}
 
-	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, JAXBException, ParserConfigurationException {
+	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, ParserConfigurationException {
 		this.properties = properties;
 
 		// Load the KeyStore and get the signing key and certificate.
@@ -115,12 +113,10 @@ class DigitalMailMapper {
 	/**
 	 * Reads certificate information from a keystore
 	 *
-	 * @return
+	 * @return                             X509CertificateWithPrivateKey containing the certificate and private key
 	 * @throws KeyStoreException
-	 * @throws IOException
 	 * @throws UnrecoverableEntryException
 	 * @throws NoSuchAlgorithmException
-	 * @throws CertificateException
 	 */
 	private X509CertificateWithPrivateKey setupCertificate()
 		throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
@@ -145,7 +141,7 @@ class DigitalMailMapper {
 
 	/**
 	 * @param  dto to map to a request
-	 * @return
+	 * @return     A DeliverSecure-object containing the SealedDelivery to be sent to Skatteverket
 	 */
 	DeliverSecure createDeliverSecure(final DigitalMailDto dto) {
 		final var sealedDelivery = createSealedDelivery(dto);
@@ -157,7 +153,7 @@ class DigitalMailMapper {
 	/**
 	 * The sealed delivery to be inserted into the SealedDelivery-object
 	 *
-	 * @param  dto
+	 * @param  dto to be translated into a {@link SealedDelivery}
 	 * @return     A Sealed delivery signed by not the sender but us as a mediator.
 	 */
 	SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
@@ -282,8 +278,8 @@ class DigitalMailMapper {
 	/**
 	 * Creates the &lt;v3:header&gt;-element
 	 *
-	 * @param  dto
-	 * @return
+	 * @param  dto to be translated into a {@link MessageHeader}
+	 * @return     A {@link MessageHeader}
 	 */
 	MessageHeader createMessageHeader(final DigitalMailDto dto) {
 		final var messageHeader = new MessageHeader();
@@ -297,8 +293,8 @@ class DigitalMailMapper {
 	/**
 	 * Creates the Supportinfo-element
 	 *
-	 * @param  dto
-	 * @return
+	 * @param  dto to be translated into a {@link SupportInfo}
+	 * @return     A {@link SupportInfo} containing the support information
 	 */
 
 	SupportInfo createSupportInfo(final DigitalMailDto dto) {
@@ -361,9 +357,10 @@ class DigitalMailMapper {
 	 * Retrieve the alias for the key from the keystore.
 	 * As we only have one key we get the first one, if we need to get more we need to find it by alias.
 	 *
-	 * @param  keyStore
-	 * @return
-	 * @throws KeyStoreException
+	 * @param  keyStore          the keystore to search in
+	 * @param  wantedAlias       the alias we want to find
+	 * @throws KeyStoreException if the keystore cannot be accessed or the alias is not
+	 * @return                   the alias of the key in the keystore
 	 */
 	String getAliasFromKeystore(final KeyStore keyStore, final String wantedAlias) throws KeyStoreException {
 		final var aliases = keyStore.aliases();
