@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.service;
 
 import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,13 +65,13 @@ public class DigitalMailService {
 				.withStatus(NOT_FOUND)
 				.build());
 
-		final var possibleMailbox = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber), organizationNumber);
+		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber), organizationNumber);
 
-		// We'll only have one here
-		final var mailbox = possibleMailbox.getFirst();
+		// We'll only have one mailbox as we only handle one personal number at a time.
+		final var mailbox = mailboxes.getFirst();
 		requestDto.setRecipientId(mailbox.getRecipientId());
 
-		// Send message, since the serviceAddress may differ we set this as a parameter into the integration.
+		// Send digital mail, since the serviceAddress may differ we set this as a parameter into the integration.
 		return digitalMailIntegration.sendDigitalMail(requestDto, mailbox.getServiceAddress());
 	}
 
@@ -91,7 +92,7 @@ public class DigitalMailService {
 		return new DigitalInvoiceResponse(invoiceDto.getPartyId(), false);
 	}
 
-	public List<Mailbox> getRecipientsMailboxes(final List<String> partyIds, final String municipalityId, final String organizationNumber) {
+	public List<Mailbox> getMailboxes(final List<String> partyIds, final String municipalityId, final String organizationNumber) {
 		var partyIdPersonalNumberMap = new HashMap<String, String>();
 
 		// Lookup personalNumber for each partyId
@@ -102,7 +103,7 @@ public class DigitalMailService {
 				personalNumber -> partyIdPersonalNumberMap.put(partyId, personalNumber),
 				() -> {
 					partyIdPersonalNumberMap.put(partyId, null);
-					LOGGER.warn("No personal number found for partyId: {}", partyId);
+					LOGGER.warn("No personal number found for partyId: {}", sanitizeForLogging(partyId));
 				});
 		});
 
@@ -136,7 +137,7 @@ public class DigitalMailService {
 			mailboxes.add(toMailbox(mailboxDto, partyId));
 		}
 
-		// Create an "unrachable" mailbox for all the missing personal numbers
+		// Create "unrachable" mailboxes for all the missing personal numbers
 		partyIdPersonalNumberMap.forEach((partyId, personalNumber) -> {
 			if (personalNumber == null) {
 				mailboxes.add(Mailbox.builder()

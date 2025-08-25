@@ -36,7 +36,7 @@ public class ReachableIntegration {
 	 */
 	public List<MailboxDto> isReachable(final List<String> personalNumbers, String organizationNumber) {
 		try {
-			// Call Skatteverket to see which mailbox(es) (if any) the person has
+			// Call Skatteverket to see which mailbox(es) (if any) the persons have
 			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, organizationNumber);
 
 			LOGGER.info("Sending is reachable request");

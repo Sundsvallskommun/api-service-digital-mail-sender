@@ -193,13 +193,13 @@ class DigitalMailServiceTest {
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER)))
 			.thenReturn(List.of(generateReachableMailboxDto(reachablePersonalNumber), genereateUnreachableMailboxDto(unreachablePersonalNumber)));
 
-		final var mailboxes = service.getRecipientsMailboxes(List.of("partyId1", "partyId2", "partyIdNotFound"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2", "partyIdNotFound"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
-		assertThat(mailboxes).hasSize(3);
-		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable).containsExactlyInAnyOrder(
-			tuple("partyId1", "kivra", true),
-			tuple("partyId2", null, false),
-			tuple("partyIdNotFound", null, false));
+		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable)
+			.containsExactlyInAnyOrder(
+				tuple("partyId1", "kivra", true),
+				tuple("partyId2", null, false),
+				tuple("partyIdNotFound", null, false));
 
 		verify(mockPartyIntegration, times(3)).getLegalId(eq(MUNICIPALITY_ID), anyString());
 		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));

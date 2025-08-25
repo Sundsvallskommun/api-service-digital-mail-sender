@@ -129,7 +129,7 @@ class DigitalMailResourceTest {
 		final var supplier = "Kivra";
 		final var mailbox = Mailbox.builder().withReachable(true).withSupplier(supplier).withPartyId(partyId).build();
 
-		when(mockDigitalMailService.getRecipientsMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(List.of(mailbox));
+		when(mockDigitalMailService.getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(List.of(mailbox));
 
 		var response = webTestClient.post()
 			.uri(HAS_AVAILABLE_MAILBOXES_PATH, ORGANIZATION_NUMBER)
@@ -146,7 +146,7 @@ class DigitalMailResourceTest {
 			.containsExactly(
 				tuple(partyId, true, supplier));
 
-		verify(mockDigitalMailService, times(1)).getRecipientsMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verify(mockDigitalMailService, times(1)).getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 		verifyNoInteractions(mockHtmlValidator);
 	}
 }
