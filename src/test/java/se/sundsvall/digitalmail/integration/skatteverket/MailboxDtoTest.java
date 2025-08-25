@@ -38,6 +38,10 @@ class MailboxDtoTest {
 			.build();
 
 		assertThat(mailbox).isNotNull().hasNoNullFieldsOrProperties();
+		assertThat(mailbox.getServiceAddress()).isEqualTo(serviceAddress);
+		assertThat(mailbox.getServiceName()).isEqualTo(serviceName);
+		assertThat(mailbox.getRecipientId()).isEqualTo(recipientId);
+		assertThat(mailbox.isValidMailbox()).isEqualTo(validMailbox);
 	}
 
 	@Test

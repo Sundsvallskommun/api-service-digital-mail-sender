@@ -25,7 +25,7 @@ class RecipientIntegrationMapper {
 
 	/**
 	 *
-	 * @param  personalNumbers    map of personalnumbers with corresponding partyIds
+	 * @param  personalNumbers    map of personalnumbers
 	 * @param  organizationNumber the organization number of the sender
 	 * @return                    a request object that can be sent to Skatteverket to check if the personal numbers are
 	 *                            reachable
@@ -45,7 +45,7 @@ class RecipientIntegrationMapper {
 	 * @param  response the response from Skatteverket
 	 * @return          a list of {@link MailboxDto} objects.
 	 */
-	List<MailboxDto> toMailboxDtoList(final IsReachableResponse response) {
+	List<MailboxDto> toMailboxDtos(final IsReachableResponse response) {
 		if (CollectionUtils.isNotEmpty(response.getReturns())) {
 			return response.getReturns().stream()
 				.map(this::toMailboxDto)
@@ -82,11 +82,7 @@ class RecipientIntegrationMapper {
 		}
 
 		var serviceSupplier = accountStatus.getServiceSupplier();
-		if (!isSupportedSupplier(serviceSupplier.getName()) || isBlank(serviceSupplier.getServiceAdress())) {
-			return false;
-		}
-
-		return true;
+		return isSupportedSupplier(serviceSupplier.getName()) && !isBlank(serviceSupplier.getServiceAdress());
 	}
 
 	/**

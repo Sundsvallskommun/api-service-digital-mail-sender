@@ -4,11 +4,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 import java.util.stream.Stream;
 import org.assertj.core.groups.Tuple;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -33,44 +35,50 @@ class RecipientIntegrationMapperTest {
 	@InjectMocks
 	private RecipientIntegrationMapper mapper;
 
+	@AfterEach
+	void tearDown() {
+		verifyNoMoreInteractions(mockSkatteverketProperties);
+	}
+
 	@Test
-	void testCreateIsRegistered() {
-		final var personalNumber = "197001011234";
+	void testCreateIsReachableRequest() {
+		final var personalNumbers = List.of("personalNumber", "anotherPersonalNumber");
 		final var organizationNumber = "2120002411";
 
-		final var isReachableRequest = mapper.createIsReachableRequest(List.of(personalNumber), organizationNumber);
+		final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, organizationNumber);
 
 		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(organizationNumber);
-		assertThat(isReachableRequest.getRecipientIds().getFirst()).isEqualTo(personalNumber);
+		assertThat(isReachableRequest.getRecipientIds()).containsExactlyInAnyOrderElementsOf(personalNumbers);
 
 		verifyNoInteractions(mockSkatteverketProperties);
 	}
 
 	@Test
-	void testToMailboxDtoListShouldReturnRecipientIdWhenPresent() {
+	void testToMailboxDtos() {
 		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
 
 		final var response = createIsReachableResponse(false, true, true);
 
-		final var mailboxSettings = mapper.toMailboxDtoList(response);
+		final var mailboxSettings = mapper.toMailboxDtos(response);
 
 		assertThat(mailboxSettings).hasSize(1);
 		assertThat(mailboxSettings.getFirst().getServiceAddress()).isEqualTo("https://somewhere.com");
 		assertThat(mailboxSettings.getFirst().getRecipientId()).isEqualTo("recipientId");
+		assertThat(mailboxSettings.getFirst().getServiceName()).isEqualTo("Kivra");
+		assertThat(mailboxSettings.getFirst().isValidMailbox()).isTrue();
 
 		verify(mockSkatteverketProperties).supportedSuppliers();
 	}
 
 	@Test
 	void testFindMatchingSupplier() {
-		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("supplier1", "supplier2", "supplier3"));
+		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("supplier1", "supplier2"));
 
 		assertThat(mapper.isSupportedSupplier("supplier1")).isTrue();
 		assertThat(mapper.isSupportedSupplier("supplier2")).isTrue();
-		assertThat(mapper.isSupportedSupplier("supplier3")).isTrue();
 		assertThat(mapper.isSupportedSupplier("unknownSupplier")).isFalse();
 
-		verify(mockSkatteverketProperties, times(4)).supportedSuppliers();
+		verify(mockSkatteverketProperties, times(3)).supportedSuppliers();
 	}
 
 	@Test
@@ -84,9 +92,9 @@ class RecipientIntegrationMapperTest {
 	}
 
 	@Test
-	void testToMailboxDtoListShouldReturnEmptyListWhenEmptyResponse() {
+	void testToMailboxDtosWhenEmptyResponse() {
 		final var response = new IsReachableResponse();
-		final var mailboxSettings = mapper.toMailboxDtoList(response);
+		final var mailboxSettings = mapper.toMailboxDtos(response);
 
 		assertThat(mailboxSettings).isEmpty();
 
@@ -94,9 +102,9 @@ class RecipientIntegrationMapperTest {
 	}
 
 	@Test
-	void testToMailboxDtoListWhenNotSupportedServiceSupplier() {
+	void testToMailboxDtosWhenNotSupportedServiceSupplier() {
 		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("anotherSupplier"));
-		final var mailboxSettings = mapper.toMailboxDtoList(createIsReachableResponse(false, true, true));
+		final var mailboxSettings = mapper.toMailboxDtos(createIsReachableResponse(false, true, true));
 
 		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
 			.containsExactlyInAnyOrder(
@@ -107,8 +115,8 @@ class RecipientIntegrationMapperTest {
 
 	@ParameterizedTest
 	@MethodSource("reachableResponseProvider")
-	void testToMailboxSettingsWhenInvalidMailbox(IsReachableResponse response) {
-		final var mailboxSettings = mapper.toMailboxDtoList(response);
+	void testToMailboxDtosWhenInvalidMailbox(IsReachableResponse response) {
+		final var mailboxSettings = mapper.toMailboxDtos(response);
 
 		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
 			.containsExactlyInAnyOrder(

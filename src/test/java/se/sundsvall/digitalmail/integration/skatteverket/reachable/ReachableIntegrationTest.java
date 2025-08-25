@@ -50,29 +50,27 @@ class ReachableIntegrationTest {
 		final var response = new IsReachableResponse();
 		response.getReturns().add(reachabilityStatus);
 
-		when(mockMapper.toMailboxDtoList(response))
+		when(mockMapper.toMailboxDtos(response))
 			.thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName", true)));
 
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
 
-		final var isReachableResponse = reachableIntegration.isReachable(List.of("somePersonalNumbers"), "2120002411");
+		final var isReachableResponse = reachableIntegration.isReachable(List.of("personalNumber"), "2120002411");
 
 		assertThat(isReachableResponse).isNotNull().hasSize(1);
 
 		verify(mockMapper).createIsReachableRequest(any(), any());
 		verify(mockReachableTemplate).marshalSendAndReceive(any(IsReachable.class));
-		verify(mockMapper).toMailboxDtoList(response);
+		verify(mockMapper).toMailboxDtos(response);
 		verifyNoMoreInteractions(mockMapper, mockReachableTemplate);
 	}
 
 	@Test
 	void testCallIsRegistered_whenException_shouldThrowProblem() {
-
-		final var personalNumbers = List.of("personalNumber");
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenThrow(new RuntimeException());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> reachableIntegration.isReachable(personalNumbers, "2120002411"))
+			.isThrownBy(() -> reachableIntegration.isReachable(List.of("personalNumber"), "2120002411"))
 			.withMessage("Error while getting digital mailboxes from skatteverket");
 
 		verify(mockMapper).createIsReachableRequest(any(), any());

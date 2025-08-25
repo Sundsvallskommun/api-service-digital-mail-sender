@@ -36,14 +36,14 @@ public class ReachableIntegration {
 	 */
 	public List<MailboxDto> isReachable(final List<String> personalNumbers, String organizationNumber) {
 		try {
-			// Call Skatteverket to see which mailbox(es) (if any) the person has
+			// Call Skatteverket to see which mailbox(es) (if any) the persons have
 			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, organizationNumber);
 
 			LOGGER.info("Sending is reachable request");
 			final var isReachableResponse = (IsReachableResponse) isReachableTemplate.marshalSendAndReceive(isReachableRequest);
 
 			LOGGER.info("Mapping and getting mailbox settings");
-			return mapper.toMailboxDtoList(isReachableResponse);
+			return mapper.toMailboxDtos(isReachableResponse);
 		} catch (Exception e) {
 			throw Problem.builder()
 				.withTitle("Error while getting digital mailboxes from skatteverket")

@@ -95,8 +95,7 @@ class DigitalMailResource {
 					.build();
 			});
 
-		final var response = digitalMailService.sendDigitalMail(new DigitalMailDto(request), municipalityId, organizationNumber);
-		return ok(response);
+		return ok(digitalMailService.sendDigitalMail(new DigitalMailDto(request), municipalityId, organizationNumber));
 	}
 
 	@Operation(summary = "Send a digital invoice")
@@ -120,6 +119,6 @@ class DigitalMailResource {
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Parameter(name = "organizationNumber", description = "The organization number of the intended sending organization", example = "5561234567") @ValidOrganizationNumber @PathVariable final String organizationNumber,
 		@RequestBody @UniqueElements @NotEmpty final List<@ValidUuid String> partyIds) {
-		return ok(digitalMailService.getRecipientsMailboxes(partyIds, municipalityId, organizationNumber));
+		return ok(digitalMailService.getMailboxes(partyIds, municipalityId, organizationNumber));
 	}
 }

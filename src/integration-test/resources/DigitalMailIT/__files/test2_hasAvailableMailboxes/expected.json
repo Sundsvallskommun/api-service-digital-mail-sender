@@ -1,0 +1,19 @@
+[
+	{
+		"partyId": "84f9c52b-8545-486a-9510-9743237bd547",
+		"reachable": true,
+		"supplier": "Kivra"
+	},
+	{
+		"partyId": "f10545c1-d05d-41f2-b2bc-9dd22241ebc6",
+		"reachable": false
+	},
+	{
+		"partyId": "831f24d4-2836-4645-a502-035368b43683",
+		"reachable": false
+	},
+	{
+		"partyId": "172524d4-ac0a-4fc6-8553-8286e04835dc",
+		"reachable": false
+	}
+]

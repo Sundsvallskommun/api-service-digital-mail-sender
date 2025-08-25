@@ -1,0 +1,38 @@
+{
+	"request": {
+		"method": "POST",
+		"bodyPatterns": [
+			{
+				"xPathNamespaces": {
+					"ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				},
+				"matchesXPath": "//*[ns17:isReachable]//*[ns17:recipientId='190101010159']"
+			}
+		],
+		"url": "/recipient"
+	},
+	"response": {
+		"headers": {
+			"Keep-Alive": [
+				"timeout=60"
+			],
+			"Transfer-Encoding": [
+				"chunked"
+			],
+			"Connection": [
+				"keep-alive"
+			],
+			"Content-Encoding": [
+				""
+			],
+			"Content-Type": [
+				"text/xml;charset=UTF-8"
+			]
+		},
+		"transformers": [
+			"response-template"
+		],
+		"bodyFileName": "test1_sendDigitalMail/response/recipient.xml",
+		"status": 200
+	}
+}

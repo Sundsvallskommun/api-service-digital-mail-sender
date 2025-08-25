@@ -6,7 +6,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -22,11 +21,6 @@ class PartyIntegrationTest {
 	@InjectMocks
 	private PartyIntegration partyIntegration;
 
-	@AfterEach
-	void afterEach() {
-		verifyNoMoreInteractions(partyClient);
-	}
-
 	@Test
 	void getLegalId() {
 		var partyId = "1234567890";
@@ -39,5 +33,6 @@ class PartyIntegrationTest {
 
 		assertThat(result.get()).contains(legalId);
 		verify(partyClient).getLegalId(municipalityId, partyId);
+		verifyNoMoreInteractions(partyClient);
 	}
 }

@@ -180,6 +180,8 @@ class DigitalMailServiceTest {
 	void getRecipientMailboxes() {
 		var reachablePersonalNumber = "personalNumber";
 		var unreachablePersonalNumber = "unreachablePersonalNumber";
+		var reachableMailboxDto = new MailboxDto("personalNumber", "serviceAddress", "kivra", true);
+		var unreachableMailboxDto = new MailboxDto("unreachablePersonalNumber", null, null, false);
 
 		// Test that we find personal numbers for 2 out of 3 partyIds
 		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
@@ -191,26 +193,18 @@ class DigitalMailServiceTest {
 		// found.
 		// Return one reachable and one unreachable mailbox.
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER)))
-			.thenReturn(List.of(generateReachableMailboxDto(reachablePersonalNumber), genereateUnreachableMailboxDto(unreachablePersonalNumber)));
+			.thenReturn(List.of(reachableMailboxDto, unreachableMailboxDto));
 
-		final var mailboxes = service.getRecipientsMailboxes(List.of("partyId1", "partyId2", "partyIdNotFound"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2", "partyIdNotFound"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
-		assertThat(mailboxes).hasSize(3);
-		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable).containsExactlyInAnyOrder(
-			tuple("partyId1", "kivra", true),
-			tuple("partyId2", null, false),
-			tuple("partyIdNotFound", null, false));
+		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable)
+			.containsExactlyInAnyOrder(
+				tuple("partyId1", "kivra", true),
+				tuple("partyId2", null, false),
+				tuple("partyIdNotFound", null, false));
 
 		verify(mockPartyIntegration, times(3)).getLegalId(eq(MUNICIPALITY_ID), anyString());
 		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
 		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
-	}
-
-	private MailboxDto generateReachableMailboxDto(String personalNumber) {
-		return new MailboxDto(personalNumber, "serviceAddress", "kivra", true);
-	}
-
-	private MailboxDto genereateUnreachableMailboxDto(String unreachablePersonalNumber) {
-		return new MailboxDto(unreachablePersonalNumber, null, null, false);
 	}
 }

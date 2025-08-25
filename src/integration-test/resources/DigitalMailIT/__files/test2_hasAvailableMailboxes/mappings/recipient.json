@@ -1,0 +1,30 @@
+{
+	"request": {
+		"method": "POST",
+		"url": "/recipient"
+	},
+	"response": {
+		"headers": {
+			"Keep-Alive": [
+				"timeout=60"
+			],
+			"Transfer-Encoding": [
+				"chunked"
+			],
+			"Connection": [
+				"keep-alive"
+			],
+			"Content-Encoding": [
+				""
+			],
+			"Content-Type": [
+				"text/xml;charset=UTF-8"
+			]
+		},
+		"transformers": [
+			"response-template"
+		],
+		"bodyFileName": "test2_hasAvailableMailboxes/response/recipient.xml",
+		"status": 200
+	}
+}
