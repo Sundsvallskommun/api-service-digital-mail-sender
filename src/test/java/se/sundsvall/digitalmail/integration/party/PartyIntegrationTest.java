@@ -5,7 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import org.junit.jupiter.api.AfterEach;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -21,22 +21,18 @@ class PartyIntegrationTest {
 	@InjectMocks
 	private PartyIntegration partyIntegration;
 
-	@AfterEach
-	void afterEach() {
-		verifyNoMoreInteractions(partyClient);
-	}
-
 	@Test
 	void getLegalId() {
 		var partyId = "1234567890";
 		var municipalityId = "2281";
 		var legalId = "1234567890";
 
-		when(partyClient.getLegalId(municipalityId, partyId)).thenReturn(legalId);
+		when(partyClient.getLegalId(municipalityId, partyId)).thenReturn(Optional.of(legalId));
 
 		var result = partyIntegration.getLegalId(municipalityId, partyId);
 
-		assertThat(result).isEqualTo(legalId);
+		assertThat(result.get()).contains(legalId);
 		verify(partyClient).getLegalId(municipalityId, partyId);
+		verifyNoMoreInteractions(partyClient);
 	}
 }

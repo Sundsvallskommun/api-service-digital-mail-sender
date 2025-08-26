@@ -75,7 +75,7 @@ class DigitalMailMapperTest {
 		softly.assertThat(header.getSupportinfo().getURL()).isEqualTo("http://url.com");
 		softly.assertThat(header.getSupportinfo().getText()).isEqualTo("support text");
 
-		final var body = signedDelivery.getDelivery().getMessages().get(0).getBody();
+		final var body = signedDelivery.getDelivery().getMessages().getFirst().getBody();
 		softly.assertThat(body.getBody()).isNotNull();
 		softly.assertThat(body.getContentType()).isEqualTo("text/plain");
 	}
@@ -147,7 +147,7 @@ class DigitalMailMapperTest {
 
 		final var attachments = mapper.createAttachments(List.of(attachment, attachment2));
 
-		assertThat(new String(attachments.get(0).getBody(), StandardCharsets.UTF_8)).isEqualTo("body");
+		assertThat(new String(attachments.getFirst().getBody(), StandardCharsets.UTF_8)).isEqualTo("body");
 		assertThat(attachments.get(0).getContentType()).isEqualTo(MediaType.APPLICATION_PDF_VALUE);
 		assertThat(attachments.get(0).getFilename()).isEqualTo("filename.pdf");
 

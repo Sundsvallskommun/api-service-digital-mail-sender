@@ -2,13 +2,22 @@ package se.sundsvall.digitalmail.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 import java.util.List;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,42 +34,46 @@ class AvailabilityServiceTest {
 	@InjectMocks
 	private AvailabilityService availabilityService;
 
-	@Test
-	void testPresentMailbox_shouldReturnMailbox() {
-		when(mockReachableIntegration.isReachable(any())).thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName")));
+	private static final MailboxDto VALID_MAILBOX = new MailboxDto("someRecipient", "someServiceAddress", "someServiceName", true);
+	private static final MailboxDto INVALID_MAILBOX = new MailboxDto("someRecipient", "someServiceAddress", "someServiceName", false);
 
-		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"));
-
-		assertThat(mailboxes).isNotEmpty();
+	@AfterEach
+	void tearDown() {
+		verifyNoMoreInteractions(mockReachableIntegration);
 	}
 
 	@Test
-	void testEmptyOptionalMailbox_shouldOnlyReturnPresentMailboxes() {
-		final var response = Stream.concat(generateEmptyMailboxResponse().stream(), generatePresentMailboxResponse().stream()).toList();
+	void testGetRecipientMailboxesAndCheckAvailability() {
+		var mailboxes = List.of(VALID_MAILBOX, INVALID_MAILBOX);
+		when(mockReachableIntegration.isReachable(anyList(), anyString())).thenReturn(mailboxes);
 
-		when(mockReachableIntegration.isReachable(any())).thenReturn(response);
+		final var response = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"), ORGANIZATION_NUMBER);
 
-		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"));
+		assertThat(response).isEqualTo(mailboxes);
 
-		assertThat(mailboxes).isNotEmpty().singleElement().isNotNull();
+		verify(mockReachableIntegration).isReachable(anyList(), anyString());
 	}
 
-	@Test
-	void testNoMailbox_shouldThrowException() {
-		when(mockReachableIntegration.isReachable(any())).thenReturn(List.of());
+	@ParameterizedTest
+	@MethodSource("invalidMailboxesProvider")
+	void testNoValidMailboxesShouldThrowProblem(List<MailboxDto> invalidMailboxes) {
+		when(mockReachableIntegration.isReachable(anyList(), anyString())).thenReturn(invalidMailboxes);
 
-		final var personalNumbers = List.of("personalNumber");
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(personalNumbers));
+			.isThrownBy(() -> availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"), ORGANIZATION_NUMBER))
+			.satisfies(problem -> {
+				assertThat(problem.getStatus()).isEqualTo(NOT_FOUND);
+				assertThat(problem.getTitle()).isEqualTo("Couldn't find any mailboxes");
+				assertThat(problem.getDetail()).isEqualTo("No mailbox could be found for any of the given partyIds or the recipients doesn't allow the sender.");
+			});
+
+		verify(mockReachableIntegration).isReachable(anyList(), anyString());
 	}
 
-	private List<MailboxDto> generateEmptyMailboxResponse() {
-		return List.of();
-	}
-
-	private List<MailboxDto> generatePresentMailboxResponse() {
-		final var mailbox = new MailboxDto("recipientId", "serviceAddress", "serviceName");
-
-		return List.of(mailbox);
+	public static Stream<Arguments> invalidMailboxesProvider() {
+		return Stream.of(
+			Arguments.of(List.of()),
+			Arguments.of(List.of(INVALID_MAILBOX)),
+			Arguments.of(List.of(INVALID_MAILBOX, INVALID_MAILBOX)));
 	}
 }

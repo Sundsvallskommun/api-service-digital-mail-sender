@@ -1,9 +1,8 @@
 package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
-import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static org.apache.commons.lang3.StringUtils.isBlank;
 
 import java.util.List;
-import java.util.Optional;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
@@ -16,8 +15,6 @@ import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 @Component
 class RecipientIntegrationMapper {
 
-	static final String SENDER_ORG_NR = "162120002411"; // We will always send as sundsvalls kommun.
-
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
 	private final SkatteverketProperties skatteverketProperties;
@@ -27,60 +24,72 @@ class RecipientIntegrationMapper {
 	}
 
 	/**
-	 * 
-	 * @param  personalNumbers map of personalnumbers with corresponding partyIds
-	 * @return
+	 *
+	 * @param  personalNumbers    map of personalnumbers
+	 * @param  organizationNumber the organization number of the sender
+	 * @return                    a request object that can be sent to Skatteverket to check if the personal numbers are
+	 *                            reachable
 	 */
-	IsReachable createIsReachableRequest(final List<String> personalNumbers) {
+	IsReachable createIsReachableRequest(final List<String> personalNumbers, String organizationNumber) {
 		final var isReachable = OBJECT_FACTORY.createIsReachable();
 		isReachable.getRecipientIds().addAll(personalNumbers);
-		isReachable.setSenderOrgNr(SENDER_ORG_NR);
+		isReachable.setSenderOrgNr(organizationNumber);
 		return isReachable;
 	}
 
-	List<MailboxDto> getMailboxSettings(final IsReachableResponse response) {
+	/**
+	 * Get mailbox settings.
+	 * This method maps the response from Skatteverket to a list of {@link MailboxDto} objects.
+	 * If no mailboxes could be found an empty list is returned.
+	 *
+	 * @param  response the response from Skatteverket
+	 * @return          a list of {@link MailboxDto} objects.
+	 */
+	List<MailboxDto> toMailboxDtos(final IsReachableResponse response) {
 		if (CollectionUtils.isNotEmpty(response.getReturns())) {
-			// There will only be one since we only ever ask for one, get it (for now at least).
 			return response.getReturns().stream()
-				.map(this::getMailboxSettings)
-				.filter(Optional::isPresent)
-				.map(Optional::get)
+				.map(this::toMailboxDto)
 				.toList();
 		}
 
 		return List.of();
 	}
 
-	/**
-	 * Check that:
-	 * - there's not a pending accountregistration (that we have somewhere to send the message)
-	 * - The sender is accepted by the recipient (no difference between disallowing and no mailbox)
-	 * - that there's an existing servicesupplier object.
-	 *
-	 * @param  reachabilityStatus status of the recipient
-	 * @return                    Optional {@link MailboxDto} containing the url and recipientId.
-	 */
-	private Optional<MailboxDto> getMailboxSettings(final ReachabilityStatus reachabilityStatus) {
-		if (reachabilityStatus.isSenderAccepted() &&                                                            // Make sure the recipient accepts the sender (Sundsvalls kommun)
-			reachabilityStatus.getAccountStatus().getServiceSupplier() != null &&                           // If the recipient doesn't have a mailbox this will not be present
-			!reachabilityStatus.getAccountStatus().isPending() &&                                           // It should not be a pending account registration
-			isSupportedSupplier(reachabilityStatus.getAccountStatus().getServiceSupplier().getName()) &&    // Check that we support the supplier
-			isNotBlank(reachabilityStatus.getAccountStatus().getServiceSupplier().getServiceAdress())) {    // Make sure we have an address to send something to.
-			final var recipientId = reachabilityStatus.getAccountStatus().getRecipientId();
-			final var serviceAdress = reachabilityStatus.getAccountStatus().getServiceSupplier().getServiceAdress();
-			final var serviceName = getShortSupplierName(reachabilityStatus.getAccountStatus().getServiceSupplier().getName());
+	private MailboxDto toMailboxDto(final ReachabilityStatus reachabilityStatus) {
+		if (isValidMailbox(reachabilityStatus)) {
+			return MailboxDto.builder()
+				.withValidMailbox(true)
+				.withRecipientId(reachabilityStatus.getAccountStatus().getRecipientId())
+				.withServiceAddress(reachabilityStatus.getAccountStatus().getServiceSupplier().getServiceAdress())
+				.withServiceName(reachabilityStatus.getAccountStatus().getServiceSupplier().getName())
+				.build();
+		} else {
+			return MailboxDto.builder()
+				.withRecipientId(reachabilityStatus.getAccountStatus().getRecipientId())
+				.withValidMailbox(false)
+				.build();
+		}
+	}
 
-			return Optional.of(new MailboxDto(recipientId, serviceAdress, serviceName));
+	private boolean isValidMailbox(final ReachabilityStatus reachabilityStatus) {
+		if (!reachabilityStatus.isSenderAccepted()) {
+			return false;
 		}
 
-		return Optional.empty();
+		var accountStatus = reachabilityStatus.getAccountStatus();
+		if (accountStatus.isPending() || accountStatus.getServiceSupplier() == null) {
+			return false;
+		}
+
+		var serviceSupplier = accountStatus.getServiceSupplier();
+		return isSupportedSupplier(serviceSupplier.getName()) && !isBlank(serviceSupplier.getServiceAdress());
 	}
 
 	/**
 	 * Check if the service supplier "name" is one that we support.
 	 *
-	 * @param  supplier
-	 * @return
+	 * @param  supplier name of the supplier
+	 * @return          If the supplier is supported
 	 */
 	boolean isSupportedSupplier(final String supplier) {
 		return skatteverketProperties.supportedSuppliers().stream()

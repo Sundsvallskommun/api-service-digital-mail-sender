@@ -140,11 +140,9 @@ class CertificateHealthSchedulerTests {
 				assertThat(request.getSender().getName()).isEqualTo(name);
 				assertThat(request.getSender().getReplyTo()).isNull();
 			})
-			.satisfiesExactlyInAnyOrder(request -> {
-				assertThat(request.getEmailAddress()).isEqualTo(recipient1);
-			}, request -> {
-				assertThat(request.getEmailAddress()).isEqualTo(recipient2);
-			});
+			.satisfiesExactlyInAnyOrder(
+				request -> assertThat(request.getEmailAddress()).isEqualTo(recipient1),
+				request -> assertThat(request.getEmailAddress()).isEqualTo(recipient2));
 	}
 
 	@Test
