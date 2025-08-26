@@ -93,9 +93,31 @@ public class DigitalMailService {
 	}
 
 	public List<Mailbox> getMailboxes(final List<String> partyIds, final String municipalityId, final String organizationNumber) {
-		var partyIdPersonalNumberMap = new HashMap<String, String>();
+		var partyIdPersonalNumberMap = getPartyIdPersonalNumberMap(partyIds, municipalityId);
 
-		// Lookup personalNumber for each partyId
+		// Create a reversed hashmap so we don't need to iterate through the whole original hashmap to find a personalNumber
+		var personalNumberPartyIdMap = createPersonalNumberPartyIdMap(partyIdPersonalNumberMap);
+
+		// Now we know which partyIds have a personal number and which do not, extract the ones we have and check availability.
+		var foundPersonalNumbers = partyIdPersonalNumberMap.values().stream()
+			.filter(Objects::nonNull)
+			.toList();
+
+		var mailBoxDtoList = availabilityService.getRecipientMailboxesAndCheckAvailability(foundPersonalNumbers, organizationNumber);
+
+		return createMailboxes(mailBoxDtoList, personalNumberPartyIdMap, partyIdPersonalNumberMap);
+	}
+
+	private Map<String, String> createPersonalNumberPartyIdMap(HashMap<String, String> partyIdPersonalNumberMap) {
+		return partyIdPersonalNumberMap.entrySet().stream()
+			.filter(entry -> entry.getValue() != null) // Filter out null values, i.e. personal numbers not found.
+			.collect(Collectors.toMap(
+				Map.Entry::getValue,
+				Map.Entry::getKey));
+	}
+
+	private HashMap<String, String> getPartyIdPersonalNumberMap(final List<String> partyIds, final String municipalityId) {
+		var partyIdPersonalNumberMap = new HashMap<String, String>();
 		partyIds.forEach(partyId -> {
 			// Add the partyId to the map even if the personal number is null, so we can keep track of which partyIds have no
 			// personal number.
@@ -107,21 +129,7 @@ public class DigitalMailService {
 				});
 		});
 
-		// Create a reversed hashmap so we don't need to iterate through the whole original hashmap to find a personalNumber
-		var personalNumberPartyIdMap = partyIdPersonalNumberMap.entrySet().stream()
-			.filter(entry -> entry.getValue() != null) // Filter out null values, i.e. personal numbers not found.
-			.collect(Collectors.toMap(
-				Map.Entry::getValue,
-				Map.Entry::getKey));
-
-		// Now we know which partyIds have a personal number and which do not, extract the ones we have and check availability.
-		var foundPersonalNumbers = partyIdPersonalNumberMap.values().stream()
-			.filter(Objects::nonNull)
-			.toList();
-
-		var mailBoxDtoList = availabilityService.getRecipientMailboxesAndCheckAvailability(foundPersonalNumbers, organizationNumber);
-
-		return createMailboxes(mailBoxDtoList, personalNumberPartyIdMap, partyIdPersonalNumberMap);
+		return partyIdPersonalNumberMap;
 	}
 
 	private ArrayList<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> personalNumberPartyIdMap, final HashMap<String, String> partyIdPersonalNumberMap) {
@@ -137,7 +145,7 @@ public class DigitalMailService {
 			mailboxes.add(toMailbox(mailboxDto, partyId));
 		}
 
-		// Create "unrachable" mailboxes for all the missing personal numbers
+		// Create "unreachable" mailboxes for all the missing personal numbers
 		partyIdPersonalNumberMap.forEach((partyId, personalNumber) -> {
 			if (personalNumber == null) {
 				mailboxes.add(Mailbox.builder()
