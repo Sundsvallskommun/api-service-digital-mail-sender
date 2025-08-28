@@ -73,7 +73,7 @@ class DigitalMailServiceTest {
 
 		final var pdfLength = request.getAttachments().getFirst().getBody().length();  // Save the length of the pdf before compression
 
-		final var digitalMailResponse = service.sendDigitalMail(new DigitalMailDto(request), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var digitalMailResponse = service.sendDigitalMail(request, MUNICIPALITY_ID);
 
 		final var compressedPdfLength = request.getAttachments().getFirst().getBody().length(); // Save the length of the pdf after compression
 
@@ -92,7 +92,7 @@ class DigitalMailServiceTest {
 		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.empty());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID))
 			.satisfies(thrownProblem -> {
 				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital mail: No personal number found for partyId: " + request.getPartyId());

@@ -2,6 +2,7 @@ package se.sundsvall.digitalmail.integration.skatteverket;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
@@ -21,12 +22,13 @@ class DigitalMailDtoTest {
 			.withBodyInformation(BodyInformation.builder().withContentType(TEXT_PLAIN_VALUE).build())
 			.build();
 
-		final var dto = new DigitalMailDto(request);
+		final var dto = new DigitalMailDto(request, ORGANIZATION_NUMBER);
 
 		assertThat(dto.getPartyId()).isEqualTo("partyId");
 		assertThat(dto.getHeaderSubject()).isEqualTo("Subject");
 		assertThat(dto.getSupportInfo()).isNotNull();
 		assertThat(dto.getAttachments()).isNotNull();
 		assertThat(dto.getBodyInformation()).isNotNull();
+		assertThat(dto.getOrganizationNumber()).isEqualTo(ORGANIZATION_NUMBER);
 	}
 }

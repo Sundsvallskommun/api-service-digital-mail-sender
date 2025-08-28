@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,7 +40,7 @@ class SecureMailIntegrationTest {
 		when(mockMapper.createDigitalMailResponse(any(DeliverSecureResponse.class), anyString()))
 			.thenReturn(new DigitalMailResponse());
 
-		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().withPartyId("somePartyId").build());
+		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().withPartyId("somePartyId").build(), ORGANIZATION_NUMBER);
 
 		final var deliverSecureResponse = mailIntegration.sendDigitalMail(digitalMailDto, "https://nowhere.com");
 		assertThat(deliverSecureResponse).isNotNull();
@@ -50,7 +51,7 @@ class SecureMailIntegrationTest {
 	@Test
 	void testExceptionFromIntegration_shouldThrowProblem() {
 
-		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().build());
+		final var digitalMailDto = new DigitalMailDto(DigitalMailRequest.builder().build(), ORGANIZATION_NUMBER);
 		when(mockMapper.createDeliverSecure(any(DigitalMailDto.class))).thenCallRealMethod();
 		when(mockWebServiceTemplate.marshalSendAndReceive(eq("https://nowhere.com"), any(DeliverSecure.class))).thenThrow(new RuntimeException("error-message"));
 

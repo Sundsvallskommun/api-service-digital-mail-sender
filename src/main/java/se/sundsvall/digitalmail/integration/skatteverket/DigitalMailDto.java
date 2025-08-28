@@ -9,8 +9,10 @@ import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 public class DigitalMailDto extends DigitalMailRequest {
 
 	private String recipientId; // Recipient id from e.g. kivra.
+	private String organizationNumber;
 
-	public DigitalMailDto(final DigitalMailRequest request) {
+	public DigitalMailDto(final DigitalMailRequest request, String organizationNumber) {
 		super(request.getPartyId(), request.getMunicipalityId(), request.getHeaderSubject(), request.getSupportInfo(), request.getAttachments(), request.getBodyInformation());
+		this.organizationNumber = organizationNumber;
 	}
 }

@@ -2,6 +2,7 @@ package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
 
 import jakarta.xml.bind.DatatypeConverter;
 import jakarta.xml.bind.JAXBContext;
@@ -62,7 +63,6 @@ import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 @Component
 class DigitalMailMapper {
 
-	public static final String SENDER_ID = "162120002411";
 	public static final String SENDER_NAME = "Sundsvalls Kommun";
 	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
@@ -341,14 +341,14 @@ class DigitalMailMapper {
 
 	SecureDeliveryHeader createSecureDeliveryHeader(final DigitalMailDto dto) {
 		final var secureDeliveryHeader = new SecureDeliveryHeader();
-		secureDeliveryHeader.setSender(createSender());
+		secureDeliveryHeader.setSender(createSender(dto.getOrganizationNumber()));
 		secureDeliveryHeader.setRecipient(dto.getRecipientId());
 		return secureDeliveryHeader;
 	}
 
-	Sender createSender() {
+	Sender createSender(String organizationNumber) {
 		final var sender = new Sender();
-		sender.setId(SENDER_ID);
+		sender.setId(prefixOrgNumber(organizationNumber));
 		sender.setName(SENDER_NAME);
 		return sender;
 	}

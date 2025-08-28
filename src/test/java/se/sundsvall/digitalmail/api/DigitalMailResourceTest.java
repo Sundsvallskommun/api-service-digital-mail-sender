@@ -73,7 +73,7 @@ class DigitalMailResourceTest {
 				.build())
 			.build();
 
-		when(mockDigitalMailService.sendDigitalMail(any(DigitalMailDto.class), anyString(), anyString())).thenReturn(response);
+		when(mockDigitalMailService.sendDigitalMail(any(DigitalMailDto.class), anyString())).thenReturn(response);
 
 		final var result = webTestClient.post()
 			.uri(SEND_DIGITAL_MAIL_PATH, ORGANIZATION_NUMBER)
@@ -93,7 +93,7 @@ class DigitalMailResourceTest {
 			assertThat(resultDeliverystatus.getTransactionId()).isEqualTo(response.getDeliveryStatus().getTransactionId());
 		});
 
-		verify(mockDigitalMailService).sendDigitalMail(any(DigitalMailDto.class), anyString(), anyString());
+		verify(mockDigitalMailService).sendDigitalMail(any(DigitalMailDto.class), anyString());
 		verifyNoInteractions(mockHtmlValidator);
 	}
 

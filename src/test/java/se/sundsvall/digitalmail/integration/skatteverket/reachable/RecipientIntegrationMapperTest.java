@@ -6,6 +6,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
+import static se.sundsvall.digitalmail.TestObjectFactory.PREFIXED_ORGANIZATION_NUMBER;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -43,11 +45,10 @@ class RecipientIntegrationMapperTest {
 	@Test
 	void testCreateIsReachableRequest() {
 		final var personalNumbers = List.of("personalNumber", "anotherPersonalNumber");
-		final var organizationNumber = "2120002411";
 
-		final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, organizationNumber);
+		final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, ORGANIZATION_NUMBER);
 
-		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(organizationNumber);
+		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(PREFIXED_ORGANIZATION_NUMBER);
 		assertThat(isReachableRequest.getRecipientIds()).containsExactlyInAnyOrderElementsOf(personalNumbers);
 
 		verifyNoInteractions(mockSkatteverketProperties);

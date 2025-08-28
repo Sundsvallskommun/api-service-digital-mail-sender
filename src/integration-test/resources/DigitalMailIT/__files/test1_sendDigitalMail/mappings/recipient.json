@@ -3,10 +3,16 @@
 		"method": "POST",
 		"bodyPatterns": [
 			{
+				"matchesXPath": "//ns16:senderOrgNr[text()='162120002410']",
 				"xPathNamespaces": {
-					"ns17": "http://minameddelanden.gov.se/schema/Recipient/v3"
-				},
-				"matchesXPath": "//*[ns17:isReachable]//*[ns17:recipientId='190101010159']"
+					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				}
+			},
+			{
+				"matchesXPath": "//ns16:recipientId[text()='190101010159']",
+				"xPathNamespaces": {
+					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				}
 			}
 		],
 		"url": "/recipient"

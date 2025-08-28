@@ -1,7 +1,33 @@
 {
 	"request": {
 		"method": "POST",
-		"url": "/recipient"
+		"url": "/recipient",
+		"bodyPatterns": [
+			{
+				"matchesXPath": "//ns16:senderOrgNr[text()='162120002410']",
+				"xPathNamespaces": {
+					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				}
+			},
+			{
+				"matchesXPath": "//ns16:recipientId[text()='200001102391']",
+				"xPathNamespaces": {
+					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				}
+			},
+			{
+				"matchesXPath": "//ns16:recipientId[text()='201001212388']",
+				"xPathNamespaces": {
+					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				}
+			},
+			{
+				"matchesXPath": "//ns16:recipientId[text()='201301172399']",
+				"xPathNamespaces": {
+					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
+				}
+			}
+		]
 	},
 	"response": {
 		"headers": {

@@ -55,7 +55,7 @@ public class DigitalMailService {
 	 * @param  requestDto containing message and recipient
 	 * @return            Response whether the sending went ok or not.
 	 */
-	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId, final String organizationNumber) {
+	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
 		PdfCompressor.compress(requestDto.getAttachments());
 
 		final var personalNumber = partyIntegration.getLegalId(municipalityId, requestDto.getPartyId())
@@ -65,7 +65,7 @@ public class DigitalMailService {
 				.withStatus(NOT_FOUND)
 				.build());
 
-		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber), organizationNumber);
+		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber), requestDto.getOrganizationNumber());
 
 		// We'll only have one mailbox as we only handle one personal number at a time.
 		final var mailbox = mailboxes.getFirst();

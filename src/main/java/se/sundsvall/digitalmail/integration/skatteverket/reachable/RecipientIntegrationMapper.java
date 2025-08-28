@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
 
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
@@ -33,7 +34,7 @@ class RecipientIntegrationMapper {
 	IsReachable createIsReachableRequest(final List<String> personalNumbers, String organizationNumber) {
 		final var isReachable = OBJECT_FACTORY.createIsReachable();
 		isReachable.getRecipientIds().addAll(personalNumbers);
-		isReachable.setSenderOrgNr(organizationNumber);
+		isReachable.setSenderOrgNr(prefixOrgNumber(organizationNumber));
 		return isReachable;
 	}
 
