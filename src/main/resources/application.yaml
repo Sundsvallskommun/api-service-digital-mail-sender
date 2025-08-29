@@ -33,6 +33,8 @@ integration:
       - minmyndighetspost
       - billo
       - fortnox
+    supported-senders:
+      2120002411: Sundsvalls kommun
 
 # Circuit breaker settings
 resilience4j:

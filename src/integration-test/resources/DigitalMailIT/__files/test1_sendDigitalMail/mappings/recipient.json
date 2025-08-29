@@ -3,7 +3,7 @@
 		"method": "POST",
 		"bodyPatterns": [
 			{
-				"matchesXPath": "//ns16:senderOrgNr[text()='162120002410']",
+				"matchesXPath": "//ns16:senderOrgNr[text()='162120002411']",
 				"xPathNamespaces": {
 					"ns16": "http://minameddelanden.gov.se/schema/Recipient/v3"
 				}
