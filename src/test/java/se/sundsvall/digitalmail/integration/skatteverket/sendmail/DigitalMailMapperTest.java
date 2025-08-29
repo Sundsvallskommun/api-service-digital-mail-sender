@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static se.sundsvall.digitalmail.TestObjectFactory.PREFIXED_ORGANIZATION_NUMBER;
 
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -64,7 +65,7 @@ class DigitalMailMapperTest {
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getCorrelationId()).isNull();
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getRecipient()).isEqualTo("recipientId");
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls Kommun");
-		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo("162120002411");
+		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo(PREFIXED_ORGANIZATION_NUMBER);
 
 		final var header = signedDelivery.getDelivery().getMessages().getFirst().getHeader();
 

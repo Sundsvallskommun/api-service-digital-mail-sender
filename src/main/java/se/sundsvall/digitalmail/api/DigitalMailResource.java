@@ -95,7 +95,7 @@ class DigitalMailResource {
 					.build();
 			});
 
-		return ok(digitalMailService.sendDigitalMail(new DigitalMailDto(request), municipalityId, organizationNumber));
+		return ok(digitalMailService.sendDigitalMail(new DigitalMailDto(request, organizationNumber), municipalityId));
 	}
 
 	@Operation(summary = "Send a digital invoice")
