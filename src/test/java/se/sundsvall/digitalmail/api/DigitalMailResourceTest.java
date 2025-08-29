@@ -40,7 +40,7 @@ class DigitalMailResourceTest {
 
 	private static final String MUNICIPALITY_ID = "2281";
 
-	private static final String ORGANIZATION_NUMBER = "2120001472";
+	private static final String ORGANIZATION_NUMBER = "2120002411";
 
 	private static final String SEND_DIGITAL_MAIL_PATH = "/" + MUNICIPALITY_ID + "/{organizationNumber}/send-digital-mail";
 

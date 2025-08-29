@@ -35,6 +35,7 @@ import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.Mailbox;
 import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
+import se.sundsvall.digitalmail.api.model.validation.annotation.ValidSender;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.service.DigitalMailService;
@@ -81,7 +82,7 @@ class DigitalMailResource {
 		produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<DigitalMailResponse> sendDigitalMail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
-		@Parameter(name = "organizationNumber", description = "The organization number of the sending organization", example = "5561234567") @ValidOrganizationNumber @PathVariable final String organizationNumber,
+		@Parameter(name = "organizationNumber", description = "The organization number of the sending organization", example = "5561234567") @ValidSender @ValidOrganizationNumber @PathVariable final String organizationNumber,
 		@Valid @RequestBody final DigitalMailRequest request) {
 
 		// Validate body as HTML if content type is text/html
@@ -117,7 +118,7 @@ class DigitalMailResource {
 		produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<Mailbox>> hasAvailableMailboxes(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
-		@Parameter(name = "organizationNumber", description = "The organization number of the intended sending organization", example = "5561234567") @ValidOrganizationNumber @PathVariable final String organizationNumber,
+		@Parameter(name = "organizationNumber", description = "The organization number of the intended sending organization", example = "5561234567") @ValidSender @ValidOrganizationNumber @PathVariable final String organizationNumber,
 		@RequestBody @UniqueElements @NotEmpty final List<@ValidUuid String> partyIds) {
 		return ok(digitalMailService.getMailboxes(partyIds, municipalityId, organizationNumber));
 	}

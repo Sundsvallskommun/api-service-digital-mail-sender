@@ -64,7 +64,7 @@ class DigitalMailMapperTest {
 
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getCorrelationId()).isNull();
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getRecipient()).isEqualTo("recipientId");
-		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls Kommun");
+		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls kommun");
 		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo(PREFIXED_ORGANIZATION_NUMBER);
 
 		final var header = signedDelivery.getDelivery().getMessages().getFirst().getHeader();

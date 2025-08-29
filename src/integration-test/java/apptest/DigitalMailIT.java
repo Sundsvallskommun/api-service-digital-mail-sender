@@ -14,8 +14,8 @@ import se.sundsvall.digitalmail.Application;
 @WireMockAppTestSuite(files = "classpath:/DigitalMailIT/", classes = Application.class)
 class DigitalMailIT extends AbstractAppTest {
 
-	private static final String SEND_DIGITAL_MAIL_SERVICE_PATH = "/2281/2120002410/send-digital-mail";
-	private static final String MAILBOXES_SERVICE_PATH = "/2281/2120002410/mailboxes";
+	private static final String SEND_DIGITAL_MAIL_SERVICE_PATH = "/2281/2120002411/send-digital-mail";
+	private static final String MAILBOXES_SERVICE_PATH = "/2281/2120002411/mailboxes";
 	
 	private static final String REQUEST = "request.json"; 
 	private static final String EXPECTED = "expected.json";
