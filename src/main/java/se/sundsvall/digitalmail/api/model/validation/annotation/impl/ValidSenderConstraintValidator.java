@@ -1,6 +1,5 @@
 package se.sundsvall.digitalmail.api.model.validation.annotation.impl;
 
-import static java.util.Optional.ofNullable;
 import static org.springframework.util.CollectionUtils.isEmpty;
 
 import jakarta.validation.ConstraintValidator;
@@ -11,12 +10,12 @@ import se.sundsvall.digitalmail.api.model.validation.annotation.ValidSender;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @Component
-public class ValidSenderContraintValidator implements ConstraintValidator<ValidSender, String> {
+public class ValidSenderConstraintValidator implements ConstraintValidator<ValidSender, String> {
 
 	private final SkatteverketProperties skatteverketProperties;
 	private final SenderHealthIndicator senderHealthIndicator;
 
-	public ValidSenderContraintValidator(SkatteverketProperties skatteverketProperties, SenderHealthIndicator senderHealthIndicator) {
+	public ValidSenderConstraintValidator(SkatteverketProperties skatteverketProperties, SenderHealthIndicator senderHealthIndicator) {
 		this.skatteverketProperties = skatteverketProperties;
 		this.senderHealthIndicator = senderHealthIndicator;
 	}
@@ -33,6 +32,6 @@ public class ValidSenderContraintValidator implements ConstraintValidator<ValidS
 		}
 
 		// Check if the map contains the organization number as a key
-		return ofNullable(validSenders.get(organizationNumber)).isPresent();
+		return validSenders.containsKey(organizationNumber);
 	}
 }

@@ -8,14 +8,14 @@ import jakarta.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidSenderContraintValidator;
+import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidSenderConstraintValidator;
 
 @Documented
 @Target({
 	PARAMETER
 })
 @Retention(RUNTIME)
-@Constraint(validatedBy = ValidSenderContraintValidator.class)
+@Constraint(validatedBy = ValidSenderConstraintValidator.class)
 public @interface ValidSender {
 
 	String message() default "Sending organization is not registered as authorized sender";

@@ -20,7 +20,7 @@ import se.sundsvall.digitalmail.api.healthcheck.SenderHealthIndicator;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @ExtendWith(MockitoExtension.class)
-class ValidSenderContraintValidatorTest {
+class ValidSenderConstraintValidatorTest {
 
 	@Mock
 	private ConstraintValidatorContext mockContext;
@@ -32,7 +32,7 @@ class ValidSenderContraintValidatorTest {
 	private SenderHealthIndicator mockHealthIndicator;
 
 	@InjectMocks
-	private ValidSenderContraintValidator validator;
+	private ValidSenderConstraintValidator validator;
 
 	public static Stream<Arguments> sendersProvider() {
 		return Stream.of(

@@ -2,8 +2,8 @@ package se.sundsvall.digitalmail.integration.skatteverket;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 import org.springframework.validation.annotation.Validated;
@@ -30,4 +30,4 @@ public record SkatteverketProperties(
 
 	@DefaultValue("120000") long readTimeout,
 
-	HashMap<String, String> supportedSenders) {}
+	Map<String, String> supportedSenders) {}
