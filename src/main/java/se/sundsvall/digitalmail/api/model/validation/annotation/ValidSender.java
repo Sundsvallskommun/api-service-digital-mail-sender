@@ -1,7 +1,5 @@
 package se.sundsvall.digitalmail.api.model.validation.annotation;
 
-import static java.lang.annotation.ElementType.CONSTRUCTOR;
-import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -14,13 +12,13 @@ import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidSender
 
 @Documented
 @Target({
-	FIELD, CONSTRUCTOR, PARAMETER
+	PARAMETER
 })
 @Retention(RUNTIME)
 @Constraint(validatedBy = ValidSenderContraintValidator.class)
 public @interface ValidSender {
 
-	String message() default "Sender is not registered as authorized sender";
+	String message() default "Sending organization is not registered as authorized sender";
 
 	boolean nullable() default false;
 

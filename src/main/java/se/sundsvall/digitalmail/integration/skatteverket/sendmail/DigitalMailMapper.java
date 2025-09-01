@@ -89,13 +89,12 @@ class DigitalMailMapper {
 				.build();
 		}
 	});
-	private final SkatteverketProperties skatteverketProperties;
 
 	private Marshaller getMarshaller() {
 		return threadLocalMarshaller.get();
 	}
 
-	DigitalMailMapper(final SkatteverketProperties properties, SkatteverketProperties skatteverketProperties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, ParserConfigurationException {
+	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, ParserConfigurationException {
 		this.properties = properties;
 
 		// Load the KeyStore and get the signing key and certificate.
@@ -108,7 +107,6 @@ class DigitalMailMapper {
 		final var documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
 		documentBuilder = documentBuilderFactory.newDocumentBuilder();
-		this.skatteverketProperties = skatteverketProperties;
 	}
 
 	/**
@@ -352,7 +350,7 @@ class DigitalMailMapper {
 		sender.setId(prefixOrgNumber(organizationNumber));
 
 		// We've already verified the sender is valid, if we're here it will be present
-		sender.setName(skatteverketProperties.supportedSenders().get(organizationNumber));
+		sender.setName(properties.supportedSenders().get(organizationNumber));
 		return sender;
 	}
 

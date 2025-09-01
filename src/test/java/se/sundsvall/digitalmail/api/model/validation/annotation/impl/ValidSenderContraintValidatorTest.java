@@ -8,6 +8,7 @@ import static org.mockito.Mockito.when;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashMap;
 import java.util.stream.Stream;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -15,6 +16,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import se.sundsvall.digitalmail.api.healthcheck.SenderHealthIndicator;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @ExtendWith(MockitoExtension.class)
@@ -25,6 +27,9 @@ class ValidSenderContraintValidatorTest {
 
 	@Mock
 	private SkatteverketProperties mockProperties;
+
+	@Mock
+	private SenderHealthIndicator mockHealthIndicator;
 
 	@InjectMocks
 	private ValidSenderContraintValidator validator;
@@ -50,6 +55,20 @@ class ValidSenderContraintValidatorTest {
 		assertThat(validator.isValid(organizationNumber, mockContext)).isEqualTo(expected);
 
 		verify(mockProperties).supportedSenders();
-		verifyNoMoreInteractions(mockProperties);
+		verify(mockHealthIndicator).setHealthy();
+
+		verifyNoMoreInteractions(mockProperties, mockHealthIndicator);
+	}
+
+	@Test
+	void testEmptyPropertiesShouldSetUnhealthy() {
+		when(mockProperties.supportedSenders()).thenReturn(null);
+
+		assertThat(validator.isValid("someOrganization", mockContext)).isFalse();
+
+		verify(mockProperties).supportedSenders();
+		verify(mockHealthIndicator).setUnhealthy();
+
+		verifyNoMoreInteractions(mockProperties, mockHealthIndicator);
 	}
 }
