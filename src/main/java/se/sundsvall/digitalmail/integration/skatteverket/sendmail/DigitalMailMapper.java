@@ -63,7 +63,6 @@ import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 @Component
 class DigitalMailMapper {
 
-	public static final String SENDER_NAME = "Sundsvalls Kommun";
 	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
 	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
 
@@ -349,7 +348,9 @@ class DigitalMailMapper {
 	Sender createSender(String organizationNumber) {
 		final var sender = new Sender();
 		sender.setId(prefixOrgNumber(organizationNumber));
-		sender.setName(SENDER_NAME);
+
+		// We've already verified the sender is valid, if we're here it will be present
+		sender.setName(properties.supportedSenders().get(organizationNumber));
 		return sender;
 	}
 
