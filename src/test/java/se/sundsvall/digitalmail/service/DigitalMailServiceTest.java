@@ -22,9 +22,13 @@ import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -100,6 +104,25 @@ class DigitalMailServiceTest {
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
 		verify(mockAvailabilityService, never()).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
+		verify(mockDigitalMailIntegration, never()).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
+	}
+
+	@Test
+	void testSendDigitalMailNoValidMailboxShouldthrowProblem() {
+		final var request = generateDigitalMailRequestDto();
+
+		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("personalNumber"));
+		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of());
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID))
+			.satisfies(thrownProblem -> {
+				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
+				assertThat(thrownProblem.getMessage()).isEqualTo("Couldn't find any mailboxes: No mailbox could be found for any of the given partyIds or the recipients doesn't allow the sender.");
+			});
+
+		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
+		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
 		verify(mockDigitalMailIntegration, never()).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
 	}
 
@@ -206,5 +229,26 @@ class DigitalMailServiceTest {
 		verify(mockPartyIntegration, times(3)).getLegalId(eq(MUNICIPALITY_ID), anyString());
 		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
 		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
+	}
+
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("mailboxListProvider")
+	void getRecipientMailboxesShouldReturnEmptyListWhenNoMailboxesFound(String testName, List<MailboxDto> mailboxDtoList) {
+		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("personalNumber"));
+		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(mailboxDtoList);
+
+		final var mailboxes = service.getMailboxes(List.of("partyId1"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+
+		assertThat(mailboxes).isEmpty();
+
+		verify(mockPartyIntegration).getLegalId(eq(MUNICIPALITY_ID), anyString());
+		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
+		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
+	}
+
+	public static Stream<Arguments> mailboxListProvider() {
+		return Stream.of(
+			Arguments.of("null list", null),
+			Arguments.of("empty list", List.of()));
 	}
 }

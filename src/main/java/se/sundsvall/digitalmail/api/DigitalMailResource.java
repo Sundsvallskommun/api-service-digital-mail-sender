@@ -54,11 +54,6 @@ import se.sundsvall.digitalmail.service.DigitalMailService;
 		schema = @Schema(oneOf = {
 			Problem.class, ConstraintViolationProblem.class
 		})))
-@ApiResponse(responseCode = "404",
-	description = "Not Found",
-	content = @Content(
-		mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-		schema = @Schema(implementation = Problem.class)))
 @ApiResponse(responseCode = "500",
 	description = "Internal Server Error",
 	content = @Content(
@@ -76,6 +71,11 @@ class DigitalMailResource {
 	}
 
 	@Operation(summary = "Send a digital mail")
+	@ApiResponse(responseCode = "404",
+		description = "Not Found",
+		content = @Content(
+			mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+			schema = @Schema(implementation = Problem.class)))
 	@PostMapping(
 		value = "/{organizationNumber}/send-digital-mail",
 		consumes = APPLICATION_JSON_VALUE,
@@ -100,6 +100,11 @@ class DigitalMailResource {
 	}
 
 	@Operation(summary = "Send a digital invoice")
+	@ApiResponse(responseCode = "404",
+		description = "Not Found",
+		content = @Content(
+			mediaType = APPLICATION_PROBLEM_JSON_VALUE,
+			schema = @Schema(implementation = Problem.class)))
 	@PostMapping(
 		value = "/send-digital-invoice",
 		consumes = APPLICATION_JSON_VALUE,

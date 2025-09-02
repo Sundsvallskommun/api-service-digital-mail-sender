@@ -149,4 +149,27 @@ class DigitalMailResourceTest {
 		verify(mockDigitalMailService, times(1)).getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 		verifyNoInteractions(mockHtmlValidator);
 	}
+
+	@Test
+	void hasAvailableMailboxesNoValidMailboxesShouldReturnEmptyList() {
+		final var partyId = UUID.randomUUID().toString();
+
+		when(mockDigitalMailService.getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER)).thenReturn(List.of());
+
+		var response = webTestClient.post()
+			.uri(HAS_AVAILABLE_MAILBOXES_PATH, ORGANIZATION_NUMBER)
+			.bodyValue(List.of(partyId))
+			.exchange()
+			.expectStatus().isOk()
+			.expectBodyList(Mailbox.class)
+			.returnResult()
+			.getResponseBody();
+
+		assertThat(response)
+			.isNotNull()
+			.isEmpty();
+
+		verify(mockDigitalMailService, times(1)).getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		verifyNoInteractions(mockHtmlValidator);
+	}
 }
