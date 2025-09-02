@@ -1,5 +1,6 @@
 package se.sundsvall.digitalmail.service;
 
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.zalando.problem.Status.NOT_FOUND;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
@@ -67,6 +68,15 @@ public class DigitalMailService {
 
 		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber), requestDto.getOrganizationNumber());
 
+		// Check if we didn't get any mailboxes at all
+		if (isEmpty(mailboxes) || mailboxes.stream().noneMatch(MailboxDto::isValidMailbox)) {
+			throw Problem.builder()
+				.withTitle("Couldn't find any mailboxes")
+				.withDetail("No mailbox could be found for any of the given partyIds or the recipients doesn't allow the sender.")
+				.withStatus(NOT_FOUND)
+				.build();
+		}
+
 		// We'll only have one mailbox as we only handle one personal number at a time.
 		final var mailbox = mailboxes.getFirst();
 		requestDto.setRecipientId(mailbox.getRecipientId());
@@ -132,7 +142,11 @@ public class DigitalMailService {
 		return partyIdPersonalNumberMap;
 	}
 
-	private ArrayList<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> personalNumberPartyIdMap, final HashMap<String, String> partyIdPersonalNumberMap) {
+	private List<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> personalNumberPartyIdMap, final HashMap<String, String> partyIdPersonalNumberMap) {
+		if (isEmpty(mailBoxDtoList)) {
+			return List.of();
+		}
+
 		var mailboxes = new ArrayList<Mailbox>();
 
 		// Map each MailboxDto to a Mailbox object.

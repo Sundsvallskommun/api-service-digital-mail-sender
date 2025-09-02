@@ -1,10 +1,7 @@
 package se.sundsvall.digitalmail.service;
 
-import static org.zalando.problem.Status.NOT_FOUND;
-
 import java.util.List;
 import org.springframework.stereotype.Service;
-import org.zalando.problem.Problem;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.reachable.ReachableIntegration;
 
@@ -26,17 +23,6 @@ public class AvailabilityService {
 	 * @return                    List of MailboxDto containing the mailboxes for the given personal numbers
 	 */
 	public List<MailboxDto> getRecipientMailboxesAndCheckAvailability(final List<String> personalNumbers, String organizationNumber) {
-		final var mailboxes = reachableIntegration.isReachable(personalNumbers, organizationNumber);
-
-		// Check if we didn't get any mailboxes at all
-		if (mailboxes.isEmpty() || mailboxes.stream().noneMatch(MailboxDto::isValidMailbox)) {
-			throw Problem.builder()
-				.withTitle("Couldn't find any mailboxes")
-				.withDetail("No mailbox could be found for any of the given partyIds or the recipients doesn't allow the sender.")
-				.withStatus(NOT_FOUND)
-				.build();
-		}
-
-		return mailboxes;
+		return reachableIntegration.isReachable(personalNumbers, organizationNumber);
 	}
 }
