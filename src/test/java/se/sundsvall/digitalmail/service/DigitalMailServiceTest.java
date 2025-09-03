@@ -22,13 +22,9 @@ import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -200,7 +196,7 @@ class DigitalMailServiceTest {
 	}
 
 	@Test
-	void getRecipientMailboxes() {
+	void testGetMailboxes() {
 		var reachablePersonalNumber = "personalNumber";
 		var unreachablePersonalNumber = "unreachablePersonalNumber";
 		var reachableMailboxDto = new MailboxDto("personalNumber", "serviceAddress", "kivra", true);
@@ -231,24 +227,39 @@ class DigitalMailServiceTest {
 		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
 	}
 
-	@ParameterizedTest(name = "{0}")
-	@MethodSource("mailboxListProvider")
-	void getRecipientMailboxesShouldReturnEmptyListWhenNoMailboxesFound(String testName, List<MailboxDto> mailboxDtoList) {
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("personalNumber"));
-		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(mailboxDtoList);
+	@Test
+	void testGetMailboxesWhenNoPersonalNumberFound() {
+		// Test that we find no personal numbers for any of the partyIds
+		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
+			.thenReturn(Optional.empty())
+			.thenReturn(Optional.empty());
 
-		final var mailboxes = service.getMailboxes(List.of("partyId1"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
-		assertThat(mailboxes).isEmpty();
+		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable)
+			.containsExactlyInAnyOrder(
+				tuple("partyId1", null, false),
+				tuple("partyId2", null, false));
 
-		verify(mockPartyIntegration).getLegalId(eq(MUNICIPALITY_ID), anyString());
-		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
-		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
+		verify(mockPartyIntegration, times(2)).getLegalId(eq(MUNICIPALITY_ID), anyString());
+		verifyNoInteractions(mockAvailabilityService, mockKivraIntegration, mockDigitalMailIntegration);
 	}
 
-	public static Stream<Arguments> mailboxListProvider() {
-		return Stream.of(
-			Arguments.of("null list", null),
-			Arguments.of("empty list", List.of()));
+	@Test
+	void getGetMailboxesWhenEmptyResponseFromAvailabilityService() {
+		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
+			.thenReturn(Optional.of("personalNumber"))
+			.thenReturn(Optional.of("anotherPersonalNumber"));
+		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of());
+
+		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+
+		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable)
+			.containsExactly(
+				tuple("partyId1", null, false), tuple("partyId2", null, false));
+
+		verify(mockPartyIntegration, times(2)).getLegalId(eq(MUNICIPALITY_ID), anyString());
+		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
+		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
 	}
 }
