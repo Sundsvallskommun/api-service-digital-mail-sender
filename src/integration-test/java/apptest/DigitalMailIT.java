@@ -72,4 +72,18 @@ class DigitalMailIT extends AbstractAppTest {
 			.sendRequestAndVerifyResponse()
 			.verifyAllStubs();
 	}
+	
+	@Test
+	void test4_sendDigitalMailNoAvailableMailboxes() {
+		setupCall()
+			.withExtensions(new ResponseBodyTransformer()
+				.withModifier(body -> body.replace("https://mm.kivra.com/service/v3", replacementUrl)))
+			.withServicePath(SEND_DIGITAL_MAIL_SERVICE_PATH)
+			.withRequest(REQUEST)
+			.withHttpMethod(HttpMethod.POST)
+			.withExpectedResponseStatus(HttpStatus.NOT_FOUND)
+			.withExpectedResponse(EXPECTED)
+			.sendRequestAndVerifyResponse()
+			.verifyAllStubs();
+	}
 }
