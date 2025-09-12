@@ -44,8 +44,6 @@ class PartyIntegrationTest {
 		final var legalId = "5591628136";
 		final var prefixedLegalId = "165591628136";
 
-		when(partyClient.getLegalId(MUNICIPALITY_ID, PartyType.PRIVATE, partyId)).thenReturn(Optional.of(legalId));
-
 		when(partyClient.getLegalId(MUNICIPALITY_ID, PartyType.PRIVATE, partyId)).thenReturn(Optional.empty());
 		when(partyClient.getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId)).thenReturn(Optional.of(legalId));
 
