@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,7 +56,7 @@ class ReachableIntegrationTest {
 
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
 
-		final var isReachableResponse = reachableIntegration.isReachable(List.of("personalNumber"), "2120002411");
+		final var isReachableResponse = reachableIntegration.isReachable(List.of("legalId"), ORGANIZATION_NUMBER);
 
 		assertThat(isReachableResponse).isNotNull().hasSize(1);
 
@@ -70,7 +71,7 @@ class ReachableIntegrationTest {
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenThrow(new RuntimeException());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> reachableIntegration.isReachable(List.of("personalNumber"), "2120002411"))
+			.isThrownBy(() -> reachableIntegration.isReachable(List.of("legalId"), ORGANIZATION_NUMBER))
 			.withMessage("Error while getting digital mailboxes from skatteverket");
 
 		verify(mockMapper).createIsReachableRequest(any(), any());

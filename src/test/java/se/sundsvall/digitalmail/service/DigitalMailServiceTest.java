@@ -63,11 +63,11 @@ class DigitalMailServiceTest {
 	}
 
 	@Test
-	void testSendDigitalMail_shouldReturnResponse() {
+	void testSendDigitalMailForLegalId_shouldReturnResponse() {
 		final var request = generateDigitalMailRequestDto();
 		final var mailbox = new MailboxDto("recipientId", "serviceAddress", "kivra", true);
 
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("personalNumber"));
+		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("legalId"));
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of(mailbox));
 		when(mockDigitalMailIntegration.sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"))).thenReturn(new DigitalMailResponse());
 
@@ -86,7 +86,7 @@ class DigitalMailServiceTest {
 
 	// Same thing will happen if any integration throws an exception so will only test one.
 	@Test
-	void testSendDigitalMailNoPersonalNumberFromPartyShouldThrowProblem() {
+	void testSendDigitalMailNoLegalIdFromPartyShouldThrowProblem() {
 		final var request = generateDigitalMailRequestDto();
 
 		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.empty());
@@ -95,7 +95,7 @@ class DigitalMailServiceTest {
 			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID))
 			.satisfies(thrownProblem -> {
 				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
-				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital mail: No personal number found for partyId: " + request.getPartyId());
+				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital mail: No legal Id found for partyId: " + request.getPartyId());
 			});
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
@@ -107,7 +107,7 @@ class DigitalMailServiceTest {
 	void testSendDigitalMailNoValidMailboxShouldthrowProblem() {
 		final var request = generateDigitalMailRequestDto();
 
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("personalNumber"));
+		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("legalId"));
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
@@ -128,7 +128,7 @@ class DigitalMailServiceTest {
 	@Test
 	void sendDigitalInvoice_1() {
 		final var municipalityId = "2281";
-		final var legalId = "somePersonalNumber";
+		final var legalId = "someLegalId";
 		final var invoiceDto = generateInvoiceDto();
 		when(mockPartyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId())).thenReturn(Optional.of(legalId));
 		when(mockKivraIntegration.verifyValidRecipient(legalId)).thenReturn(true);
@@ -150,7 +150,7 @@ class DigitalMailServiceTest {
 	@Test
 	void sendDigitalInvoice_2() {
 		final var municipalityId = "2281";
-		final var legalId = "somePersonalNumber";
+		final var legalId = "somelegalId";
 		final var invoiceDto = generateInvoiceDto();
 		when(mockPartyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId())).thenReturn(Optional.of(legalId));
 		when(mockKivraIntegration.verifyValidRecipient(legalId)).thenReturn(false);
@@ -165,7 +165,7 @@ class DigitalMailServiceTest {
 	}
 
 	@Test
-	void sendDigitalInvoiceNoPersonalNumberFromPartyShouldThrowProblem() {
+	void sendDigitalInvoiceNoLegalIdFromPartyShouldThrowProblem() {
 		final var invoiceDto = generateInvoiceDto();
 		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
 			.thenReturn(Optional.empty());
@@ -174,7 +174,7 @@ class DigitalMailServiceTest {
 			.isThrownBy(() -> service.sendDigitalInvoice(invoiceDto, ""))
 			.satisfies(thrownProblem -> {
 				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
-				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital invoice: No personal number found for partyId: " + invoiceDto.getPartyId());
+				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital invoice: No legal Id found for partyId: " + invoiceDto.getPartyId());
 			});
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
@@ -184,31 +184,31 @@ class DigitalMailServiceTest {
 	@Test
 	void sendDigitalInvoice_kivraIntegrationThrowsProblem() {
 		final var invoiceDto = generateInvoiceDto();
-		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("somePersonalNumber"));
-		when(mockKivraIntegration.verifyValidRecipient("somePersonalNumber")).thenReturn(true);
+		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("someLegalId"));
+		when(mockKivraIntegration.verifyValidRecipient("someLegalId")).thenReturn(true);
 		when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
 
 		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(invoiceDto, ""));
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
-		verify(mockKivraIntegration).verifyValidRecipient("somePersonalNumber");
+		verify(mockKivraIntegration).verifyValidRecipient("someLegalId");
 		verify(mockKivraIntegration).sendInvoice(any(InvoiceDto.class));
 	}
 
 	@Test
 	void testGetMailboxes() {
-		var reachablePersonalNumber = "personalNumber";
-		var unreachablePersonalNumber = "unreachablePersonalNumber";
-		var reachableMailboxDto = new MailboxDto("personalNumber", "serviceAddress", "kivra", true);
-		var unreachableMailboxDto = new MailboxDto("unreachablePersonalNumber", null, null, false);
+		final var reachableLegalId = "LegalId";
+		final var unreachableLegalId = "unreachableLegalId";
+		final var reachableMailboxDto = new MailboxDto("LegalId", "serviceAddress", "kivra", true);
+		final var unreachableMailboxDto = new MailboxDto("unreachableLegalId", null, null, false);
 
-		// Test that we find personal numbers for 2 out of 3 partyIds
+		// Test that we find legal Ids for 2 out of 3 partyIds
 		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
-			.thenReturn(Optional.of(reachablePersonalNumber))
-			.thenReturn(Optional.of(unreachablePersonalNumber))
+			.thenReturn(Optional.of(reachableLegalId))
+			.thenReturn(Optional.of(unreachableLegalId))
 			.thenReturn(Optional.empty());
 
-		// That would result in a list of 2 MailboxDto objects as we only check availability for personal numbers that were
+		// That would result in a list of 2 MailboxDto objects as we only check availability for legal Ids that were
 		// found.
 		// Return one reachable and one unreachable mailbox.
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER)))
@@ -228,8 +228,8 @@ class DigitalMailServiceTest {
 	}
 
 	@Test
-	void testGetMailboxesWhenNoPersonalNumberFound() {
-		// Test that we find no personal numbers for any of the partyIds
+	void testGetMailboxesWhenNoLegalIdFound() {
+		// Test that we find no legal Id for any of the partyIds
 		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
 			.thenReturn(Optional.empty())
 			.thenReturn(Optional.empty());
@@ -248,8 +248,8 @@ class DigitalMailServiceTest {
 	@Test
 	void getGetMailboxesWhenEmptyResponseFromAvailabilityService() {
 		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
-			.thenReturn(Optional.of("personalNumber"))
-			.thenReturn(Optional.of("anotherPersonalNumber"));
+			.thenReturn(Optional.of("LegalId"))
+			.thenReturn(Optional.of("anotherLegalId"));
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of());
 
 		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);

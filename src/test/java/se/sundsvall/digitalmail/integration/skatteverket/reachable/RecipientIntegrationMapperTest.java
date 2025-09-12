@@ -44,12 +44,12 @@ class RecipientIntegrationMapperTest {
 
 	@Test
 	void testCreateIsReachableRequest() {
-		final var personalNumbers = List.of("personalNumber", "anotherPersonalNumber");
+		final var legalIds = List.of("legalId", "anotherLegalId");
 
-		final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, ORGANIZATION_NUMBER);
+		final var isReachableRequest = mapper.createIsReachableRequest(legalIds, ORGANIZATION_NUMBER);
 
 		assertThat(isReachableRequest.getSenderOrgNr()).isEqualTo(PREFIXED_ORGANIZATION_NUMBER);
-		assertThat(isReachableRequest.getRecipientIds()).containsExactlyInAnyOrderElementsOf(personalNumbers);
+		assertThat(isReachableRequest.getRecipientIds()).containsExactlyInAnyOrderElementsOf(legalIds);
 
 		verifyNoInteractions(mockSkatteverketProperties);
 	}

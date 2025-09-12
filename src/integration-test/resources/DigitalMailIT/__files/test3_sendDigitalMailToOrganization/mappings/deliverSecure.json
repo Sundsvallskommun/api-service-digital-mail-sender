@@ -1,0 +1,44 @@
+{
+	"request": {
+		"method": "POST",
+		"bodyPatterns": [
+			{
+				"matchesXPath": "//ns9:Header/ns8:Sender/ns5:Id[text()='162120002411']",
+				"xPathNamespaces": {
+					"ns5": "http://minameddelanden.gov.se/schema/Sender",
+					"ns8": "http://minameddelanden.gov.se/schema/Message/v2",
+					"ns9": "http://minameddelanden.gov.se/schema/Message/v3"
+				}
+			},
+			{
+				"matchesXPath": "//ns9:Header/ns8:Recipient[text()='165591628136']",
+				"xPathNamespaces": {
+					"ns8": "http://minameddelanden.gov.se/schema/Message/v2",
+					"ns9": "http://minameddelanden.gov.se/schema/Message/v3"
+				}
+			}
+		],
+		"url": "/deliversecure"
+	},
+	"response": {
+		"headers": {
+			"Keep-Alive": [
+				"timeout=60"
+			],
+			"Transfer-Encoding": [
+				"chunked"
+			],
+			"Connection": [
+				"keep-alive"
+			],
+			"Content-Encoding": [
+				""
+			],
+			"Content-Type": [
+				"text/xml;charset=UTF-8"
+			]
+		},
+		"bodyFileName": "test3_sendDigitalMailToOrganization/response/deliverSecure.xml",
+		"status": 200
+	}
+}

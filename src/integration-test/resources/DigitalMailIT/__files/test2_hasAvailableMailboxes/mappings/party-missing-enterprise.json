@@ -1,0 +1,12 @@
+{
+	"request": {
+		"method": "GET",
+		"url": "/party/2281/ENTERPRISE/172524d4-ac0a-4fc6-8553-8286e04835dc/legalId"
+	},
+	"response": {
+		"headers": {
+			"Content-Type": "text/plain"
+		},
+		"status": 404
+	}
+}

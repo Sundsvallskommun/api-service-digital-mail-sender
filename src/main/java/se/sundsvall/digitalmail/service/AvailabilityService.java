@@ -16,13 +16,13 @@ public class AvailabilityService {
 
 	/**
 	 * Fetch a list of possible mailboxes.
-	 * Throws a problem in case no valid mailboxes are found for the given personal numbers.
+	 * Throws a problem in case no valid mailboxes are found for the given legal Ids.
 	 *
-	 * @param  personalNumbers    containing all personal numbers we should fetch mailboxes for
+	 * @param  legalIds           containing all legal Ids we should fetch mailboxes for
 	 * @param  organizationNumber the organization number of the sender
-	 * @return                    List of MailboxDto containing the mailboxes for the given personal numbers
+	 * @return                    List of MailboxDto containing the mailboxes for the given legal Ids
 	 */
-	public List<MailboxDto> getRecipientMailboxesAndCheckAvailability(final List<String> personalNumbers, String organizationNumber) {
-		return reachableIntegration.isReachable(personalNumbers, organizationNumber);
+	public List<MailboxDto> getRecipientMailboxesAndCheckAvailability(final List<String> legalIds, String organizationNumber) {
+		return reachableIntegration.isReachable(legalIds, organizationNumber);
 	}
 }

@@ -3,6 +3,7 @@ package se.sundsvall.digitalmail.integration.party;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 import static se.sundsvall.digitalmail.integration.party.PartyConfig.INTEGRATION_NAME;
 
+import generated.se.sundsvall.party.PartyType;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.Optional;
 import org.springframework.cloud.openfeign.FeignClient;
@@ -21,9 +22,10 @@ public interface PartyClient {
 	 * Fetches legalId for a partyId.
 	 *
 	 * @param  municipalityId municipalityId to fetch legalId for.
+	 * @param  partyType      partyType to fetch legalId for (PRIVATE or ENTERPRISE).
 	 * @param  partyId        partyId to fetch legalId for.
 	 * @return                personId or organizationId.
 	 */
-	@GetMapping(path = "/{municipalityId}/PRIVATE/{partyId}/legalId", produces = TEXT_PLAIN_VALUE)
-	Optional<String> getLegalId(@PathVariable("municipalityId") String municipalityId, @PathVariable("partyId") String partyId);
+	@GetMapping(path = "/{municipalityId}/{partyType}/{partyId}/legalId", produces = TEXT_PLAIN_VALUE)
+	Optional<String> getLegalId(@PathVariable("municipalityId") String municipalityId, @PathVariable("partyType") PartyType partyType, @PathVariable("partyId") String partyId);
 }

@@ -29,7 +29,7 @@
 				"text/xml;charset=UTF-8"
 			]
 		},
-		"bodyFileName": "test1_sendDigitalMail/response/deliverSecure.xml",
+		"bodyFileName": "test1_sendDigitalMailToPrivatePerson/response/deliverSecure.xml",
 		"status": 200
 	}
 }
