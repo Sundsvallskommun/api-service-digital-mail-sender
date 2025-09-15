@@ -38,10 +38,10 @@ class AvailabilityServiceTest {
 
 	@Test
 	void testGetRecipientMailboxesAndCheckAvailability() {
-		var mailboxes = List.of(VALID_MAILBOX, INVALID_MAILBOX);
+		final var mailboxes = List.of(VALID_MAILBOX, INVALID_MAILBOX);
 		when(mockReachableIntegration.isReachable(anyList(), anyString())).thenReturn(mailboxes);
 
-		final var response = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"), ORGANIZATION_NUMBER);
+		final var response = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("legalId"), ORGANIZATION_NUMBER);
 
 		assertThat(response).isEqualTo(mailboxes);
 
@@ -52,7 +52,7 @@ class AvailabilityServiceTest {
 	void testNoValidMailboxesShouldReturnEmptyList() {
 		when(mockReachableIntegration.isReachable(anyList(), anyString())).thenReturn(emptyList());
 
-		var availability = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("personalNumber"), ORGANIZATION_NUMBER);
+		final var availability = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of("legalId"), ORGANIZATION_NUMBER);
 		assertThat(availability).isEmpty();
 
 		verify(mockReachableIntegration).isReachable(anyList(), anyString());

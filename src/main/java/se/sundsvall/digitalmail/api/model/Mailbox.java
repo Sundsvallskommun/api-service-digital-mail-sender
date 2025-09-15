@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Schema(description = "Response model for a mailbox")
 public class Mailbox {
 
-	@Schema(description = "partyId for the person the mailbox belongs to")
+	@Schema(description = "partyId for the legal Id the mailbox belongs to")
 	private String partyId;
 
 	@Schema(description = "Name of the mailbox, e.g. Kivra")

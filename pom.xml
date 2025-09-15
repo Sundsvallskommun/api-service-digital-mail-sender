@@ -177,6 +177,36 @@
 							</configOptions>
 						</configuration>
 					</execution>
+					<execution>
+						<id>party-api</id>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+						<configuration>
+							<inputSpec>${project.basedir}/src/main/resources/contracts/party/party.yml</inputSpec>
+							<output>${generated-sources-path}</output>
+							<generatorName>spring</generatorName>
+							<generateApis>false</generateApis>
+							<generateSupportingFiles>false</generateSupportingFiles>
+							<configOptions>
+								<sourceFolder>${generated-sources-java-path}</sourceFolder>
+								<modelPackage>generated.se.sundsvall.party</modelPackage>
+								<generateSupportingFiles>false</generateSupportingFiles>
+								<generatedConstructorWithRequiredArgs>false</generatedConstructorWithRequiredArgs>
+								<generatePom>false</generatePom>
+								<library>spring-boot</library>
+								<dateLibrary>java8</dateLibrary>
+								<apiPackage>generated</apiPackage>
+								<openApiNullable>false</openApiNullable>
+								<useSwaggerUi>false</useSwaggerUi>
+								<useBeanValidation>true</useBeanValidation>
+								<useSwaggerAnnotations>true</useSwaggerAnnotations>
+								<hideGenerationTimestamp>true</hideGenerationTimestamp>
+								<interfaceOnly>true</interfaceOnly>
+								<useSpringBoot3>true</useSpringBoot3>
+							</configOptions>
+						</configuration>
+					</execution>
 				</executions>
 			</plugin>
 			<plugin>

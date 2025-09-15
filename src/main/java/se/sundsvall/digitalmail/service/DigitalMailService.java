@@ -29,7 +29,7 @@ import se.sundsvall.digitalmail.util.PdfCompressor;
 public class DigitalMailService {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(DigitalMailService.class);
-	private static final String ERROR_NO_PERSONAL_NUMBER_FOUND = "No personal number found for partyId: %s";
+	private static final String ERROR_NO_LEGAL_ID_FOUND = "No legal Id found for partyId: %s";
 
 	private final PartyIntegration partyIntegration;
 
@@ -59,14 +59,14 @@ public class DigitalMailService {
 	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
 		PdfCompressor.compress(requestDto.getAttachments());
 
-		final var personalNumber = partyIntegration.getLegalId(municipalityId, requestDto.getPartyId())
+		final var legalId = partyIntegration.getLegalId(municipalityId, requestDto.getPartyId())
 			.orElseThrow(() -> Problem.builder()
 				.withTitle("Error while sending digital mail")
-				.withDetail(ERROR_NO_PERSONAL_NUMBER_FOUND.formatted(requestDto.getPartyId()))
+				.withDetail(ERROR_NO_LEGAL_ID_FOUND.formatted(requestDto.getPartyId()))
 				.withStatus(NOT_FOUND)
 				.build());
 
-		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(personalNumber), requestDto.getOrganizationNumber());
+		final var mailboxes = availabilityService.getRecipientMailboxesAndCheckAvailability(List.of(legalId), requestDto.getOrganizationNumber());
 
 		// Check if we didn't get any mailboxes at all
 		if (isEmpty(mailboxes) || mailboxes.stream().noneMatch(MailboxDto::isValidMailbox)) {
@@ -77,7 +77,7 @@ public class DigitalMailService {
 				.build();
 		}
 
-		// We'll only have one mailbox as we only handle one personal number at a time.
+		// We'll only have one mailbox as we only handle one legal Id at a time.
 		final var mailbox = mailboxes.getFirst();
 		requestDto.setRecipientId(mailbox.getRecipientId());
 
@@ -89,7 +89,7 @@ public class DigitalMailService {
 		final var ssn = partyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId())
 			.orElseThrow(() -> Problem.builder()
 				.withTitle("Error while sending digital invoice")
-				.withDetail(ERROR_NO_PERSONAL_NUMBER_FOUND.formatted(invoiceDto.getPartyId()))
+				.withDetail(ERROR_NO_LEGAL_ID_FOUND.formatted(invoiceDto.getPartyId()))
 				.withStatus(NOT_FOUND)
 				.build());
 
@@ -103,66 +103,65 @@ public class DigitalMailService {
 	}
 
 	public List<Mailbox> getMailboxes(final List<String> partyIds, final String municipalityId, final String organizationNumber) {
-		var partyIdPersonalNumberMap = getPartyIdPersonalNumberMap(partyIds, municipalityId);
+		var partyIdLegalIdMap = getPartyIdLegalIdMap(partyIds, municipalityId);
 
-		// Now we know which partyIds have a personal number and which do not, extract the ones we have and check availability.
-		var foundPersonalNumbers = partyIdPersonalNumberMap.values().stream()
+		// Now we know which partyIds have a legal Id and which do not, extract the ones we have and check availability.
+		var foundLegalIds = partyIdLegalIdMap.values().stream()
 			.filter(Objects::nonNull)
 			.toList();
 
-		// If we have no personal numbers we cannot continue, create unreachable mailboxes for all partyIds.
-		if (foundPersonalNumbers.isEmpty()) {
+		// If we have no legal Ids we cannot continue, create unreachable mailboxes for all partyIds.
+		if (foundLegalIds.isEmpty()) {
 			// And return it directly, no need to call availabilityService with an empty list.
-			LOGGER.info("No personal numbers found for any of the given partyIds, returning unreachable mailboxes for all partyIds.");
+			LOGGER.info("No legal Ids found for any of the given partyIds, returning unreachable mailboxes for all partyIds.");
 			return createUnreachableMailboxes(partyIds);
 		}
 
-		// Otherwise, call availabilityService with the found personal numbers.
-		var mailBoxDtoList = availabilityService.getRecipientMailboxesAndCheckAvailability(foundPersonalNumbers, organizationNumber);
+		// Otherwise, call availabilityService with the found legal Ids.
+		var mailBoxDtoList = availabilityService.getRecipientMailboxesAndCheckAvailability(foundLegalIds, organizationNumber);
 
 		// Same thing here, if we got no mailboxes back (unlikely), create unreachable mailboxes for all partyIds.
 		if (mailBoxDtoList.isEmpty()) {
-			LOGGER.info("No mailboxes found for any of the given personal numbers, returning unreachable mailboxes for all partyIds.");
+			LOGGER.info("No mailboxes found for any of the given legal Ids, returning unreachable mailboxes for all partyIds.");
 			return createUnreachableMailboxes(partyIds);
 		}
 
-		return createMailboxes(mailBoxDtoList, partyIdPersonalNumberMap);
+		return createMailboxes(mailBoxDtoList, partyIdLegalIdMap);
 	}
 
-	private Map<String, String> getPartyIdPersonalNumberMap(final List<String> partyIds, final String municipalityId) {
-		var partyIdPersonalNumberMap = new HashMap<String, String>();
+	private Map<String, String> getPartyIdLegalIdMap(final List<String> partyIds, final String municipalityId) {
+		var partyIdLegalIdNumberMap = new HashMap<String, String>();
 		partyIds.forEach(partyId -> {
-			// Add the partyId to the map even if the personal number is null, so we can keep track of which partyIds have no
-			// personal number.
+			// Add the partyId to the map even if the legal Id is null, so we can keep track of which partyIds have no legal Id.
 			partyIntegration.getLegalId(municipalityId, partyId).ifPresentOrElse(
-				personalNumber -> partyIdPersonalNumberMap.put(partyId, personalNumber),
+				legalId -> partyIdLegalIdNumberMap.put(partyId, legalId),
 				() -> {
-					partyIdPersonalNumberMap.put(partyId, null);
-					LOGGER.warn("No personal number found for partyId: {}", sanitizeForLogging(partyId));
+					partyIdLegalIdNumberMap.put(partyId, null);
+					LOGGER.warn("No legal id found for partyId: {}", sanitizeForLogging(partyId));
 				});
 		});
 
-		return partyIdPersonalNumberMap;
+		return partyIdLegalIdNumberMap;
 	}
 
-	private List<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> partyIdPersonalNumberMap) {
+	private List<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> partyIdLegalIdMap) {
 		var mailboxes = new ArrayList<Mailbox>();
-		// Create a reversed hashmap so we don't need to iterate through the whole original hashmap to find a personalNumber
-		var personalNumberPartyIdMap = createPersonalNumberPartyIdMap(partyIdPersonalNumberMap);
+		// Create a reversed hashmap so we don't need to iterate through the whole original hashmap to find a legal Id
+		var legalIdPartyIdMap = createLegalIdPartyIdMap(partyIdLegalIdMap);
 
 		// Map each MailboxDto to a Mailbox object.
 		for (MailboxDto mailboxDto : mailBoxDtoList) {
-			var personalNumber = mailboxDto.getRecipientId();
+			var legalId = mailboxDto.getRecipientId();
 			// Find the corresponding partyId
-			var partyId = personalNumberPartyIdMap.get(personalNumber);
+			var partyId = legalIdPartyIdMap.get(legalId);
 
 			// Create a Mailbox object and add it to the list to return
 			mailboxes.add(toMailbox(mailboxDto, partyId));
 		}
 
-		// Create "unreachable" mailboxes for all partyIds with missing personal numbers
-		partyIdPersonalNumberMap.forEach((partyId, personalNumber) -> {
-			if (personalNumber == null) {
+		// Create "unreachable" mailboxes for all partyIds with missing legal Ids
+		partyIdLegalIdMap.forEach((partyId, legalId) -> {
+			if (legalId == null) {
 				mailboxes.add(createUnreachableMailbox(partyId));
 			}
 		});
@@ -170,9 +169,9 @@ public class DigitalMailService {
 		return mailboxes;
 	}
 
-	private Map<String, String> createPersonalNumberPartyIdMap(Map<String, String> partyIdPersonalNumberMap) {
-		return partyIdPersonalNumberMap.entrySet().stream()
-			.filter(entry -> entry.getValue() != null) // Filter out null values, i.e. personal numbers not found.
+	private Map<String, String> createLegalIdPartyIdMap(Map<String, String> partyIdLegalIdMap) {
+		return partyIdLegalIdMap.entrySet().stream()
+			.filter(entry -> entry.getValue() != null) // Filter out null values, i.e. legal Ids not found.
 			.collect(Collectors.toMap(
 				Map.Entry::getValue,
 				Map.Entry::getKey));

@@ -26,14 +26,13 @@ class RecipientIntegrationMapper {
 
 	/**
 	 *
-	 * @param  personalNumbers    map of personalnumbers
+	 * @param  legalIds           map of legalIds
 	 * @param  organizationNumber the organization number of the sender
-	 * @return                    a request object that can be sent to Skatteverket to check if the personal numbers are
-	 *                            reachable
+	 * @return                    a request object that can be sent to Skatteverket to check if the legal Ids are reachable
 	 */
-	IsReachable createIsReachableRequest(final List<String> personalNumbers, String organizationNumber) {
+	IsReachable createIsReachableRequest(final List<String> legalIds, String organizationNumber) {
 		final var isReachable = OBJECT_FACTORY.createIsReachable();
-		isReachable.getRecipientIds().addAll(personalNumbers);
+		isReachable.getRecipientIds().addAll(legalIds);
 		isReachable.setSenderOrgNr(prefixOrgNumber(organizationNumber));
 		return isReachable;
 	}

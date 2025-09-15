@@ -1,0 +1,15 @@
+{
+	"municipalityId": "2281",
+	"bodyInformation": {
+		"body": "PCFET0NUWVBFIGh0bWw+PGh0bWwgbGFuZz0iZW4iPjxoZWFkPjxtZXRhIGNoYXJzZXQ9InV0Zi04Ij48dGl0bGU+VGVzdDwvdGl0bGU+PC9oZWFkPjxib2R5PjxwPkhhaTwvcD48L2JvZHk+PC9odG1sPg==",
+		"contentType": "text/html"
+	},
+	"partyId": "1bcc5953-06fb-416b-b192-db551565c5ff",
+	"headerSubject": "Viktig information från Sundsvalls kommun",
+	"supportInfo": {
+		"contactInformationUrl": "https://sundsvall.se/",
+		"supportText": "Kontakta oss via epost eller telefon.",
+		"contactInformationPhoneNumber": "46701234567",
+		"contactInformationEmail": "someone@sundsvall.se"
+	}
+}

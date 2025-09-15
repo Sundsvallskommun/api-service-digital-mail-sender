@@ -30,14 +30,14 @@ public class ReachableIntegration {
 	/**
 	 * Fetches a mailbox and if a mailbox is reachable.
 	 *
-	 * @param  personalNumbers    All personal numbers to fetch mailboxes for
+	 * @param  legalIds           All legal Ids to fetch mailboxes for
 	 * @param  organizationNumber The organization number of the sender
-	 * @return                    List of MailboxDto containing the mailboxes for the given personal numbers
+	 * @return                    List of MailboxDto containing the mailboxes for the given legal Ids
 	 */
-	public List<MailboxDto> isReachable(final List<String> personalNumbers, String organizationNumber) {
+	public List<MailboxDto> isReachable(final List<String> legalIds, String organizationNumber) {
 		try {
-			// Call Skatteverket to see which mailbox(es) (if any) the persons have
-			final var isReachableRequest = mapper.createIsReachableRequest(personalNumbers, organizationNumber);
+			// Call Skatteverket to see which mailboxes (if any) are present for the given legal Ids
+			final var isReachableRequest = mapper.createIsReachableRequest(legalIds, organizationNumber);
 
 			LOGGER.info("Sending is reachable request");
 			final var isReachableResponse = (IsReachableResponse) isReachableTemplate.marshalSendAndReceive(isReachableRequest);
