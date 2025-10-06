@@ -30,7 +30,7 @@ public final class TestObjectFactory {
 	public static DigitalMailDto generateDigitalMailRequestDto() {
 		var supportInfo = new SupportInfo();
 		supportInfo.setContactInformationEmail("email@somewhere.com");
-		supportInfo.setContactInformationPhoneNumber("0701234567");
+		supportInfo.setContactInformationPhoneNumber("0701740605");
 		supportInfo.setSupportText("support text");
 		supportInfo.setContactInformationUrl("http://url.com");
 

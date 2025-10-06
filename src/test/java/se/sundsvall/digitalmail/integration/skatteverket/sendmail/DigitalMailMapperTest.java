@@ -71,7 +71,7 @@ class DigitalMailMapperTest {
 
 		softly.assertThat(header.getSubject()).isEqualTo("Some subject");
 		softly.assertThat(header.getLanguage()).isEqualTo("svSE");
-		softly.assertThat(header.getSupportinfo().getPhoneNumber()).isEqualTo("0701234567");
+		softly.assertThat(header.getSupportinfo().getPhoneNumber()).isEqualTo("0701740605");
 		softly.assertThat(header.getSupportinfo().getEmailAdress()).isEqualTo("email@somewhere.com");
 		softly.assertThat(header.getSupportinfo().getURL()).isEqualTo("http://url.com");
 		softly.assertThat(header.getSupportinfo().getText()).isEqualTo("support text");
