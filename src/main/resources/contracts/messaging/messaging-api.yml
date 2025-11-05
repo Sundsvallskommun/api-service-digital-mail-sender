@@ -5,11 +5,139 @@ info:
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "7.3"
+  version: "7.9"
 servers:
-  - url: https://messaging-af-messaging.apps.ocp101.sundsvall.se
+  - url: http://localhost:53686
     description: Generated server url
 paths:
+  /{municipalityId}/{organizationNumber}/mailboxes:
+    post:
+      tags:
+        - Sending Resources
+      summary: Retrieve a list of digital mailboxes
+      description: "Response contains a list of partyIds, supplier and if the digital\
+        \ mailbox is reachable for the given organization."
+      operationId: getMailboxes
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: organizationNumber
+          in: path
+          description: The organization number of the intended sending organization
+          required: true
+          schema:
+            type: string
+          example: 5561234567
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: string
+        required: true
+      responses:
+        "200":
+          description: Successful Operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Mailbox"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/{organizationNumber}/digital-mail:
+    post:
+      tags:
+        - Sending Resources
+      summary: Send a single digital mail to one or more parties
+      operationId: sendDigitalMail
+      parameters:
+        - name: x-origin
+          in: header
+          description: Origin of the request
+          required: false
+          schema:
+            type: string
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: organizationNumber
+          in: path
+          description: The organization number of the sending organization
+          required: true
+          schema:
+            type: string
+          example: 5561234567
+        - name: async
+          in: query
+          description: If the message should be sent asynchronously or not
+          required: false
+          schema:
+            type: boolean
+            default: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DigitalMailRequest"
+        required: true
+      responses:
+        "201":
+          description: Successful Operation
+          headers:
+            Location:
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageBatchResult"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/webmessage:
     post:
       tags:
@@ -63,6 +191,111 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MessageResult"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/snail-mail:
+    post:
+      tags:
+        - Sending Resources
+      summary: Add snail-mail to a batch
+      operationId: addSnailMailToBatch
+      parameters:
+        - name: x-origin
+          in: header
+          description: Origin of the request
+          required: false
+          schema:
+            type: string
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: batchId
+          in: query
+          description: The snail-mail batch id
+          required: true
+          schema:
+            type: string
+          example: f427952b-247c-4d3b-b081-675a467b3619
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SnailmailRequest"
+        required: true
+      responses:
+        "201":
+          description: Successful Operation
+          headers:
+            Location:
+              style: simple
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResult"
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+        "502":
+          description: Bad Gateway
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
+  /{municipalityId}/snail-mail/batch/{batchId}:
+    post:
+      tags:
+        - Sending Resources
+      summary: Trigger processing of a snail-mail batch
+      operationId: triggerSnailMailBatchProcessing
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: batchId
+          in: path
+          description: The snail-mail batch id
+          required: true
+          schema:
+            type: string
+          example: f427952b-247c-4d3b-b081-675a467b3619
+      responses:
+        "200":
+          description: Successful Operation
         "400":
           description: Bad Request
           content:
@@ -569,7 +802,9 @@ paths:
       tags:
         - Sending Resources
       summary: Send a single digital mail to one or more parties
-      operationId: sendDigitalMail
+      description: "This endpoint is deprecated in favor of /{organizationNumber}/digital-mail\
+        \ and will be removed in a future version."
+      operationId: sendDigitalMailDeprecated
       parameters:
         - name: x-origin
           in: header
@@ -635,6 +870,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+      deprecated: true
   /{municipalityId}/digital-invoice:
     post:
       tags:
@@ -1382,11 +1618,59 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+  /{municipalityId}/messages/{messageId}/attachments:
+    get:
+      tags:
+        - History Resources
+      summary: Stream attachment by messageId and fileName
+      operationId: readAttachmentByRequestParameter
+      parameters:
+        - name: municipalityId
+          in: path
+          description: Municipality id
+          required: true
+          schema:
+            type: string
+          example: 2281
+        - name: messageId
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+          example: d1e07d2c-2e75-44e0-b978-de7e19d7edad
+        - name: fileName
+          in: query
+          required: true
+          schema:
+            minLength: 1
+            type: string
+          example: some-filename.txt
+      responses:
+        "200":
+          description: Successful Operation
+        "400":
+          description: Bad Request
+          content:
+            application/problem+json:
+              schema:
+                oneOf:
+                  - $ref: "#/components/schemas/Problem"
+                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+        "500":
+          description: Internal Server Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: "#/components/schemas/Problem"
   /{municipalityId}/messages/{messageId}/attachments/{fileName}:
     get:
       tags:
         - History Resources
       summary: Stream attachment by messageId and fileName
+      description: |
+        This endpoint is deprecated and will be removed in a future version."
+        Use /{municipalityId}/messages/{messageId}/attachments and provide the filename using request parameter fileName.
       operationId: readAttachment
       parameters:
         - name: municipalityId
@@ -1426,6 +1710,7 @@ paths:
             application/problem+json:
               schema:
                 $ref: "#/components/schemas/Problem"
+      deprecated: true
   /{municipalityId}/conversation-history/{partyId}:
     get:
       tags:
@@ -1502,6 +1787,149 @@ paths:
       x-wso2-mutual-ssl: Optional
 components:
   schemas:
+    Problem:
+      type: object
+      properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
+        instance:
+          type: string
+          format: uri
+        type:
+          type: string
+          format: uri
+        parameters:
+          type: object
+          additionalProperties:
+            type: object
+    StatusType:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+        reasonPhrase:
+          type: string
+    Mailbox:
+      type: object
+      properties:
+        partyId:
+          type: string
+          description: partyId for the person the mailbox belongs to
+        supplier:
+          type: string
+          description: "Name of the mailbox, e.g. Kivra"
+        reachable:
+          type: boolean
+          description: If it's possible to send messages to this mailbox
+      description: Response model for a mailbox
+    DigitalMailAttachment:
+      required:
+        - content
+        - filename
+      type: object
+      properties:
+        contentType:
+          type: string
+          description: Content type
+          enum:
+            - application/pdf
+        content:
+          minLength: 1
+          type: string
+          description: Content (BASE64-encoded)
+        filename:
+          minLength: 1
+          type: string
+          description: Filename
+      description: Attachment
+    DigitalMailParty:
+      required:
+        - partyIds
+      type: object
+      properties:
+        partyIds:
+          minItems: 1
+          type: array
+          items:
+            type: string
+            description: The message party ids
+            format: uuid
+        externalReferences:
+          type: array
+          description: External references
+          items:
+            $ref: "#/components/schemas/ExternalReference"
+      description: Party
+    DigitalMailRequest:
+      required:
+        - body
+        - contentType
+        - party
+      type: object
+      properties:
+        party:
+          $ref: "#/components/schemas/DigitalMailParty"
+        sender:
+          $ref: "#/components/schemas/DigitalMailSender"
+        subject:
+          type: string
+          description: Subject
+          nullable: true
+        department:
+          type: string
+          description: Department and unit that should be billed for the message
+          nullable: true
+          example: "SBK(Gatuavdelningen, Trafiksektionen)"
+        contentType:
+          minLength: 1
+          type: string
+          description: Content type
+          enum:
+            - text/plain
+            - text/html
+        body:
+          minLength: 1
+          type: string
+          description: "Body (plain text if contentType is set to 'text/plain', BASE64-encoded\
+            \ if contentType is set to 'application/html')"
+        attachments:
+          type: array
+          description: Attachments
+          items:
+            $ref: "#/components/schemas/DigitalMailAttachment"
+    DigitalMailSender:
+      required:
+        - supportInfo
+      type: object
+      properties:
+        supportInfo:
+          $ref: "#/components/schemas/DigitalMailSenderSupportInfo"
+      description: Sender
+    DigitalMailSenderSupportInfo:
+      required:
+        - text
+      type: object
+      properties:
+        text:
+          minLength: 1
+          type: string
+          description: Text
+        emailAddress:
+          type: string
+          description: E-mail address
+          format: email
+        phoneNumber:
+          type: string
+          description: Phone number
+        url:
+          type: string
+          description: URL
+      description: Support info
     ExternalReference:
       required:
         - key
@@ -1519,6 +1947,68 @@ components:
           description: The external reference value
           example: 356t4r34f
       description: External references
+    DeliveryResult:
+      type: object
+      properties:
+        deliveryId:
+          type: string
+          description: The delivery id
+          format: uuid
+        messageType:
+          $ref: "#/components/schemas/MessageType"
+        status:
+          $ref: "#/components/schemas/MessageStatus"
+      description: Delivery result
+    MessageBatchResult:
+      type: object
+      properties:
+        batchId:
+          type: string
+          description: The batch id
+          format: uuid
+        messages:
+          type: array
+          description: The individual message results
+          items:
+            $ref: "#/components/schemas/MessageResult"
+      description: Message batch result
+    MessageResult:
+      type: object
+      properties:
+        messageId:
+          type: string
+          description: The message id
+          format: uuid
+        deliveries:
+          type: array
+          description: The message deliveries
+          items:
+            $ref: "#/components/schemas/DeliveryResult"
+      description: Message result
+    MessageStatus:
+      type: string
+      description: Status
+      enum:
+        - PENDING
+        - AWAITING_FEEDBACK
+        - SENT
+        - NOT_SENT
+        - FAILED
+        - NO_CONTACT_SETTINGS_FOUND
+        - NO_CONTACT_WANTED
+    MessageType:
+      type: string
+      description: Message type
+      enum:
+        - MESSAGE
+        - EMAIL
+        - SMS
+        - WEB_MESSAGE
+        - DIGITAL_MAIL
+        - DIGITAL_INVOICE
+        - SNAIL_MAIL
+        - LETTER
+        - SLACK
     WebMessageAttachment:
       type: object
       properties:
@@ -1585,82 +2075,103 @@ components:
           description: The user ID of the sender. I.e. employee ID
           example: joe01doe
       description: Sender
-    Problem:
+    Address:
       type: object
       properties:
-        instance:
+        firstName:
           type: string
-          format: uri
-        type:
+          description: The first name of the recipient
+          example: John
+        lastName:
           type: string
-          format: uri
-        parameters:
-          type: object
-          additionalProperties:
-            type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        detail:
+          description: The last name of the recipient
+          example: Doe
+        address:
           type: string
-        title:
+          description: The address
+          example: Main Street 1
+        apartmentNumber:
           type: string
-    StatusType:
+          description: The apartment number
+          example: "1101"
+        careOf:
+          type: string
+          description: The care of
+          example: c/o John Doe
+        zipCode:
+          type: string
+          description: The zip code
+          example: "12345"
+        city:
+          type: string
+          description: The city
+          example: Main Street
+        country:
+          type: string
+          description: The country
+          example: Sweden
+      description: Address
+    SnailmailAttachment:
+      required:
+        - content
+        - filename
       type: object
       properties:
-        statusCode:
-          type: integer
-          format: int32
-        reasonPhrase:
+        filename:
+          minLength: 1
           type: string
-    DeliveryResult:
+          description: The attachment filename
+          example: test.txt
+        contentType:
+          type: string
+          description: The attachment content type
+          example: text/plain
+        content:
+          type: string
+          description: The attachment (file) content as a BASE64-encoded string
+          example: aGVsbG8gd29ybGQK
+      description: Attachment
+    SnailmailParty:
       type: object
       properties:
-        deliveryId:
+        partyId:
           type: string
-          description: The delivery id
-          format: uuid
-        messageType:
-          $ref: "#/components/schemas/MessageType"
-        status:
-          $ref: "#/components/schemas/MessageStatus"
-      description: Delivery result
-    MessageResult:
-      type: object
-      properties:
-        messageId:
-          type: string
-          description: The message id
-          format: uuid
-        deliveries:
+          description: The message party id
+          example: f427952b-247c-4d3b-b081-675a467b3619
+        externalReferences:
           type: array
-          description: The message deliveries
+          description: External references
           items:
-            $ref: "#/components/schemas/DeliveryResult"
-      description: Message result
-    MessageStatus:
-      type: string
-      description: Status
-      enum:
-        - PENDING
-        - AWAITING_FEEDBACK
-        - SENT
-        - NOT_SENT
-        - FAILED
-        - NO_CONTACT_SETTINGS_FOUND
-        - NO_CONTACT_WANTED
-    MessageType:
-      type: string
-      description: Message type
-      enum:
-        - MESSAGE
-        - EMAIL
-        - SMS
-        - WEB_MESSAGE
-        - DIGITAL_MAIL
-        - DIGITAL_INVOICE
-        - SNAIL_MAIL
-        - LETTER
-        - SLACK
+            $ref: "#/components/schemas/ExternalReference"
+      description: Party
+    SnailmailRequest:
+      required:
+        - department
+      type: object
+      properties:
+        party:
+          $ref: "#/components/schemas/SnailmailParty"
+        address:
+          $ref: "#/components/schemas/Address"
+        department:
+          minLength: 1
+          type: string
+          description: Department and unit that should be billed
+          example: "SBK(Gatuavdelningen, Trafiksektionen)"
+        deviation:
+          type: string
+          description: If the letter to send deviates from the standard
+          example: A3 Ritning
+        attachments:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/SnailmailAttachment"
+        folderName:
+          type: string
+          description: Used by snailmail-sender to set the name of the organization
+            folder
+          example: Sundsvalls Kommun
     SmsRequest:
       required:
         - message
@@ -1752,19 +2263,6 @@ components:
           type: string
           description: "Mobile number, which should start with +467x"
       description: Parties to send the sms message to
-    MessageBatchResult:
-      type: object
-      properties:
-        batchId:
-          type: string
-          description: The batch id
-          format: uuid
-        messages:
-          type: array
-          description: The individual message results
-          items:
-            $ref: "#/components/schemas/MessageResult"
-      description: Message batch result
     SlackRequest:
       required:
         - channel
@@ -1798,10 +2296,12 @@ components:
           minLength: 1
           type: string
           description: Sender e-mail address
+          format: email
           example: sender@sender.se
         replyTo:
           type: string
           description: Reply-to e-mail address
+          format: email
           example: sender@sender.se
     Message:
       required:
@@ -1885,42 +2385,6 @@ components:
           type: string
           description: The sender of the SMS
           example: sender
-    Address:
-      type: object
-      properties:
-        firstName:
-          type: string
-          description: The first name of the recipient
-          example: John
-        lastName:
-          type: string
-          description: The last name of the recipient
-          example: Doe
-        address:
-          type: string
-          description: The address
-          example: Main Street 1
-        apartmentNumber:
-          type: string
-          description: The apartment number
-          example: "1101"
-        careOf:
-          type: string
-          description: The care of
-          example: c/o John Doe
-        zipCode:
-          type: string
-          description: The zip code
-          example: "12345"
-        city:
-          type: string
-          description: The city
-          example: Main Street
-        country:
-          type: string
-          description: The country
-          example: Sweden
-      description: Addresses that gets a letter copy
     LetterAttachment:
       required:
         - content
@@ -2029,6 +2493,7 @@ components:
         emailAddress:
           type: string
           description: E-mail address
+          format: email
         phoneNumber:
           type: string
           description: Phone number
@@ -2068,6 +2533,7 @@ components:
           minLength: 1
           type: string
           description: Recipient e-mail address
+          format: email
         subject:
           minLength: 1
           type: string
@@ -2120,10 +2586,12 @@ components:
           minLength: 1
           type: string
           description: Sender e-mail address
+          format: email
           example: sender@sender.se
         replyTo:
           type: string
           description: Reply-to e-mail address
+          format: email
           example: sender@sender.se
       description: Sender
     EmailBatchRequest:
@@ -2176,109 +2644,8 @@ components:
           minLength: 1
           type: string
           description: Recipient e-mail address
+          format: email
           example: someone@somewhere.com
-    DigitalMailAttachment:
-      required:
-        - content
-        - filename
-      type: object
-      properties:
-        contentType:
-          type: string
-          description: Content type
-          enum:
-            - application/pdf
-        content:
-          minLength: 1
-          type: string
-          description: Content (BASE64-encoded)
-        filename:
-          minLength: 1
-          type: string
-          description: Filename
-      description: Attachment
-    DigitalMailParty:
-      required:
-        - partyIds
-      type: object
-      properties:
-        partyIds:
-          minItems: 1
-          type: array
-          items:
-            type: string
-            description: The message party ids
-            format: uuid
-        externalReferences:
-          type: array
-          description: External references
-          items:
-            $ref: "#/components/schemas/ExternalReference"
-      description: Party
-    DigitalMailRequest:
-      required:
-        - body
-        - contentType
-        - party
-      type: object
-      properties:
-        party:
-          $ref: "#/components/schemas/DigitalMailParty"
-        sender:
-          $ref: "#/components/schemas/DigitalMailSender"
-        subject:
-          type: string
-          description: Subject
-          nullable: true
-        department:
-          type: string
-          description: Department and unit that should be billed for the message
-          nullable: true
-          example: "SBK(Gatuavdelningen, Trafiksektionen)"
-        contentType:
-          minLength: 1
-          type: string
-          description: Content type
-          enum:
-            - text/plain
-            - text/html
-        body:
-          minLength: 1
-          type: string
-          description: "Body (plain text if contentType is set to 'text/plain', BASE64-encoded\
-            \ if contentType is set to 'application/html')"
-        attachments:
-          type: array
-          description: Attachments
-          items:
-            $ref: "#/components/schemas/DigitalMailAttachment"
-    DigitalMailSender:
-      required:
-        - supportInfo
-      type: object
-      properties:
-        supportInfo:
-          $ref: "#/components/schemas/DigitalMailSenderSupportInfo"
-      description: Sender
-    DigitalMailSenderSupportInfo:
-      required:
-        - text
-      type: object
-      properties:
-        text:
-          minLength: 1
-          type: string
-          description: Text
-        emailAddress:
-          type: string
-          description: E-mail address
-        phoneNumber:
-          type: string
-          description: Phone number
-        url:
-          type: string
-          description: URL
-      description: Support info
     Details:
       required:
         - accountNumber
@@ -2428,6 +2795,8 @@ components:
           type: string
         message:
           type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -2435,8 +2804,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        detail:
-          type: string
         suppressed:
           type: array
           items:
@@ -2499,6 +2866,12 @@ components:
                 type: boolean
         message:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
+        detail:
+          type: string
+        title:
+          type: string
         instance:
           type: string
           format: uri
@@ -2509,12 +2882,6 @@ components:
           type: object
           additionalProperties:
             type: object
-        status:
-          $ref: "#/components/schemas/StatusType"
-        detail:
-          type: string
-        title:
-          type: string
         suppressed:
           type: array
           items:
@@ -2616,6 +2983,10 @@ components:
           type: string
           description: The message type
           example: SNAIL_MAIL
+        mobileNumber:
+          type: string
+          description: The recipient mobile number
+          example: "+46123456789"
         status:
           type: string
           description: The message status
@@ -2645,6 +3016,10 @@ components:
           type: string
           description: The message subject
           example: Important message
+        body:
+          type: string
+          description: The message body
+          example: This is a message
         recipients:
           type: array
           readOnly: true
