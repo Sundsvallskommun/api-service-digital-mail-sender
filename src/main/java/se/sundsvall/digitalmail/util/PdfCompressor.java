@@ -6,7 +6,7 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.openpdf.text.Document;
 import org.openpdf.text.pdf.PdfReader;
 import org.openpdf.text.pdf.PdfSmartCopy;
@@ -17,23 +17,23 @@ import se.sundsvall.digitalmail.api.model.File;
 
 public final class PdfCompressor {
 
-	private PdfCompressor() {}
-
 	private static final Logger LOGGER = LoggerFactory.getLogger(PdfCompressor.class);
+
+	private PdfCompressor() {}
 
 	public static void compress(final List<File> files) {
 		files.stream().filter(file -> StringUtils.isNotEmpty(file.getBody())).forEach(file -> {
 			LOGGER.info("Trying to compress pdf: {}", sanitizeForLogging(file.getFilename()));
 
-			var sizeBeforeCompression = file.getBody().length();
+			final var sizeBeforeCompression = file.getBody().length();
 			file.setBody(compress(file.getBody()));
 
 			logCompressionResult(sizeBeforeCompression, file.getBody().length());
 		});
 	}
 
-	private static void logCompressionResult(int sizeBeforeCompression, int sizeAfterCompression) {
-		var compressedPercentage = String.format("%.0f", (double) sizeAfterCompression / sizeBeforeCompression * 100);
+	private static void logCompressionResult(final int sizeBeforeCompression, final int sizeAfterCompression) {
+		final var compressedPercentage = String.format("%.0f", (double) sizeAfterCompression / sizeBeforeCompression * 100);
 
 		if (!"100".equals(compressedPercentage)) {
 			LOGGER.info("Pdf is now {}% of the original size.", compressedPercentage);
@@ -42,7 +42,7 @@ public final class PdfCompressor {
 		}
 	}
 
-	public static String compress(String pdfContent) {
+	public static String compress(final String pdfContent) {
 		// decode the base64-content
 		try (final var pdfReader = new PdfReader(Base64.getDecoder().decode(pdfContent.getBytes(StandardCharsets.UTF_8)));
 			final var document = new Document();

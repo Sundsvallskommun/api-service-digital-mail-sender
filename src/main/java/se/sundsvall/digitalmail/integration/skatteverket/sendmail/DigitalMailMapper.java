@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jose4j.base64url.Base64;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -76,7 +76,7 @@ class DigitalMailMapper {
 	private final KeyStore keyStore;
 	private final X509CertificateWithPrivateKey certificate;
 
-	// Since the marshaller is not thread safe we need to create a new one for each thread.
+	// Since the marshaller is not thread safe, we need to create a new one for each thread.
 	private final ThreadLocal<Marshaller> threadLocalMarshaller = ThreadLocal.withInitial(() -> {
 		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(SignedDelivery.class, SealedDelivery.class, DeliverSecure.class);
@@ -89,10 +89,6 @@ class DigitalMailMapper {
 				.build();
 		}
 	});
-
-	private Marshaller getMarshaller() {
-		return threadLocalMarshaller.get();
-	}
 
 	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, ParserConfigurationException {
 		this.properties = properties;
@@ -109,13 +105,14 @@ class DigitalMailMapper {
 		documentBuilder = documentBuilderFactory.newDocumentBuilder();
 	}
 
+	private Marshaller getMarshaller() {
+		return threadLocalMarshaller.get();
+	}
+
 	/**
 	 * Reads certificate information from a keystore
 	 *
-	 * @return                             X509CertificateWithPrivateKey containing the certificate and private key
-	 * @throws KeyStoreException
-	 * @throws UnrecoverableEntryException
-	 * @throws NoSuchAlgorithmException
+	 * @return X509CertificateWithPrivateKey containing the certificate and private key
 	 */
 	private X509CertificateWithPrivateKey setupCertificate()
 		throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
@@ -189,8 +186,8 @@ class DigitalMailMapper {
 			sealedDelivery = signedXml.toJaxbObject(SealedDelivery.class);
 
 			return sealedDelivery;
-		} catch (JAXBException | DatatypeConfigurationException e) {
-			// Needed to see stacktraces
+		} catch (final JAXBException | DatatypeConfigurationException e) {
+			// Needed to see stacktrace
 			LOG.error("Failed to create sealed delivery", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create a SealedDelivery object to send")
@@ -207,10 +204,10 @@ class DigitalMailMapper {
 	 * The object to be digitally signed
 	 *
 	 * @param  dto to be translated into a {@link SignedDelivery}
-	 * @return     A Signed delivery, should be signed by the sender, which in this case is also us.
+	 * @return     A Signed delivery should be signed by the sender, which in this case is also us.
 	 */
 	SignedDelivery createSignedDelivery(final DigitalMailDto dto) {
-		var signedDelivery = OBJECT_FACTORY.createSignedDelivery();
+		final var signedDelivery = OBJECT_FACTORY.createSignedDelivery();
 		signedDelivery.setDelivery(createSecureDelivery(dto));
 		return signedDelivery;
 	}
@@ -264,7 +261,7 @@ class DigitalMailMapper {
 			md5.update(attachmentBodyBytes);
 			final var digest = md5.digest();
 			return DatatypeConverter.printHexBinary(digest);
-		} catch (Exception e) {
+		} catch (final Exception e) {
 			LOG.error("Couldn't create MD5-checksum for attachment", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create MD5-checksum for attachment")
@@ -306,8 +303,7 @@ class DigitalMailMapper {
 	}
 
 	/**
-	 * Creates the body-element
-	 * Will create an empty body if no bodyInformation object or body is present.
+	 * Creates the body-element Will create an empty body if no bodyInformation object or body is present.
 	 *
 	 * @param  dto to be translated into a {@link MessageBody}
 	 * @return     A {@link MessageBody}
@@ -333,7 +329,7 @@ class DigitalMailMapper {
 			// If it's regular text, encode it.
 			return bodyInformation.getBody().getBytes(StandardCharsets.UTF_8);
 		} else {
-			// If it's text/html we need to first decode the content and then "encode" it..
+			// If it's text/html, we need to first decode the content and then "encode" it.
 			return Base64.decode(bodyInformation.getBody());
 		}
 	}
@@ -345,7 +341,7 @@ class DigitalMailMapper {
 		return secureDeliveryHeader;
 	}
 
-	Sender createSender(String organizationNumber) {
+	Sender createSender(final String organizationNumber) {
 		final var sender = new Sender();
 		sender.setId(prefixOrgNumber(organizationNumber));
 
@@ -355,13 +351,13 @@ class DigitalMailMapper {
 	}
 
 	/**
-	 * Retrieve the alias for the key from the keystore.
-	 * As we only have one key we get the first one, if we need to get more we need to find it by alias.
+	 * Retrieve the alias for the key from the keystore. As we only have one key, we get the first one, if we need to get
+	 * more, we need to find it by alias.
 	 *
 	 * @param  keyStore          the keystore to search in
 	 * @param  wantedAlias       the alias we want to find
-	 * @throws KeyStoreException if the keystore cannot be accessed or the alias is not
 	 * @return                   the alias of the key in the keystore
+	 * @throws KeyStoreException if the keystore cannot be accessed or the alias is not
 	 */
 	String getAliasFromKeystore(final KeyStore keyStore, final String wantedAlias) throws KeyStoreException {
 		final var aliases = keyStore.aliases();
