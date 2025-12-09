@@ -1,13 +1,13 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: Digital Mail Sender
-  contact: {}
+  contact: { }
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
   version: "4.0"
 servers:
-  - url: http://127.0.0.1:8080
+  - url: http://localhost:60476
     description: Generated server url
 paths:
   /{municipalityId}/{organizationNumber}/send-digital-mail:
@@ -183,62 +183,64 @@ paths:
 components:
   schemas:
     Attachment:
-      required:
-        - body
-        - contentType
-        - filename
       type: object
+      description: A PDF file/attachment
       properties:
         contentType:
           type: string
           description: "Allowed type is: application/pdf"
-          example: application/pdf
+          examples:
+            - application/pdf
         body:
-          minLength: 1
           type: string
           description: BASE64-encoded body
-        filename:
           minLength: 1
+        filename:
           type: string
           description: The name of the file
-          example: sample.pdf
-      description: A PDF file/attachment
-    BodyInformation:
+          examples:
+            - sample.pdf
+          minLength: 1
       required:
+        - body
         - contentType
+        - filename
+    BodyInformation:
       type: object
+      description: The body of the message
       properties:
         contentType:
           type: string
           description: "The content type for the message, text/plain for only text,\
             \ text/html for HTML messages."
-          example: text/html
+          examples:
+            - text/html
         body:
           type: string
           description: Plain-text body
-      description: The body of the message
-    DigitalMailRequest:
       required:
-        - headerSubject
-        - municipalityId
-        - partyId
-        - supportInfo
+        - contentType
+    DigitalMailRequest:
       type: object
+      description: The body of the digital mail request
       properties:
         partyId:
           type: string
           description: partyId for the person or organization the digital mail should
             be sent to
-          example: 6a5c3d04-412d-11ec-973a-0242ac130003
+          examples:
+            - 6a5c3d04-412d-11ec-973a-0242ac130003
         municipalityId:
           type: string
           description: MunicipalityId
-          example: "2281"
+          examples:
+            - "2281"
         headerSubject:
-          minLength: 1
           type: string
           description: The subject of the digital mail.
-          example: Viktig information från Sundsvalls kommun
+          examples:
+            - Viktig information från Sundsvalls kommun
+          minLength: 1
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
         attachments:
@@ -247,37 +249,51 @@ components:
             $ref: "#/components/schemas/Attachment"
         bodyInformation:
           $ref: "#/components/schemas/BodyInformation"
-      description: The body of the digital mail request
-    SupportInfo:
       required:
-        - supportText
+        - headerSubject
+        - municipalityId
+        - partyId
+        - supportInfo
+    SupportInfo:
       type: object
+      description: Contains contact information and where the recipient may turn to
+        for questions.
       properties:
         supportText:
-          minLength: 1
           type: string
           description: Information text describing the different ways the recipient
             may contact the sender.
-          example: Kontakta oss via epost eller telefon.
+          examples:
+            - Kontakta oss via epost eller telefon.
+          minLength: 1
         contactInformationUrl:
           type: string
           description: Url where the recipient may find more information.
-          example: https://sundsvall.se/
+          examples:
+            - https://sundsvall.se/
         contactInformationPhoneNumber:
           type: string
           description: Phone number the recipient may call to get in contact with
             the sender.
-          example: "4660191000"
+          examples:
+            - "4660191000"
         contactInformationEmail:
           type: string
           description: Email address the recipient may use to get in contact with
             the sender.
-          example: sundsvalls.kommun@sundsvall.se
-      description: Contains contact information and where the recipient may turn to
-        for questions.
+          examples:
+            - sundsvalls.kommun@sundsvall.se
+      required:
+        - supportText
     Problem:
       type: object
       properties:
+        status:
+          $ref: "#/components/schemas/StatusType"
+        title:
+          type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -286,14 +302,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
-        title:
-          type: string
-        detail:
-          type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
+          additionalProperties: { }
     StatusType:
       type: object
       properties:
@@ -342,15 +351,14 @@ components:
           type: string
         message:
           type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
-        detail:
-          type: string
+          additionalProperties: { }
         suppressed:
           type: array
           items:
@@ -387,8 +395,7 @@ components:
     ThrowableProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
+        cause: { }
         stackTrace:
           type: array
           items:
@@ -413,6 +420,12 @@ components:
                 type: boolean
         message:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
+        title:
+          type: string
+        detail:
+          type: string
         instance:
           type: string
           format: uri
@@ -421,14 +434,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties:
-            type: object
-        title:
-          type: string
-        detail:
-          type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
+          additionalProperties: { }
         suppressed:
           type: array
           items:
@@ -485,6 +491,7 @@ components:
           $ref: "#/components/schemas/DeliveryStatus"
     Mailbox:
       type: object
+      description: Response model for a mailbox
       properties:
         partyId:
           type: string
@@ -495,8 +502,50 @@ components:
         reachable:
           type: boolean
           description: If it's possible to send messages to this mailbox
-      description: Response model for a mailbox
     Details:
+      type: object
+      description: Invoice details
+      properties:
+        amount:
+          type: number
+          format: float
+          description: The invoice amount
+          examples:
+            - "123.45"
+        dueDate:
+          type: string
+          format: date
+          description: The invoice due date
+          examples:
+            - 2023-10-09
+        paymentReferenceType:
+          type: string
+          description: The payment reference type
+          enum:
+            - SE_OCR
+            - TENANT_REF
+          examples:
+            - SE_OCR
+        paymentReference:
+          type: string
+          description: The payment reference number
+          examples:
+            - "426523791"
+          maxLength: 25
+          minLength: 1
+        accountType:
+          type: string
+          description: The receiving account type
+          enum:
+            - BANKGIRO
+            - PLUSGIRO
+          examples:
+            - BANKGIRO
+        accountNumber:
+          type: string
+          description: The receiving account (a valid BANKGIRO or PLUSGIRO number)
+          examples:
+            - "12345"
       required:
         - accountNumber
         - accountType
@@ -504,85 +553,52 @@ components:
         - dueDate
         - paymentReference
         - paymentReferenceType
-      type: object
-      properties:
-        amount:
-          type: number
-          description: The invoice amount
-          format: float
-          example: 123.45
-        dueDate:
-          type: string
-          description: The invoice due date
-          format: date
-          example: 2023-10-09
-        paymentReferenceType:
-          type: string
-          description: The payment reference type
-          example: SE_OCR
-          enum:
-            - SE_OCR
-            - TENANT_REF
-        paymentReference:
-          maxLength: 25
-          minLength: 1
-          type: string
-          description: The payment reference number
-          example: "426523791"
-        accountType:
-          type: string
-          description: The receiving account type
-          example: BANKGIRO
-          enum:
-            - BANKGIRO
-            - PLUSGIRO
-        accountNumber:
-          type: string
-          description: The receiving account (a valid BANKGIRO or PLUSGIRO number)
-          example: "12345"
-      description: Invoice details
     DigitalInvoiceRequest:
-      required:
-        - details
-        - files
-        - partyId
-        - subject
-        - type
       type: object
       properties:
         partyId:
           type: string
           description: partyId for the person or organization the invoice should be
             sent to
-          example: 6a5c3d04-412d-11ec-973a-0242ac130003
+          examples:
+            - 6a5c3d04-412d-11ec-973a-0242ac130003
         type:
           type: string
-          description: Invoice type
-          example: INVOICE
           default: INVOICE
+          description: Invoice type
           enum:
             - INVOICE
             - REMINDER
+          examples:
+            - INVOICE
         subject:
-          minLength: 1
           type: string
           description: The invoice subject
-          example: Faktura från Sundsvalls kommun
+          examples:
+            - Faktura från Sundsvalls kommun
+          minLength: 1
         reference:
           type: string
           description: Invoice reference
-          example: "Faktura #12345"
+          examples:
+            - "Faktura #12345"
         payable:
           type: boolean
-          description: Whether the invoice is payable
           default: true
+          description: Whether the invoice is payable
         details:
           $ref: "#/components/schemas/Details"
         files:
-          minItems: 1
           type: array
           items:
             $ref: "#/components/schemas/Attachment"
+          minItems: 1
+      required:
+        - details
+        - files
+        - partyId
+        - subject
+        - type
     DigitalInvoiceResponse:
       type: object
       properties:
@@ -590,4 +606,4 @@ components:
           type: string
         sent:
           type: boolean
-  securitySchemes: {}
+  securitySchemes: { }

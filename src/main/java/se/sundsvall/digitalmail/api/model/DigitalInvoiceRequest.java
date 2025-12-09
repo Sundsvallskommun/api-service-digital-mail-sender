@@ -18,13 +18,13 @@ import se.sundsvall.digitalmail.domain.invoice.ReferenceType;
 
 public record DigitalInvoiceRequest(
 
-	@ValidUuid @Schema(description = "partyId for the person or organization the invoice should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED) String partyId,
+	@ValidUuid @Schema(description = "partyId for the person or organization the invoice should be sent to", examples = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED) String partyId,
 
 	@NotNull @Schema(description = "Invoice type", requiredMode = REQUIRED) InvoiceType type,
 
-	@NotBlank @Schema(description = "The invoice subject", example = "Faktura från Sundsvalls kommun", requiredMode = REQUIRED) String subject,
+	@NotBlank @Schema(description = "The invoice subject", examples = "Faktura från Sundsvalls kommun", requiredMode = REQUIRED) String subject,
 
-	@Schema(description = "Invoice reference", example = "Faktura #12345") String reference,
+	@Schema(description = "Invoice reference", examples = "Faktura #12345") String reference,
 
 	@Schema(description = "Whether the invoice is payable", defaultValue = "true") Boolean payable,
 
@@ -35,15 +35,15 @@ public record DigitalInvoiceRequest(
 	@Schema(description = "Invoice details")
 	public record Details(
 
-		@NotNull @Positive @Schema(description = "The invoice amount", example = "123.45", requiredMode = REQUIRED) Float amount,
+		@NotNull @Positive @Schema(description = "The invoice amount", examples = "123.45", requiredMode = REQUIRED) Float amount,
 
-		@NotNull @Schema(description = "The invoice due date", example = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
+		@NotNull @Schema(description = "The invoice due date", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
 
 		@NotNull @Schema(requiredMode = REQUIRED) ReferenceType paymentReferenceType,
 
-		@NotBlank @Schema(description = "The payment reference number", maxLength = 25, example = "426523791", requiredMode = REQUIRED) String paymentReference,
+		@NotBlank @Schema(description = "The payment reference number", maxLength = 25, examples = "426523791", requiredMode = REQUIRED) String paymentReference,
 
 		@NotNull @Schema(requiredMode = REQUIRED) AccountType accountType,
 
-		@ValidAccountNumber @Schema(description = "The receiving account (a valid BANKGIRO or PLUSGIRO number)", example = "12345", requiredMode = REQUIRED) String accountNumber) {}
+		@ValidAccountNumber @Schema(description = "The receiving account (a valid BANKGIRO or PLUSGIRO number)", examples = "12345", requiredMode = REQUIRED) String accountNumber) {}
 }
