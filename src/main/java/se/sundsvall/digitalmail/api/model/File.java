@@ -25,7 +25,7 @@ import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
 public class File {
 
 	@OneOf(APPLICATION_PDF_VALUE)
-	@Schema(description = "Allowed type is: application/pdf", example = APPLICATION_PDF_VALUE, requiredMode = REQUIRED)
+	@Schema(description = "Allowed type is: application/pdf", examples = APPLICATION_PDF_VALUE, requiredMode = REQUIRED)
 	private String contentType;
 
 	@NotBlank
@@ -34,6 +34,6 @@ public class File {
 	private String body;
 
 	@NotBlank
-	@Schema(description = "The name of the file", example = "sample.pdf", requiredMode = REQUIRED)
+	@Schema(description = "The name of the file", examples = "sample.pdf", requiredMode = REQUIRED)
 	private String filename;
 }

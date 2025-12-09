@@ -42,6 +42,8 @@ class OpenApiSpecificationIT {
 		final var existingOpenApiSpecification = asString(openApiResource);
 		final var currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
+		writeString(Path.of("target/openapi.yml"), currentOpenApiSpecification);
+
 		writeString(Path.of("target/api.yaml"), currentOpenApiSpecification);
 
 		assertThatJson(toJson(currentOpenApiSpecification))

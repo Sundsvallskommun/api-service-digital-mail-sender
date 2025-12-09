@@ -26,15 +26,15 @@ import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 public class DigitalMailRequest {
 
 	@ValidUuid
-	@Schema(description = "partyId for the person or organization the digital mail should be sent to", example = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED)
+	@Schema(description = "partyId for the person or organization the digital mail should be sent to", examples = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED)
 	private String partyId;
 
 	@ValidMunicipalityId
-	@Schema(description = "MunicipalityId", example = "2281", requiredMode = REQUIRED)
+	@Schema(description = "MunicipalityId", examples = "2281", requiredMode = REQUIRED)
 	private String municipalityId;
 
 	@NotBlank
-	@Schema(description = "The subject of the digital mail.", example = "Viktig information från Sundsvalls kommun", requiredMode = REQUIRED)
+	@Schema(description = "The subject of the digital mail.", examples = "Viktig information från Sundsvalls kommun", requiredMode = REQUIRED)
 	private String headerSubject;
 
 	@NotNull

@@ -20,7 +20,7 @@ public class BodyInformation {
 	@OneOf({
 		TEXT_PLAIN_VALUE, TEXT_HTML_VALUE
 	})
-	@Schema(description = "The content type for the message, text/plain for only text, text/html for HTML messages.", example = TEXT_HTML_VALUE, requiredMode = REQUIRED)
+	@Schema(description = "The content type for the message, text/plain for only text, text/html for HTML messages.", examples = TEXT_HTML_VALUE, requiredMode = REQUIRED)
 	private String contentType;
 
 	@Schema(description = "Plain-text body")

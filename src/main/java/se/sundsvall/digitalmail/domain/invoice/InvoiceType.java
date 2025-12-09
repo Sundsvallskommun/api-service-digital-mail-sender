@@ -2,7 +2,7 @@ package se.sundsvall.digitalmail.domain.invoice;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
-@Schema(description = "Invoice type", example = "INVOICE", defaultValue = "INVOICE")
+@Schema(description = "Invoice type", examples = "INVOICE", defaultValue = "INVOICE")
 public enum InvoiceType {
 	INVOICE("invoice"),
 	REMINDER("invoice.reminder");

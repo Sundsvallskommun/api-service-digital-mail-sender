@@ -1,6 +1,8 @@
 # Digital Mail Sender
 
-_The service provides functionality to send emails to digital mailboxes connected to citizens and companies, as well as digital invoices to citizens' Kivra mailboxes. Supported mailbox operators for emails: Kivra, Min Myndighetspost, Fortnox and Billo._
+_The service provides functionality to send emails to digital mailboxes connected to citizens and companies, as well as
+digital invoices to citizens' Kivra mailboxes. Supported mailbox operators for emails: Kivra, Min Myndighetspost,
+Fortnox and Billo._
 
 _This service is part of the Messaging service eco system and should not be used by its own._
 
@@ -8,7 +10,7 @@ _This service is part of the Messaging service eco system and should not be used
 
 ### Prerequisites
 
-- **Java 21 or higher**
+- **Java 25 or higher**
 - **Maven**
 - **MariaDB**
 - **Git**
@@ -32,7 +34,8 @@ cd api-service-digital-mail-sender
 
 3. **Ensure dependent services are running:**
 
-   If this microservice depends on other services, make sure they are up and accessible. See [Dependencies](#dependencies) for more details.
+   If this microservice depends on other services, make sure they are up and accessible.
+   See [Dependencies](#dependencies) for more details.
 
 4. **Build and run the application:**
 
@@ -54,16 +57,19 @@ This microservice depends on the following services:
 
 - **Party**
   - **Purpose:** Used for translating party id to legal id.
-  - **Repository:** [https://github.com/Sundsvallskommun/api-service-messaging](https://github.com/Sundsvallskommun/api-service-messaging)
+  - **Repository:
+    ** [https://github.com/Sundsvallskommun/api-service-messaging](https://github.com/Sundsvallskommun/api-service-messaging)
   - **Setup Instructions:** See documentation in repository above for installation and configuration steps.
 - **Messaging**
   - **Purpose:** Used for sending information emails and slack messages.
-  - **Repository:** [https://github.com/Sundsvallskommun/api-service-messaging](https://github.com/Sundsvallskommun/api-service-messaging)
+  - **Repository:
+    ** [https://github.com/Sundsvallskommun/api-service-messaging](https://github.com/Sundsvallskommun/api-service-messaging)
   - **Setup Instructions:** See documentation in repository above for installation and configuration steps.
 - **Kivra**
   - **Purpose:** Backend service provided by 3rd party for sending invoices to citizens that has a Kivra mailbox.
 - **Skatteverket**
-  - **Purpose:** Backend service provided by 3rd party to verify that the citizen or company has a digital mailbox and to send email to valid receivers.
+  - **Purpose:** Backend service provided by 3rd party to verify that the citizen or company has a digital mailbox and
+    to send email to valid receivers.
 
 Ensure that these services are running and properly configured before starting this microservice.
 
@@ -87,7 +93,8 @@ curl -X GET http://localhost:8080/2281/has-available-mailbox/f04e3f82-0c62-4aad-
 
 ## Configuration
 
-Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in `application.yml`.
+Configuration is crucial for the application to run successfully. Ensure all necessary settings are configured in
+`application.yml`.
 
 ### Key Configuration Parameters
 
@@ -151,7 +158,8 @@ scheduler:
 
 ### Database Initialization
 
-The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by default so you will have to enable it to automatically populate the database schema upon application startup.
+The project is set up with [Flyway](https://github.com/flyway/flyway) for database migrations. Flyway is disabled by
+default so you will have to enable it to automatically populate the database schema upon application startup.
 
 ```yaml
 spring:
@@ -159,7 +167,8 @@ spring:
     enabled: true
 ```
 
-- **No additional setup is required** for database initialization, as long as the database connection settings are correctly configured.
+- **No additional setup is required** for database initialization, as long as the database connection settings are
+  correctly configured.
 
 ### Additional Notes
 
@@ -173,7 +182,8 @@ spring:
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
+Contributions are welcome! Please
+see [CONTRIBUTING.md](https://github.com/Sundsvallskommun/.github/blob/main/.github/CONTRIBUTING.md) for guidelines.
 
 ## License
 
