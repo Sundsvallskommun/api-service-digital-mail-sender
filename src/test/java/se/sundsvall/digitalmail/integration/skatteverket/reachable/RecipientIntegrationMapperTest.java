@@ -64,7 +64,7 @@ class RecipientIntegrationMapperTest {
 
 		assertThat(mailboxSettings).hasSize(1);
 		assertThat(mailboxSettings.getFirst().getServiceAddress()).isEqualTo("https://somewhere.com");
-		assertThat(mailboxSettings.getFirst().getRecipientId()).isEqualTo("recipientId");
+		assertThat(mailboxSettings.getFirst().getRecipientId()).isEqualTo("2120002441");
 		assertThat(mailboxSettings.getFirst().getServiceName()).isEqualTo("Kivra");
 		assertThat(mailboxSettings.getFirst().isValidMailbox()).isTrue();
 
@@ -109,7 +109,7 @@ class RecipientIntegrationMapperTest {
 
 		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
 			.containsExactlyInAnyOrder(
-				Tuple.tuple("recipientId", null, null, false));
+				Tuple.tuple("2120002441", null, null, false));
 
 		verify(mockSkatteverketProperties).supportedSuppliers();
 	}
@@ -121,7 +121,7 @@ class RecipientIntegrationMapperTest {
 
 		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
 			.containsExactlyInAnyOrder(
-				Tuple.tuple("recipientId", null, null, false));
+				Tuple.tuple("2120002441", null, null, false));
 
 		verifyNoInteractions(mockSkatteverketProperties);
 	}
@@ -145,7 +145,7 @@ class RecipientIntegrationMapperTest {
 		final boolean shouldHaveServiceSupplier, final boolean isAccepted) {
 
 		final var accountStatus = new AccountStatus();
-		accountStatus.setRecipientId("recipientId");
+		accountStatus.setRecipientId("2120002441");
 		accountStatus.setPending(pending);
 
 		if (shouldHaveServiceSupplier) {

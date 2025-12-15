@@ -12,6 +12,7 @@ import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 import se.gov.minameddelanden.schema.recipient.v3.ObjectFactory;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
+import se.sundsvall.digitalmail.util.LegalIdUtil;
 
 @Component
 class RecipientIntegrationMapper {
@@ -78,6 +79,11 @@ class RecipientIntegrationMapper {
 
 		var accountStatus = reachabilityStatus.getAccountStatus();
 		if (accountStatus.isPending() || accountStatus.getServiceSupplier() == null) {
+			return false;
+		}
+
+		// If recipientId is not an organization number, check that it is an adult person, otherwise return false
+		if (!LegalIdUtil.isOrgNumber(accountStatus.getRecipientId()) && !LegalIdUtil.isAnAdult(accountStatus.getRecipientId())) {
 			return false;
 		}
 
