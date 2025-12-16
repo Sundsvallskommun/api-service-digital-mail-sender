@@ -1,13 +1,13 @@
 openapi: 3.1.0
 info:
   title: Digital Mail Sender
-  contact: { }
+  contact: {}
   license:
     name: MIT License
     url: https://opensource.org/licenses/MIT
-  version: "4.0"
+  version: "4.1"
 servers:
-  - url: http://localhost:60476
+  - url: http://localhost:61453
     description: Generated server url
 paths:
   /{municipalityId}/{organizationNumber}/send-digital-mail:
@@ -288,12 +288,12 @@ components:
     Problem:
       type: object
       properties:
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -302,7 +302,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties: { }
+          additionalProperties: {}
     StatusType:
       type: object
       properties:
@@ -358,7 +358,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties: { }
+          additionalProperties: {}
         suppressed:
           type: array
           items:
@@ -395,7 +395,7 @@ components:
     ThrowableProblem:
       type: object
       properties:
-        cause: { }
+        cause: {}
         stackTrace:
           type: array
           items:
@@ -420,12 +420,12 @@ components:
                 type: boolean
         message:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         title:
           type: string
         detail:
           type: string
+        status:
+          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
@@ -434,7 +434,7 @@ components:
           format: uri
         parameters:
           type: object
-          additionalProperties: { }
+          additionalProperties: {}
         suppressed:
           type: array
           items:
@@ -496,6 +496,9 @@ components:
         partyId:
           type: string
           description: partyId for the legal Id the mailbox belongs to
+        reason:
+          type: string
+          description: "If not reachable, the reason why"
         supplier:
           type: string
           description: "Name of the mailbox, e.g. Kivra"
@@ -606,4 +609,4 @@ components:
           type: string
         sent:
           type: boolean
-  securitySchemes: { }
+  securitySchemes: {}

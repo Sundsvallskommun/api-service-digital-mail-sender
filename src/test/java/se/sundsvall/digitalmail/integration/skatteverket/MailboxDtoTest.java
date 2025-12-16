@@ -29,12 +29,14 @@ class MailboxDtoTest {
 		final var serviceAddress = "kivra.com";
 		final var serviceName = "Kivra";
 		final var validMailbox = true;
+		final var reason = "Some reason";
 
 		final var mailbox = MailboxDto.builder()
 			.withRecipientId(recipientId)
 			.withServiceAddress(serviceAddress)
 			.withServiceName(serviceName)
 			.withValidMailbox(validMailbox)
+			.withReason(reason)
 			.build();
 
 		assertThat(mailbox).isNotNull().hasNoNullFieldsOrProperties();
@@ -42,6 +44,7 @@ class MailboxDtoTest {
 		assertThat(mailbox.getServiceName()).isEqualTo(serviceName);
 		assertThat(mailbox.getRecipientId()).isEqualTo(recipientId);
 		assertThat(mailbox.isValidMailbox()).isEqualTo(validMailbox);
+		assertThat(mailbox.getReason()).isEqualTo(reason);
 	}
 
 	@Test

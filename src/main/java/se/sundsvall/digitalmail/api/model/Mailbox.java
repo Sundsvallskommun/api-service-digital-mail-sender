@@ -17,9 +17,13 @@ public class Mailbox {
 	@Schema(description = "partyId for the legal Id the mailbox belongs to")
 	private String partyId;
 
+	@Schema(description = "If not reachable, the reason why")
+	private String reason;
+
 	@Schema(description = "Name of the mailbox, e.g. Kivra")
 	private String supplier;
 
 	@Schema(description = "If it's possible to send messages to this mailbox")
 	private boolean reachable;
+
 }

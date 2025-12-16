@@ -7,10 +7,11 @@ import static org.springframework.boot.test.context.SpringBootTest.WebEnvironmen
 import static org.springframework.web.util.UriComponentsBuilder.fromPath;
 import static se.sundsvall.dept44.util.ResourceUtils.asString;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import java.io.IOException;
 import java.nio.file.Path;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,6 +19,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
+
 import se.sundsvall.digitalmail.Application;
 
 @ActiveProfiles("junit")
@@ -42,9 +44,7 @@ class OpenApiSpecificationIT {
 		final var existingOpenApiSpecification = asString(openApiResource);
 		final var currentOpenApiSpecification = getCurrentOpenApiSpecification();
 
-		writeString(Path.of("target/openapi.yml"), currentOpenApiSpecification);
-
-		writeString(Path.of("target/api.yaml"), currentOpenApiSpecification);
+		writeString(Path.of("target/openapi.yaml"), currentOpenApiSpecification);
 
 		assertThatJson(toJson(currentOpenApiSpecification))
 			.withOptions(IGNORING_ARRAY_ORDER)
@@ -68,8 +68,8 @@ class OpenApiSpecificationIT {
 	/**
 	 * Attempts to convert the given YAML (no YAML-check...) to JSON.
 	 *
-	 * @param  yaml the YAML to convert
-	 * @return      a JSON string
+	 * @param yaml the YAML to convert
+	 * @return a JSON string
 	 */
 	private String toJson(final String yaml) {
 		try {

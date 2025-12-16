@@ -187,6 +187,7 @@ public class DigitalMailService {
 		return Mailbox.builder()
 			.withPartyId(partyId)
 			.withReachable(false)
+			.withReason(ERROR_NO_LEGAL_ID_FOUND.formatted(partyId))
 			.build();
 	}
 
@@ -195,6 +196,7 @@ public class DigitalMailService {
 			.withPartyId(partyId)
 			.withSupplier(mailboxDto.getServiceName())
 			.withReachable(mailboxDto.isValidMailbox())
+			.withReason(mailboxDto.getReason())
 			.build();
 	}
 }

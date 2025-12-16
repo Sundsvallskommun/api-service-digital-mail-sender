@@ -19,6 +19,26 @@ class RecipientIntegrationMapper {
 
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 
+	// Possible reasons when a mailbox is invalid
+	private static final String REASON_SENDER_NOT_ACCEPTED = "Sender not accepted by recipient";
+	private static final String REASON_MAILBOX_PENDING = "Mailbox is pending activation";
+	private static final String REASON_NO_SERVICE_SUPPLIER = "No service supplier available";
+	private static final String REASON_RECIPIENT_NOT_ADULT = "Recipient is not an adult";
+	private static final String REASON_UNSUPPORTED_SUPPLIER = "Unsupported service supplier";
+	private static final String REASON_SERVICE_ADDRESS_BLANK = "Service address is blank";
+
+	// Internal record for handling mailbox validation results together with possible reason for failure
+	private record ValidationResult(boolean valid, String reason) {
+
+		public static ValidationResult success() {
+			return new ValidationResult(true, null);
+		}
+
+		public static ValidationResult failure(final String reason) {
+			return new ValidationResult(false, reason);
+		}
+	}
+
 	private final SkatteverketProperties skatteverketProperties;
 
 	RecipientIntegrationMapper(final SkatteverketProperties skatteverketProperties) {
@@ -57,7 +77,9 @@ class RecipientIntegrationMapper {
 	}
 
 	private MailboxDto toMailboxDto(final ReachabilityStatus reachabilityStatus) {
-		if (isValidMailbox(reachabilityStatus)) {
+		final var validationResult = validateMailbox(reachabilityStatus);
+
+		if (validationResult.valid()) {
 			return MailboxDto.builder()
 				.withValidMailbox(true)
 				.withRecipientId(reachabilityStatus.getAccountStatus().getRecipientId())
@@ -68,27 +90,41 @@ class RecipientIntegrationMapper {
 			return MailboxDto.builder()
 				.withRecipientId(reachabilityStatus.getAccountStatus().getRecipientId())
 				.withValidMailbox(false)
+				.withReason(validationResult.reason())
 				.build();
 		}
 	}
 
-	private boolean isValidMailbox(final ReachabilityStatus reachabilityStatus) {
+	private ValidationResult validateMailbox(final ReachabilityStatus reachabilityStatus) {
 		if (!reachabilityStatus.isSenderAccepted()) {
-			return false;
+			return ValidationResult.failure(REASON_SENDER_NOT_ACCEPTED);
 		}
 
-		var accountStatus = reachabilityStatus.getAccountStatus();
-		if (accountStatus.isPending() || accountStatus.getServiceSupplier() == null) {
-			return false;
+		final var accountStatus = reachabilityStatus.getAccountStatus();
+		if (accountStatus.isPending()) {
+			return ValidationResult.failure(REASON_MAILBOX_PENDING);
+		}
+
+		if (accountStatus.getServiceSupplier() == null) {
+			return ValidationResult.failure(REASON_NO_SERVICE_SUPPLIER);
 		}
 
 		// If recipientId is not an organization number, check that it is an adult person, otherwise return false
 		if (!LegalIdUtil.isOrgNumber(accountStatus.getRecipientId()) && !LegalIdUtil.isAnAdult(accountStatus.getRecipientId())) {
-			return false;
+			return ValidationResult.failure(REASON_RECIPIENT_NOT_ADULT);
 		}
 
-		var serviceSupplier = accountStatus.getServiceSupplier();
-		return isSupportedSupplier(serviceSupplier.getName()) && !isBlank(serviceSupplier.getServiceAdress());
+		final var serviceSupplier = accountStatus.getServiceSupplier();
+
+		if (!isSupportedSupplier(serviceSupplier.getName())) {
+			return ValidationResult.failure(REASON_UNSUPPORTED_SUPPLIER);
+		}
+
+		if (isBlank(serviceSupplier.getServiceAdress())) {
+			return ValidationResult.failure(REASON_SERVICE_ADDRESS_BLANK);
+		}
+
+		return ValidationResult.success();
 	}
 
 	/**

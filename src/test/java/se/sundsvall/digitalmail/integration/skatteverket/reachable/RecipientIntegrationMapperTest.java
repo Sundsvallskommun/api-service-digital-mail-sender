@@ -9,9 +9,10 @@ import static org.mockito.Mockito.when;
 import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 import static se.sundsvall.digitalmail.TestObjectFactory.PREFIXED_ORGANIZATION_NUMBER;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Stream;
-import org.assertj.core.groups.Tuple;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -25,7 +26,6 @@ import se.gov.minameddelanden.schema.recipient.AccountStatus;
 import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.ServiceSupplier;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
-import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,7 +58,7 @@ class RecipientIntegrationMapperTest {
 	void testToMailboxDtos() {
 		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
 
-		final var response = createIsReachableResponse(false, true, true);
+		final var response = createIsReachableResponse("2120002441", false, true, "Kivra", "https://somewhere.com");
 
 		final var mailboxSettings = mapper.toMailboxDtos(response);
 
@@ -67,6 +67,7 @@ class RecipientIntegrationMapperTest {
 		assertThat(mailboxSettings.getFirst().getRecipientId()).isEqualTo("2120002441");
 		assertThat(mailboxSettings.getFirst().getServiceName()).isEqualTo("Kivra");
 		assertThat(mailboxSettings.getFirst().isValidMailbox()).isTrue();
+		assertThat(mailboxSettings.getFirst().getReason()).isNull();
 
 		verify(mockSkatteverketProperties).supportedSuppliers();
 	}
@@ -102,63 +103,89 @@ class RecipientIntegrationMapperTest {
 		verifyNoInteractions(mockSkatteverketProperties);
 	}
 
-	@Test
-	void testToMailboxDtosWhenNotSupportedServiceSupplier() {
-		when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("anotherSupplier"));
-		final var mailboxSettings = mapper.toMailboxDtos(createIsReachableResponse(false, true, true));
+	@ParameterizedTest(name = "{0}")
+	@MethodSource("invalidMailboxProvider")
+	void testInvalidateMailboxScenarios(final String testName, final IsReachableResponse response,
+		final String expectedReason, final boolean usesMock) {
 
-		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
-			.containsExactlyInAnyOrder(
-				Tuple.tuple("2120002441", null, null, false));
+		if (usesMock) {
+			when(mockSkatteverketProperties.supportedSuppliers()).thenReturn(List.of("Kivra"));
+		}
 
-		verify(mockSkatteverketProperties).supportedSuppliers();
-	}
-
-	@ParameterizedTest
-	@MethodSource("reachableResponseProvider")
-	void testToMailboxDtosWhenInvalidMailbox(IsReachableResponse response) {
 		final var mailboxSettings = mapper.toMailboxDtos(response);
 
-		assertThat(mailboxSettings).extracting(MailboxDto::getRecipientId, MailboxDto::getServiceAddress, MailboxDto::getServiceName, MailboxDto::isValidMailbox)
-			.containsExactlyInAnyOrder(
-				Tuple.tuple("2120002441", null, null, false));
+		assertThat(mailboxSettings).hasSize(1);
+		assertThat(mailboxSettings.getFirst())
+			.satisfies(mailbox -> {
+				assertThat(mailbox.isValidMailbox()).isFalse();
+				assertThat(mailbox.getReason()).isEqualTo(expectedReason);
+			});
 
-		verifyNoInteractions(mockSkatteverketProperties);
+		if (usesMock) {
+			verify(mockSkatteverketProperties).supportedSuppliers();
+		} else {
+			verifyNoInteractions(mockSkatteverketProperties);
+		}
 	}
 
-	private static Stream<Arguments> reachableResponseProvider() {
+	private static Stream<Arguments> invalidMailboxProvider() {
 		return Stream.of(
-			Arguments.of(createIsReachableResponse(false, true, false)),   // Doesn't accept the sender
-			Arguments.of(createIsReachableResponse(true, true, false)),    // Pending mailbox
-			Arguments.of(createIsReachableResponse(false, false, true)));  // No service supplier
+			Arguments.of(
+				"Sender not accepted",
+				createIsReachableResponse("2120002441", false, false, "Kivra", "https://somewhere.com"),
+				"Sender not accepted by recipient",
+				false),
+			Arguments.of(
+				"Mailbox pending",
+				createIsReachableResponse("2120002441", true, true, "Kivra", "https://somewhere.com"),
+				"Mailbox is pending activation",
+				false),
+			Arguments.of(
+				"No service supplier",
+				createIsReachableResponse("2120002441", false, true, null, null),
+				"No service supplier available",
+				false),
+			Arguments.of(
+				"Recipient not an adult",
+				createIsReachableResponse(generateMinorPersonnummer(), false, true, "Kivra", "https://somewhere.com"),
+				"Recipient is not an adult",
+				false),
+			Arguments.of(
+				"Unsupported supplier",
+				createIsReachableResponse("2120002441", false, true, "UnsupportedSupplier", "https://somewhere.com"),
+				"Unsupported service supplier",
+				true),
+			Arguments.of(
+				"Blank service address",
+				createIsReachableResponse("2120002441", false, true, "Kivra", ""),
+				"Service address is blank",
+				true));
 	}
 
-	/**
-	 *
-	 * @param  pending                   if pending, the mailbox has not yet been created and should be interpreted as the
-	 *                                   recipient not having a digital mailbox.
-	 * @param  shouldHaveServiceSupplier No serviceSupplier indicates that the recipient doesn't have a digital mailbox.
-	 * @param  isAccepted                is the sender accepted by the recipient
-	 * @return                           a response with the given parameters
-	 */
-	private static IsReachableResponse createIsReachableResponse(final boolean pending,
-		final boolean shouldHaveServiceSupplier, final boolean isAccepted) {
+	private static String generateMinorPersonnummer() {
+		final var birthDate = LocalDate.now().minusYears(13);
+		final var formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+		return birthDate.format(formatter) + "1234";  // YYYYMMDD + serial number
+	}
+
+	private static IsReachableResponse createIsReachableResponse(final String recipientId, final boolean isPending, final boolean isSenderAccepted,
+		final String supplierName, final String serviceAddress) {
 
 		final var accountStatus = new AccountStatus();
-		accountStatus.setRecipientId("2120002441");
-		accountStatus.setPending(pending);
+		accountStatus.setRecipientId(recipientId);
+		accountStatus.setPending(isPending);
 
-		if (shouldHaveServiceSupplier) {
+		if (supplierName != null) {
 			final var serviceSupplier = new ServiceSupplier();
 			serviceSupplier.setId("165568402266");
-			serviceSupplier.setName("Kivra");
-			serviceSupplier.setServiceAdress("https://somewhere.com");
+			serviceSupplier.setName(supplierName);
+			serviceSupplier.setServiceAdress(serviceAddress);
 
 			accountStatus.setServiceSupplier(serviceSupplier);
 		}
 
 		final var reachabilityStatus = new ReachabilityStatus();
-		reachabilityStatus.setSenderAccepted(isAccepted);
+		reachabilityStatus.setSenderAccepted(isSenderAccepted);
 		reachabilityStatus.setAccountStatus(accountStatus);
 
 		final var response = new IsReachableResponse();
