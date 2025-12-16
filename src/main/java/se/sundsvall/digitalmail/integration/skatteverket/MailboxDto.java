@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder(setterPrefix = "with")
 public class MailboxDto {
 
+	private String reason;
 	private String recipientId;
 	private String serviceAddress;
 	private String serviceName;

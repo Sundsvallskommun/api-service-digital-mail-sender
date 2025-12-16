@@ -52,7 +52,7 @@ class ReachableIntegrationTest {
 		response.getReturns().add(reachabilityStatus);
 
 		when(mockMapper.toMailboxDtos(response))
-			.thenReturn(List.of(new MailboxDto("someRecipientId", "someServiceAddress", "someServiceName", true)));
+			.thenReturn(List.of(new MailboxDto(null, "someRecipientId", "someServiceAddress", "someServiceName", true)));
 
 		when(mockReachableTemplate.marshalSendAndReceive(any(IsReachable.class))).thenReturn(response);
 

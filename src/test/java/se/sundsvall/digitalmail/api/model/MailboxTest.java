@@ -28,17 +28,20 @@ class MailboxTest {
 		final var partyId = "12345";
 		final var supplier = "Kivra";
 		final var reachable = true;
+		final var reason = "Some reason";
 
 		final var mailbox = Mailbox.builder()
 			.withPartyId(partyId)
 			.withSupplier(supplier)
 			.withReachable(reachable)
+			.withReason(reason)
 			.build();
 
 		assertThat(mailbox).isNotNull().hasNoNullFieldsOrProperties();
 		assertThat(mailbox.getPartyId()).isEqualTo(partyId);
 		assertThat(mailbox.getSupplier()).isEqualTo(supplier);
 		assertThat(mailbox.isReachable()).isEqualTo(reachable);
+		assertThat(mailbox.getReason()).isEqualTo(reason);
 	}
 
 	@Test

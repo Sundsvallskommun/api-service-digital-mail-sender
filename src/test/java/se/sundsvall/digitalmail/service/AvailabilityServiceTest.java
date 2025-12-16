@@ -28,8 +28,8 @@ class AvailabilityServiceTest {
 	@InjectMocks
 	private AvailabilityService availabilityService;
 
-	private static final MailboxDto VALID_MAILBOX = new MailboxDto("someRecipient", "someServiceAddress", "someServiceName", true);
-	private static final MailboxDto INVALID_MAILBOX = new MailboxDto("someRecipient", "someServiceAddress", "someServiceName", false);
+	private static final MailboxDto VALID_MAILBOX = new MailboxDto(null, "someRecipient", "someServiceAddress", "someServiceName", true);
+	private static final MailboxDto INVALID_MAILBOX = new MailboxDto("Sender not accepted by recipient", "someRecipient", "someServiceAddress", "someServiceName", false);
 
 	@AfterEach
 	void tearDown() {
