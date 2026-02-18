@@ -1,10 +1,10 @@
 package se.sundsvall.digitalmail.integration.messaging;
 
-import static org.apache.commons.lang3.ObjectUtils.anyNull;
-
 import generated.se.sundsvall.messaging.EmailRequest;
 import generated.se.sundsvall.messaging.EmailSender;
 import generated.se.sundsvall.messaging.SlackRequest;
+
+import static org.apache.commons.lang3.ObjectUtils.anyNull;
 
 public final class MessagingMapper {
 

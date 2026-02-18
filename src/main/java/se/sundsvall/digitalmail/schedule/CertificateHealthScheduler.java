@@ -1,13 +1,5 @@
 package se.sundsvall.digitalmail.schedule;
 
-import static java.lang.Boolean.TRUE;
-import static java.time.temporal.ChronoUnit.MINUTES;
-import static java.util.Collections.emptyList;
-import static java.util.Objects.nonNull;
-import static java.util.Optional.ofNullable;
-import static se.sundsvall.digitalmail.integration.messaging.MessagingMapper.toEmailRequest;
-import static se.sundsvall.digitalmail.integration.messaging.MessagingMapper.toSlackRequest;
-
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,6 +12,14 @@ import se.sundsvall.dept44.scheduling.Dept44Scheduled;
 import se.sundsvall.dept44.scheduling.health.Dept44HealthUtility;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalmail.integration.messaging.MessagingIntegration;
+
+import static java.lang.Boolean.TRUE;
+import static java.time.temporal.ChronoUnit.MINUTES;
+import static java.util.Collections.emptyList;
+import static java.util.Objects.nonNull;
+import static java.util.Optional.ofNullable;
+import static se.sundsvall.digitalmail.integration.messaging.MessagingMapper.toEmailRequest;
+import static se.sundsvall.digitalmail.integration.messaging.MessagingMapper.toSlackRequest;
 
 @Component
 public class CertificateHealthScheduler {

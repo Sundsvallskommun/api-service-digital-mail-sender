@@ -1,5 +1,24 @@
 package se.sundsvall.digitalmail.service;
 
+import java.util.List;
+import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.zalando.problem.Problem;
+import org.zalando.problem.ThrowableProblem;
+import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
+import se.sundsvall.digitalmail.api.model.Mailbox;
+import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
+import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
+import se.sundsvall.digitalmail.integration.party.PartyIntegration;
+import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
+import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.assertj.core.groups.Tuple.tuple;
@@ -19,25 +38,6 @@ import static se.sundsvall.digitalmail.TestObjectFactory.MUNICIPALITY_ID;
 import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDto;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
-
-import java.util.List;
-import java.util.Optional;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-import org.zalando.problem.Problem;
-import org.zalando.problem.ThrowableProblem;
-import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
-import se.sundsvall.digitalmail.api.model.Mailbox;
-import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
-import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
-import se.sundsvall.digitalmail.integration.party.PartyIntegration;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
-import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
-import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
 
 @ExtendWith(MockitoExtension.class)
 class DigitalMailServiceTest {

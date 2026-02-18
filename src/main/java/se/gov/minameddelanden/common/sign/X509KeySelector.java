@@ -1,7 +1,5 @@
 package se.gov.minameddelanden.common.sign;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.cert.X509Certificate;
@@ -13,6 +11,8 @@ import javax.xml.crypto.XMLCryptoContext;
 import javax.xml.crypto.dsig.keyinfo.KeyInfo;
 import javax.xml.crypto.dsig.keyinfo.X509Data;
 import org.zalando.problem.Problem;
+
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 public class X509KeySelector extends KeySelector {
 

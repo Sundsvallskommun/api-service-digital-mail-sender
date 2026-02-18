@@ -1,10 +1,10 @@
 package se.sundsvall.digitalmail.api.model.validation.annotation.impl;
 
-import static java.util.Objects.isNull;
-
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumber;
+
+import static java.util.Objects.isNull;
 
 public class ValidAccountNumberConstraintValidator implements ConstraintValidator<ValidAccountNumber, String> {
 

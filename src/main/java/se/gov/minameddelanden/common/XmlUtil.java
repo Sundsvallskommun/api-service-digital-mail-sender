@@ -1,9 +1,5 @@
 package se.gov.minameddelanden.common;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.gov.minameddelanden.common.EncodingUtils.bytesToString;
-import static se.gov.minameddelanden.common.EncodingUtils.stringToBytes;
-
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
@@ -31,6 +27,10 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.zalando.problem.Problem;
+
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.gov.minameddelanden.common.EncodingUtils.bytesToString;
+import static se.gov.minameddelanden.common.EncodingUtils.stringToBytes;
 
 public final class XmlUtil {
 

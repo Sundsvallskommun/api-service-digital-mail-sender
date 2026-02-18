@@ -1,8 +1,5 @@
 package se.gov.minameddelanden.common;
 
-import static java.lang.Math.max;
-import static java.lang.Math.min;
-
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.charset.CharacterCodingException;
@@ -11,6 +8,9 @@ import java.nio.charset.MalformedInputException;
 import java.nio.charset.StandardCharsets;
 import java.nio.charset.UnmappableCharacterException;
 import java.util.Arrays;
+
+import static java.lang.Math.max;
+import static java.lang.Math.min;
 
 public final class EncodingUtils {
 

@@ -1,9 +1,5 @@
 package se.sundsvall.digitalmail.integration.skatteverket;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.Mockito.when;
-
 import jakarta.xml.soap.MessageFactory;
 import jakarta.xml.soap.SOAPException;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,6 +12,10 @@ import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.springframework.ws.soap.saaj.SaajSoapMessage;
 import org.zalando.problem.ThrowableProblem;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.Mockito.when;
 
 class SkatteverketClientConfigTests {
 

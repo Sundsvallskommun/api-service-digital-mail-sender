@@ -1,11 +1,11 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
-import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.mapInvoiceToContent;
-
 import generated.com.kivra.UserMatchV2SSN;
 import java.util.Optional;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
+
+import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.mapInvoiceToContent;
 
 @Component
 @EnableConfigurationProperties(KivraProperties.class)

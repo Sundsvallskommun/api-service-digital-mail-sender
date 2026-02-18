@@ -1,7 +1,5 @@
 package se.sundsvall.digitalmail.util;
 
-import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
-
 import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -14,6 +12,8 @@ import org.openpdf.text.pdf.PdfStream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import se.sundsvall.digitalmail.api.model.File;
+
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 public final class PdfCompressor {
 

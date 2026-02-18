@@ -1,10 +1,10 @@
 package se.sundsvall.digitalmail.domain.invoice;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
 import static se.sundsvall.digitalmail.domain.invoice.AccountType.PLUSGIRO;
-
-import org.junit.jupiter.api.Test;
 
 class AccountTypeTests {
 

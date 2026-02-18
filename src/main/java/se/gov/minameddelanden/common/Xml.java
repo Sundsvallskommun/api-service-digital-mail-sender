@@ -1,7 +1,5 @@
 package se.gov.minameddelanden.common;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-
 import jakarta.xml.bind.JAXBException;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -14,6 +12,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.zalando.problem.Problem;
 import se.gov.minameddelanden.common.sign.SignatureUtils;
+
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 public class Xml {
 

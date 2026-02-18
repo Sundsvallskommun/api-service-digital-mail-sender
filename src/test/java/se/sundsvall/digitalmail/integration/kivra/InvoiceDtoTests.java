@@ -1,9 +1,9 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceRequest;
-
-import org.junit.jupiter.api.Test;
 
 class InvoiceDtoTests {
 

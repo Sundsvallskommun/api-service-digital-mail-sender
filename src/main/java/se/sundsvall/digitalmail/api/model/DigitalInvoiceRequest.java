@@ -1,7 +1,5 @@
 package se.sundsvall.digitalmail.api.model;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -15,6 +13,8 @@ import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumb
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;
+
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 public record DigitalInvoiceRequest(
 

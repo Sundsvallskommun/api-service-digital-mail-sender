@@ -1,9 +1,5 @@
 package se.gov.minameddelanden.common.sign;
 
-import static java.util.Collections.singletonList;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-import static se.gov.minameddelanden.common.XmlUtil.removeXmlNsPrefixes;
-
 import java.util.ArrayList;
 import java.util.regex.Pattern;
 import javax.xml.crypto.dsig.CanonicalizationMethod;
@@ -18,6 +14,10 @@ import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import org.w3c.dom.Document;
 import org.zalando.problem.Problem;
 import se.gov.minameddelanden.common.X509CertificateWithPrivateKey;
+
+import static java.util.Collections.singletonList;
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static se.gov.minameddelanden.common.XmlUtil.removeXmlNsPrefixes;
 
 public final class SignatureUtils {
 

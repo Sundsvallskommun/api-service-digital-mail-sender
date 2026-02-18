@@ -1,14 +1,14 @@
 package se.sundsvall.digitalmail.integration.party;
 
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
-import static se.sundsvall.digitalmail.integration.party.PartyConfig.INTEGRATION_NAME;
-
 import generated.se.sundsvall.party.PartyType;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.Optional;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static se.sundsvall.digitalmail.integration.party.PartyConfig.INTEGRATION_NAME;
 
 @FeignClient(
 	name = INTEGRATION_NAME,

@@ -1,11 +1,5 @@
 package se.sundsvall.digitalmail.integration.party;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalmail.TestObjectFactory.MUNICIPALITY_ID;
-
 import generated.se.sundsvall.party.PartyType;
 import java.util.Optional;
 import java.util.UUID;
@@ -14,6 +8,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.MUNICIPALITY_ID;
 
 @ExtendWith(MockitoExtension.class)
 class PartyIntegrationTest {
