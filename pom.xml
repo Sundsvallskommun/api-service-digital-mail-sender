@@ -17,7 +17,7 @@
 		<my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
 		<kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
 		<commons-io.version>2.21.0</commons-io.version>
-		<nu-html-validator.version>25.12.22</nu-html-validator.version>
+		<nu-html-validator.version>26.2.17</nu-html-validator.version>
 		<cxf.version>4.2.0</cxf.version>
 		<istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
 		<librepdf.version>3.0.0</librepdf.version>
