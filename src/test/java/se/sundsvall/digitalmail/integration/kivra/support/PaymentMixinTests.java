@@ -1,8 +1,5 @@
 package se.sundsvall.digitalmail.integration.kivra.support;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import java.io.IOException;
 import org.junit.jupiter.api.Nested;
@@ -10,6 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 
 class PaymentMixinTests {
 

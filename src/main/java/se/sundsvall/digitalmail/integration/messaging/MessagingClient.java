@@ -1,8 +1,5 @@
 package se.sundsvall.digitalmail.integration.messaging;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static se.sundsvall.digitalmail.integration.messaging.MessagingConfig.INTEGRATION_NAME;
-
 import generated.se.sundsvall.messaging.EmailRequest;
 import generated.se.sundsvall.messaging.MessageResult;
 import generated.se.sundsvall.messaging.SlackRequest;
@@ -11,6 +8,9 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static se.sundsvall.digitalmail.integration.messaging.MessagingConfig.INTEGRATION_NAME;
 
 @CircuitBreaker(name = INTEGRATION_NAME)
 @FeignClient(name = INTEGRATION_NAME, url = "${integration.messaging.api-url}", configuration = MessagingConfig.class)

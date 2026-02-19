@@ -1,7 +1,5 @@
 package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
-
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
 import org.slf4j.Logger;
@@ -12,6 +10,8 @@ import org.springframework.ws.client.core.WebServiceTemplate;
 import org.zalando.problem.Problem;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
+
+import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
 
 @Component
 @CircuitBreaker(name = "reachableIntegration")

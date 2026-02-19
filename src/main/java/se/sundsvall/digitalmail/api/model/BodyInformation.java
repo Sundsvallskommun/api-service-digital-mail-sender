@@ -1,15 +1,15 @@
 package se.sundsvall.digitalmail.api.model;
 
-import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
-import static lombok.AccessLevel.PROTECTED;
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
-
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
+
+import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
+import static lombok.AccessLevel.PROTECTED;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
 @Schema(description = "The body of the message")
 @Builder(setterPrefix = "with")

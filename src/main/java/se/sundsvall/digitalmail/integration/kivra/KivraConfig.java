@@ -1,8 +1,5 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
-import static java.util.Collections.emptySet;
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import feign.Request;
 import generated.com.kivra.ContentUserContextInvoice;
@@ -18,6 +15,9 @@ import se.sundsvall.dept44.configuration.feign.interceptor.OAuth2RequestIntercep
 import se.sundsvall.dept44.configuration.feign.retryer.ActionRetryer;
 import se.sundsvall.digitalmail.integration.kivra.support.ContentUserContextInvoiceMixin;
 import se.sundsvall.digitalmail.integration.kivra.support.PaymentMixin;
+
+import static java.util.Collections.emptySet;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Import(FeignConfiguration.class)
 class KivraConfig {

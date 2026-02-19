@@ -1,14 +1,5 @@
 package se.sundsvall.digitalmail.service;
 
-import static java.util.Collections.emptyList;
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
-
 import java.util.List;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -18,6 +9,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.reachable.ReachableIntegration;
+
+import static java.util.Collections.emptyList;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
 class AvailabilityServiceTest {

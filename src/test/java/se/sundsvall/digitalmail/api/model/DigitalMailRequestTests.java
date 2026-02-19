@@ -1,5 +1,9 @@
 package se.sundsvall.digitalmail.api.model;
 
+import java.util.List;
+import org.hamcrest.MatcherAssert;
+import org.junit.jupiter.api.Test;
+
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanConstructor;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanEquals;
 import static com.google.code.beanmatchers.BeanMatchers.hasValidBeanHashCode;
@@ -8,10 +12,6 @@ import static com.google.code.beanmatchers.BeanMatchers.hasValidGettersAndSetter
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
-
-import java.util.List;
-import org.hamcrest.MatcherAssert;
-import org.junit.jupiter.api.Test;
 
 class DigitalMailRequestTests {
 

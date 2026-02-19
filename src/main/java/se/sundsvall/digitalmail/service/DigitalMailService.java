@@ -1,9 +1,5 @@
 package se.sundsvall.digitalmail.service;
 
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.zalando.problem.Status.NOT_FOUND;
-import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +20,10 @@ import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailIntegration;
 import se.sundsvall.digitalmail.util.PdfCompressor;
+
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.zalando.problem.Status.NOT_FOUND;
+import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 @Service
 public class DigitalMailService {

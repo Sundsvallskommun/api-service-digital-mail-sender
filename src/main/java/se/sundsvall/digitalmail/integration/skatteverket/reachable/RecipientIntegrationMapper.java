@@ -1,8 +1,5 @@
 package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
-import static org.apache.commons.lang3.StringUtils.isBlank;
-import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
-
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Component;
@@ -13,6 +10,9 @@ import se.gov.minameddelanden.schema.recipient.v3.ObjectFactory;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 import se.sundsvall.digitalmail.util.LegalIdUtil;
+
+import static org.apache.commons.lang3.StringUtils.isBlank;
+import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
 
 @Component
 class RecipientIntegrationMapper {

@@ -1,11 +1,11 @@
 package se.sundsvall.digitalmail.integration.party;
 
-import static java.util.Optional.ofNullable;
-
 import generated.se.sundsvall.party.PartyType;
 import java.util.Optional;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
+
+import static java.util.Optional.ofNullable;
 
 @Component
 public class PartyIntegration {

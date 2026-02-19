@@ -1,8 +1,5 @@
 package se.sundsvall.digitalmail.api.model.validation;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,6 +7,9 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import se.sundsvall.dept44.test.annotation.resource.Load;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(ResourceLoaderExtension.class)
 class HtmlValidatorTests {

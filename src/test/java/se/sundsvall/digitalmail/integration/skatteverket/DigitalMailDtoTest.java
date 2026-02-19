@@ -1,14 +1,14 @@
 package se.sundsvall.digitalmail.integration.skatteverket;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
-import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
-
 import java.util.ArrayList;
 import org.junit.jupiter.api.Test;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.SupportInfo;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 class DigitalMailDtoTest {
 

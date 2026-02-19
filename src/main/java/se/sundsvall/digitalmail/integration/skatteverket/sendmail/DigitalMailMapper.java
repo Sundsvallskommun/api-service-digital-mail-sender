@@ -1,9 +1,5 @@
 package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
-import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
-
 import jakarta.xml.bind.DatatypeConverter;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
@@ -59,6 +55,10 @@ import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
+
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
 
 @Component
 class DigitalMailMapper {

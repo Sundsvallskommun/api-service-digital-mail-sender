@@ -1,13 +1,13 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
+import generated.com.kivra.PaymentMultipleOptions;
+import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
 import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.DATE_FORMATTER;
 import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.mapInvoiceToContent;
-
-import generated.com.kivra.PaymentMultipleOptions;
-import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
-import org.junit.jupiter.api.Test;
 
 class KivraMapperTests {
 

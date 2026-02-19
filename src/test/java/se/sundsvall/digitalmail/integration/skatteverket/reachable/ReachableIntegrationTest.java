@@ -1,13 +1,5 @@
 package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
-
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -22,6 +14,14 @@ import se.gov.minameddelanden.schema.recipient.ReachabilityStatus;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachable;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
 class ReachableIntegrationTest {

@@ -1,13 +1,13 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
-import static generated.com.kivra.PaymentMultipleOptions.CurrencyEnum.SEK;
-
 import generated.com.kivra.ContentUserV2;
 import generated.com.kivra.PartsResponsive;
 import generated.com.kivra.PaymentMultipleOptions;
 import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+
+import static generated.com.kivra.PaymentMultipleOptions.CurrencyEnum.SEK;
 
 final class KivraMapper {
 

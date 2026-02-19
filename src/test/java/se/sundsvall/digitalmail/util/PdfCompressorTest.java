@@ -1,7 +1,5 @@
 package se.sundsvall.digitalmail.util;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
@@ -9,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.openpdf.text.pdf.PdfReader;
 import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.File;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 class PdfCompressorTest {
 

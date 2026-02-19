@@ -1,11 +1,5 @@
 package se.sundsvall.digitalmail.integration.messaging;
 
-import static java.util.concurrent.TimeUnit.MILLISECONDS;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-import static se.sundsvall.digitalmail.integration.messaging.MessagingConfig.INTEGRATION_NAME;
-
 import feign.Request;
 import java.time.Duration;
 import org.junit.jupiter.api.Test;
@@ -23,6 +17,12 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import se.sundsvall.dept44.configuration.feign.FeignMultiCustomizer;
 import se.sundsvall.dept44.configuration.feign.decoder.ProblemErrorDecoder;
 import se.sundsvall.digitalmail.integration.OAuth2;
+
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static se.sundsvall.digitalmail.integration.messaging.MessagingConfig.INTEGRATION_NAME;
 
 @ExtendWith(MockitoExtension.class)
 class MessagingConfigTest {

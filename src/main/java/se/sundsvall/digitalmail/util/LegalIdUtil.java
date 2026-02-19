@@ -1,11 +1,11 @@
 package se.sundsvall.digitalmail.util;
 
-import static java.util.Optional.ofNullable;
-
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
+
+import static java.util.Optional.ofNullable;
 
 public final class LegalIdUtil {
 

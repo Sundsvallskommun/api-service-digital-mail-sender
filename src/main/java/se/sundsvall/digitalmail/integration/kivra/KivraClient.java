@@ -1,8 +1,5 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
-import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static se.sundsvall.digitalmail.integration.kivra.KivraConfig.INTEGRATION_NAME;
-
 import generated.com.kivra.ContentUserV2;
 import generated.com.kivra.TenantV2;
 import generated.com.kivra.UserMatchV2SSN;
@@ -12,6 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static se.sundsvall.digitalmail.integration.kivra.KivraConfig.INTEGRATION_NAME;
 
 @FeignClient(
 	name = INTEGRATION_NAME,

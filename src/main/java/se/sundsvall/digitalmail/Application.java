@@ -1,12 +1,12 @@
 package se.sundsvall.digitalmail;
 
-import static org.springframework.boot.SpringApplication.run;
-
 import java.security.Security;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import se.sundsvall.dept44.ServiceApplication;
+
+import static org.springframework.boot.SpringApplication.run;
 
 @ServiceApplication
 @EnableFeignClients

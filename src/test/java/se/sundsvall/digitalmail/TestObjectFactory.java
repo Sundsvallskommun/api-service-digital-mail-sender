@@ -1,11 +1,5 @@
 package se.sundsvall.digitalmail;
 
-import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
-import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
-import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
-import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -16,6 +10,12 @@ import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.api.model.SupportInfo;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
+import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
+import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
+import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
 
 public final class TestObjectFactory {
 

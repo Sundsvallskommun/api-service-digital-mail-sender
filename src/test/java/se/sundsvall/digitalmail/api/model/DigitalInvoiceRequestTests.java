@@ -1,13 +1,13 @@
 package se.sundsvall.digitalmail.api.model;
 
+import java.time.LocalDate;
+import java.util.List;
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
 import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
 import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
-
-import java.time.LocalDate;
-import java.util.List;
-import org.junit.jupiter.api.Test;
 
 class DigitalInvoiceRequestTests {
 

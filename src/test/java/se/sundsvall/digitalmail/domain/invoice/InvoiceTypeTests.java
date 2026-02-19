@@ -1,10 +1,10 @@
 package se.sundsvall.digitalmail.domain.invoice;
 
+import org.junit.jupiter.api.Test;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
 import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.REMINDER;
-
-import org.junit.jupiter.api.Test;
 
 class InvoiceTypeTests {
 
