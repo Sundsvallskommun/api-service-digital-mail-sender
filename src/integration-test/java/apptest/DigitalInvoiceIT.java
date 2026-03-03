@@ -2,11 +2,11 @@ package apptest;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
-
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalmail.Application;
+
+import static org.springframework.http.HttpStatus.OK;
 
 @WireMockAppTestSuite(files = "classpath:/DigitalInvoiceIT/", classes = Application.class)
 class DigitalInvoiceIT extends AbstractAppTest {
@@ -19,7 +19,7 @@ class DigitalInvoiceIT extends AbstractAppTest {
 			.withServicePath(SERVICE_PATH)
 			.withRequest("request.json")
 			.withHttpMethod(HttpMethod.POST)
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.withExpectedResponse("expected.json")
 			.sendRequestAndVerifyResponse()
 			.verifyAllStubs();

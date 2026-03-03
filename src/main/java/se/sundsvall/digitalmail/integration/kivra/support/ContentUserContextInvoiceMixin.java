@@ -1,12 +1,15 @@
 package se.sundsvall.digitalmail.integration.kivra.support;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import generated.com.kivra.ContentUserContextInvoice;
 import generated.com.kivra.ContentUserContextInvoicePaymentOrPaymentMultipleOptions;
+import org.springframework.boot.jackson.JacksonMixin;
 
 /**
  * Simple Jackson mixin to rename the "payment_or_payment_multiple_options" field to "payment", as
  * that is what is expected by the Kivra API
  */
+@JacksonMixin(ContentUserContextInvoice.class)
 public interface ContentUserContextInvoiceMixin {
 
 	@JsonProperty("payment")
