@@ -7,11 +7,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.client.core.WebServiceTemplate;
-import org.zalando.problem.Problem;
 import se.gov.minameddelanden.schema.recipient.v3.IsReachableResponse;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Component
 @CircuitBreaker(name = "reachableIntegration")

@@ -7,30 +7,30 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-  - url: http://localhost:61453
-    description: Generated server url
+- url: http://localhost:55440
+  description: Generated server url
 paths:
   /{municipalityId}/{organizationNumber}/send-digital-mail:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital mail
       operationId: sendDigitalMail
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: organizationNumber
-          in: path
-          description: The organization number of the sending organization
-          required: true
-          schema:
-            type: string
-          example: 5561234567
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: organizationNumber
+        in: path
+        description: The organization number of the sending organization
+        required: true
+        schema:
+          type: string
+        example: 5561234567
       requestBody:
         content:
           application/json:
@@ -50,8 +50,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -67,25 +67,25 @@ paths:
   /{municipalityId}/{organizationNumber}/mailboxes:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: "Retrieve a list of mailboxes. Contains partyId, supplier and if the\
         \ mailbox is reachable for the given organization."
       operationId: hasAvailableMailboxes
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
-        - name: organizationNumber
-          in: path
-          description: The organization number of the intended sending organization
-          required: true
-          schema:
-            type: string
-          example: 5561234567
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
+      - name: organizationNumber
+        in: path
+        description: The organization number of the intended sending organization
+        required: true
+        schema:
+          type: string
+        example: 5561234567
       requestBody:
         content:
           application/json:
@@ -109,8 +109,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -120,17 +120,17 @@ paths:
   /{municipalityId}/send-digital-invoice:
     post:
       tags:
-        - Digital Mail
+      - Digital Mail
       summary: Send a digital invoice
       operationId: sendDigitalInvoice
       parameters:
-        - name: municipalityId
-          in: path
-          description: Municipality id
-          required: true
-          schema:
-            type: string
-          example: 2281
+      - name: municipalityId
+        in: path
+        description: Municipality id
+        required: true
+        schema:
+          type: string
+        example: 2281
       requestBody:
         content:
           application/json:
@@ -150,8 +150,8 @@ paths:
             application/problem+json:
               schema:
                 oneOf:
-                  - $ref: "#/components/schemas/Problem"
-                  - $ref: "#/components/schemas/ConstraintViolationProblem"
+                - $ref: "#/components/schemas/Problem"
+                - $ref: "#/components/schemas/ConstraintViolationProblem"
         "500":
           description: Internal Server Error
           content:
@@ -167,7 +167,7 @@ paths:
   /api-docs:
     get:
       tags:
-        - API
+      - API
       summary: OpenAPI
       operationId: getApiDocs
       responses:
@@ -190,7 +190,7 @@ components:
           type: string
           description: "Allowed type is: application/pdf"
           examples:
-            - application/pdf
+          - application/pdf
         body:
           type: string
           description: BASE64-encoded body
@@ -199,12 +199,12 @@ components:
           type: string
           description: The name of the file
           examples:
-            - sample.pdf
+          - sample.pdf
           minLength: 1
       required:
-        - body
-        - contentType
-        - filename
+      - body
+      - contentType
+      - filename
     BodyInformation:
       type: object
       description: The body of the message
@@ -214,12 +214,12 @@ components:
           description: "The content type for the message, text/plain for only text,\
             \ text/html for HTML messages."
           examples:
-            - text/html
+          - text/html
         body:
           type: string
           description: Plain-text body
       required:
-        - contentType
+      - contentType
     DigitalMailRequest:
       type: object
       description: The body of the digital mail request
@@ -229,17 +229,17 @@ components:
           description: partyId for the person or organization the digital mail should
             be sent to
           examples:
-            - 6a5c3d04-412d-11ec-973a-0242ac130003
+          - 6a5c3d04-412d-11ec-973a-0242ac130003
         municipalityId:
           type: string
           description: MunicipalityId
           examples:
-            - "2281"
+          - "2281"
         headerSubject:
           type: string
           description: The subject of the digital mail.
           examples:
-            - Viktig information från Sundsvalls kommun
+          - Viktig information från Sundsvalls kommun
           minLength: 1
         supportInfo:
           $ref: "#/components/schemas/SupportInfo"
@@ -250,10 +250,10 @@ components:
         bodyInformation:
           $ref: "#/components/schemas/BodyInformation"
       required:
-        - headerSubject
-        - municipalityId
-        - partyId
-        - supportInfo
+      - headerSubject
+      - municipalityId
+      - partyId
+      - supportInfo
     SupportInfo:
       type: object
       description: Contains contact information and where the recipient may turn to
@@ -264,27 +264,27 @@ components:
           description: Information text describing the different ways the recipient
             may contact the sender.
           examples:
-            - Kontakta oss via epost eller telefon.
+          - Kontakta oss via epost eller telefon.
           minLength: 1
         contactInformationUrl:
           type: string
           description: Url where the recipient may find more information.
           examples:
-            - https://sundsvall.se/
+          - https://sundsvall.se/
         contactInformationPhoneNumber:
           type: string
           description: Phone number the recipient may call to get in contact with
             the sender.
           examples:
-            - "4660191000"
+          - "4660191000"
         contactInformationEmail:
           type: string
           description: Email address the recipient may use to get in contact with
             the sender.
           examples:
-            - sundsvalls.kommun@sundsvall.se
+          - sundsvalls.kommun@sundsvall.se
       required:
-        - supportText
+      - supportText
     Problem:
       type: object
       properties:
@@ -292,182 +292,54 @@ components:
           type: string
         detail:
           type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
         instance:
           type: string
           format: uri
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-    StatusType:
-      type: object
-      properties:
-        statusCode:
+        status:
           type: integer
           format: int32
-        reasonPhrase:
-          type: string
     ConstraintViolationProblem:
       type: object
       properties:
-        cause:
-          $ref: "#/components/schemas/ThrowableProblem"
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
         type:
           type: string
           format: uri
         status:
-          $ref: "#/components/schemas/StatusType"
+          type: integer
+          format: int32
         violations:
           type: array
           items:
             $ref: "#/components/schemas/Violation"
         title:
           type: string
-        message:
-          type: string
         detail:
           type: string
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
         instance:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
-          type: string
     ThrowableProblem:
       type: object
       properties:
-        cause: {}
-        stackTrace:
-          type: array
-          items:
-            type: object
-            properties:
-              classLoaderName:
-                type: string
-              moduleName:
-                type: string
-              moduleVersion:
-                type: string
-              methodName:
-                type: string
-              fileName:
-                type: string
-              lineNumber:
-                type: integer
-                format: int32
-              className:
-                type: string
-              nativeMethod:
-                type: boolean
-        message:
-          type: string
-        title:
-          type: string
-        detail:
-          type: string
-        status:
-          $ref: "#/components/schemas/StatusType"
-        instance:
-          type: string
-          format: uri
         type:
           type: string
           format: uri
-        parameters:
-          type: object
-          additionalProperties: {}
-        suppressed:
-          type: array
-          items:
-            type: object
-            properties:
-              stackTrace:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    classLoaderName:
-                      type: string
-                    moduleName:
-                      type: string
-                    moduleVersion:
-                      type: string
-                    methodName:
-                      type: string
-                    fileName:
-                      type: string
-                    lineNumber:
-                      type: integer
-                      format: int32
-                    className:
-                      type: string
-                    nativeMethod:
-                      type: boolean
-              message:
-                type: string
-              localizedMessage:
-                type: string
-        localizedMessage:
+        title:
           type: string
+        status:
+          type: integer
+          format: int32
+        detail:
+          type: string
+        instance:
+          type: string
+          format: uri
+        causeAsProblem: {}
     Violation:
       type: object
       properties:
@@ -514,48 +386,48 @@ components:
           format: float
           description: The invoice amount
           examples:
-            - "123.45"
+          - "123.45"
         dueDate:
           type: string
           format: date
           description: The invoice due date
           examples:
-            - 2023-10-09
+          - 2023-10-09
         paymentReferenceType:
           type: string
           description: The payment reference type
           enum:
-            - SE_OCR
-            - TENANT_REF
+          - SE_OCR
+          - TENANT_REF
           examples:
-            - SE_OCR
+          - SE_OCR
         paymentReference:
           type: string
           description: The payment reference number
           examples:
-            - "426523791"
+          - "426523791"
           maxLength: 25
           minLength: 1
         accountType:
           type: string
           description: The receiving account type
           enum:
-            - BANKGIRO
-            - PLUSGIRO
+          - BANKGIRO
+          - PLUSGIRO
           examples:
-            - BANKGIRO
+          - BANKGIRO
         accountNumber:
           type: string
           description: The receiving account (a valid BANKGIRO or PLUSGIRO number)
           examples:
-            - "12345"
+          - "12345"
       required:
-        - accountNumber
-        - accountType
-        - amount
-        - dueDate
-        - paymentReference
-        - paymentReferenceType
+      - accountNumber
+      - accountType
+      - amount
+      - dueDate
+      - paymentReference
+      - paymentReferenceType
     DigitalInvoiceRequest:
       type: object
       properties:
@@ -564,27 +436,27 @@ components:
           description: partyId for the person or organization the invoice should be
             sent to
           examples:
-            - 6a5c3d04-412d-11ec-973a-0242ac130003
+          - 6a5c3d04-412d-11ec-973a-0242ac130003
         type:
           type: string
           default: INVOICE
           description: Invoice type
           enum:
-            - INVOICE
-            - REMINDER
+          - INVOICE
+          - REMINDER
           examples:
-            - INVOICE
+          - INVOICE
         subject:
           type: string
           description: The invoice subject
           examples:
-            - Faktura från Sundsvalls kommun
+          - Faktura från Sundsvalls kommun
           minLength: 1
         reference:
           type: string
           description: Invoice reference
           examples:
-            - "Faktura #12345"
+          - "Faktura #12345"
         payable:
           type: boolean
           default: true
@@ -597,11 +469,11 @@ components:
             $ref: "#/components/schemas/Attachment"
           minItems: 1
       required:
-        - details
-        - files
-        - partyId
-        - subject
-        - type
+      - details
+      - files
+      - partyId
+      - subject
+      - type
     DigitalInvoiceResponse:
       type: object
       properties:

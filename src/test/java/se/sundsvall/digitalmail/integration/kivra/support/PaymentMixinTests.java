@@ -1,12 +1,11 @@
 package se.sundsvall.digitalmail.integration.kivra.support;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import java.io.IOException;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import tools.jackson.core.JsonGenerator;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
@@ -22,7 +21,7 @@ class PaymentMixinTests {
 		private JsonGenerator mockJsonGenerator;
 
 		@Test
-		void serialize() throws IOException {
+		void serialize() {
 			serializer.serialize(2.34f, mockJsonGenerator, null);
 
 			verify(mockJsonGenerator).writeString(anyString());

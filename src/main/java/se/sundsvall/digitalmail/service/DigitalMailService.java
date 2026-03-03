@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.zalando.problem.Problem;
+import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.Mailbox;
@@ -22,7 +22,7 @@ import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailInt
 import se.sundsvall.digitalmail.util.PdfCompressor;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.zalando.problem.Status.NOT_FOUND;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 @Service

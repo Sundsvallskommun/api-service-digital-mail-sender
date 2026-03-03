@@ -12,11 +12,11 @@ import javax.xml.crypto.dsig.dom.DOMSignContext;
 import javax.xml.crypto.dsig.spec.C14NMethodParameterSpec;
 import javax.xml.crypto.dsig.spec.TransformParameterSpec;
 import org.w3c.dom.Document;
-import org.zalando.problem.Problem;
 import se.gov.minameddelanden.common.X509CertificateWithPrivateKey;
+import se.sundsvall.dept44.problem.Problem;
 
 import static java.util.Collections.singletonList;
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static se.gov.minameddelanden.common.XmlUtil.removeXmlNsPrefixes;
 
 public final class SignatureUtils {

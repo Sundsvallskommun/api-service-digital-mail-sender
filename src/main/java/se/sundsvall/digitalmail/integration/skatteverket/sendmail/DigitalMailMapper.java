@@ -28,9 +28,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
-import org.zalando.problem.ThrowableProblem;
 import se.gov.minameddelanden.common.X509CertificateWithPrivateKey;
 import se.gov.minameddelanden.common.Xml;
 import se.gov.minameddelanden.schema.message.Attachment;
@@ -47,6 +44,8 @@ import se.gov.minameddelanden.schema.message.v3.SupportInfo;
 import se.gov.minameddelanden.schema.sender.Sender;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
+import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.dept44.requestid.RequestId;
 import se.sundsvall.dept44.util.KeyStoreUtils;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
@@ -58,6 +57,7 @@ import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
 
 @Component
@@ -84,7 +84,7 @@ class DigitalMailMapper {
 		} catch (JAXBException e) {
 			throw Problem.builder()
 				.withTitle("Failed to create Marshaller")
-				.withStatus(Status.INTERNAL_SERVER_ERROR)
+				.withStatus(INTERNAL_SERVER_ERROR)
 				.withCause((ThrowableProblem) e.getCause())
 				.build();
 		}
@@ -191,7 +191,7 @@ class DigitalMailMapper {
 			LOG.error("Failed to create sealed delivery", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create a SealedDelivery object to send")
-				.withStatus(Status.INTERNAL_SERVER_ERROR)
+				.withStatus(INTERNAL_SERVER_ERROR)
 				.withCause((ThrowableProblem) e.getCause())
 				.build();
 		} finally {
@@ -265,7 +265,7 @@ class DigitalMailMapper {
 			LOG.error("Couldn't create MD5-checksum for attachment", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create MD5-checksum for attachment")
-				.withStatus(Status.INTERNAL_SERVER_ERROR)
+				.withStatus(INTERNAL_SERVER_ERROR)
 
 				.build();
 		}
@@ -382,7 +382,7 @@ class DigitalMailMapper {
 
 		throw Problem.builder()
 			.withTitle("Couldn't find certificate for " + wantedAlias)
-			.withStatus(Status.INTERNAL_SERVER_ERROR)
+			.withStatus(INTERNAL_SERVER_ERROR)
 			.build();
 	}
 }

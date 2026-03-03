@@ -10,10 +10,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
-import org.zalando.problem.Problem;
 import se.gov.minameddelanden.common.sign.SignatureUtils;
+import se.sundsvall.dept44.problem.Problem;
 
-import static org.zalando.problem.Status.INTERNAL_SERVER_ERROR;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 public class Xml {
 

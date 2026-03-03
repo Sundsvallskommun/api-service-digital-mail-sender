@@ -10,12 +10,13 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import org.zalando.problem.Problem;
-import org.zalando.problem.violations.ConstraintViolationProblem;
-import org.zalando.problem.violations.Violation;
+import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
+import se.sundsvall.dept44.problem.violations.Violation;
 import se.sundsvall.digitalmail.Application;
 import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
 import se.sundsvall.digitalmail.service.DigitalMailService;
@@ -28,14 +29,15 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
-import static org.zalando.problem.Status.BAD_REQUEST;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDtoWithHtmlBody;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceRequest;
 
 @ActiveProfiles("junit")
+@AutoConfigureWebTestClient
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
 class DigitalMailResourceFailuresTest {
 
@@ -104,7 +106,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem.getResponseBody()).isNotNull();
 		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(tuple("sendDigitalMail.municipalityId", "not a valid municipality ID"));
 
 		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
@@ -128,7 +130,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem.getResponseBody()).isNotNull();
 		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
 				tuple("sendDigitalMail.organizationNumber", "must match the regular expression ^([1235789][\\d][2-9]\\d{7})$"),
 				tuple("sendDigitalMail.organizationNumber", "Sending organization is not registered as authorized sender"));
@@ -153,7 +155,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem.getResponseBody()).isNotNull();
 		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(tuple("sendDigitalInvoice.municipalityId", "not a valid municipality ID"));
 
 		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
@@ -173,7 +175,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem.getResponseBody()).isNotNull();
 		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(tuple("hasAvailableMailboxes.municipalityId", "not a valid municipality ID"));
 
 		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);
@@ -193,7 +195,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem.getResponseBody()).isNotNull();
 		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
-		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::getField, Violation::getMessage)
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
 				tuple("hasAvailableMailboxes.organizationNumber", "must match the regular expression ^([1235789][\\d][2-9]\\d{7})$"),
 				tuple("hasAvailableMailboxes.organizationNumber", "Sending organization is not registered as authorized sender"));
@@ -217,7 +219,7 @@ class DigitalMailResourceFailuresTest {
 		assertThat(problem).isNotNull();
 		assertThat(problem.getStatus()).isEqualTo(BAD_REQUEST);
 		assertThat(problem.getTitle()).isEqualTo("Constraint Violation");
-		assertThat(problem.getViolations()).extracting(Violation::getField, Violation::getMessage)
+		assertThat(problem.getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(tuple(field, message));
 
 		verifyNoInteractions(mockDigitalMailService, mockHtmlValidator);

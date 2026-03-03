@@ -1,40 +1,29 @@
 package apptest;
 
-import static java.lang.String.format;
-
-import apptest.extension.ResponseBodyTransformer;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
 import se.sundsvall.dept44.test.AbstractAppTest;
 import se.sundsvall.dept44.test.annotation.wiremock.WireMockAppTestSuite;
 import se.sundsvall.digitalmail.Application;
+import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.HttpStatus.OK;
 
 @WireMockAppTestSuite(files = "classpath:/DigitalMailIT/", classes = Application.class)
 class DigitalMailIT extends AbstractAppTest {
 
 	private static final String SEND_DIGITAL_MAIL_SERVICE_PATH = "/2281/2120002411/send-digital-mail";
 	private static final String MAILBOXES_SERVICE_PATH = "/2281/2120002411/mailboxes";
-	
-	private static final String REQUEST = "request.json"; 
+
+	private static final String REQUEST = "request.json";
 	private static final String EXPECTED = "expected.json";
-
-	private final String replacementUrl;
-
-	DigitalMailIT(@Value("${wiremock.server.port}") final int wiremockPort) {
-		replacementUrl = format("http://localhost:%d/deliversecure", wiremockPort);
-	}
 
 	@Test
 	void test1_sendDigitalMailToPrivatePerson() {
 		setupCall()
-			.withExtensions(new ResponseBodyTransformer()
-				.withModifier(body -> body.replace("https://mm.kivra.com/service/v3", replacementUrl)))
 			.withServicePath(SEND_DIGITAL_MAIL_SERVICE_PATH)
 			.withRequest(REQUEST)
 			.withHttpMethod(HttpMethod.POST)
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.withExpectedResponse(EXPECTED)
 			.sendRequestAndVerifyResponse()
 			.verifyAllStubs();
@@ -53,7 +42,7 @@ class DigitalMailIT extends AbstractAppTest {
 			.withServicePath(MAILBOXES_SERVICE_PATH)
 			.withRequest(REQUEST)
 			.withHttpMethod(HttpMethod.POST)
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.withExpectedResponse(EXPECTED)
 			.sendRequestAndVerifyResponse()
 			.verifyAllStubs();
@@ -62,26 +51,22 @@ class DigitalMailIT extends AbstractAppTest {
 	@Test
 	void test3_sendDigitalMailToOrganization() {
 		setupCall()
-			.withExtensions(new ResponseBodyTransformer()
-				.withModifier(body -> body.replace("https://mm.kivra.com/service/v3", replacementUrl)))
 			.withServicePath(SEND_DIGITAL_MAIL_SERVICE_PATH)
 			.withRequest(REQUEST)
 			.withHttpMethod(HttpMethod.POST)
-			.withExpectedResponseStatus(HttpStatus.OK)
+			.withExpectedResponseStatus(OK)
 			.withExpectedResponse(EXPECTED)
 			.sendRequestAndVerifyResponse()
 			.verifyAllStubs();
 	}
-	
+
 	@Test
 	void test4_sendDigitalMailNoAvailableMailboxes() {
 		setupCall()
-			.withExtensions(new ResponseBodyTransformer()
-				.withModifier(body -> body.replace("https://mm.kivra.com/service/v3", replacementUrl)))
 			.withServicePath(SEND_DIGITAL_MAIL_SERVICE_PATH)
 			.withRequest(REQUEST)
 			.withHttpMethod(HttpMethod.POST)
-			.withExpectedResponseStatus(HttpStatus.NOT_FOUND)
+			.withExpectedResponseStatus(NOT_FOUND)
 			.withExpectedResponse(EXPECTED)
 			.sendRequestAndVerifyResponse()
 			.verifyAllStubs();

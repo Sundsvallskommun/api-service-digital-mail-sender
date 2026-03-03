@@ -15,9 +15,10 @@ import org.springframework.ws.client.support.interceptor.ClientInterceptorAdapte
 import org.springframework.ws.context.MessageContext;
 import org.springframework.ws.soap.SoapMessage;
 import org.zalando.logbook.Logbook;
-import org.zalando.problem.Problem;
-import org.zalando.problem.Status;
 import se.sundsvall.dept44.configuration.webservicetemplate.WebServiceTemplateBuilder;
+import se.sundsvall.dept44.problem.Problem;
+
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Configuration
 class SkatteverketClientConfig {
@@ -106,7 +107,7 @@ class SkatteverketClientConfig {
 			if (length > maxSize) {
 				throw Problem.builder()
 					.withTitle("Message is too big to be sent as a digital mail.")
-					.withStatus(Status.BAD_REQUEST)
+					.withStatus(BAD_REQUEST)
 					.withDetail("Size is: " + length + " bytes. Max allowed is: " + maxSize + " bytes.")
 					.build();
 			}

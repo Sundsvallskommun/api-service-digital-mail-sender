@@ -24,9 +24,9 @@ public class ResponseBodyTransformer extends ResponseDefinitionTransformer {
     
     @Override
     public String getName() {
-        return "response-template";
+        return "custom-response-body-transformer";
     }
-    
+
     @Override
     public boolean applyGlobally() {
         return false;

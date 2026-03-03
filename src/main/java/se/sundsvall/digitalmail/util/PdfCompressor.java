@@ -22,6 +22,9 @@ public final class PdfCompressor {
 	private PdfCompressor() {}
 
 	public static void compress(final List<File> files) {
+		if (files == null) {
+			return;
+		}
 		files.stream().filter(file -> StringUtils.isNotEmpty(file.getBody())).forEach(file -> {
 			LOGGER.info("Trying to compress pdf: {}", sanitizeForLogging(file.getFilename()));
 
