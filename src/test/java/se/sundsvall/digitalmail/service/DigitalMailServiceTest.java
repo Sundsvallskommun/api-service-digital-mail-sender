@@ -1,6 +1,8 @@
 package se.sundsvall.digitalmail.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
@@ -27,7 +29,6 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -201,20 +202,20 @@ class DigitalMailServiceTest {
 		final var unreachableLegalId = "unreachableLegalId";
 		final var reachableMailboxDto = new MailboxDto(null, "LegalId", "serviceAddress", "kivra", true);
 		final var unreachableMailboxDto = new MailboxDto("Sender not accepted by recipient", "unreachableLegalId", null, null, false);
+		final var partyIds = List.of("partyId1", "partyId2", "partyIdNotFound");
 
-		// Test that we find legal Ids for 2 out of 3 partyIds
-		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
-			.thenReturn(Optional.of(reachableLegalId))
-			.thenReturn(Optional.of(unreachableLegalId))
-			.thenReturn(Optional.empty());
+		// Batch lookup finds legal Ids for 2 out of 3 partyIds
+		final var batchResult = new HashMap<String, String>();
+		batchResult.put("partyId1", reachableLegalId);
+		batchResult.put("partyId2", unreachableLegalId);
+		batchResult.put("partyIdNotFound", null);
+		when(mockPartyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds)).thenReturn(batchResult);
 
-		// That would result in a list of 2 MailboxDto objects as we only check availability for legal Ids that were
-		// found.
 		// Return one reachable and one unreachable mailbox.
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER)))
 			.thenReturn(List.of(reachableMailboxDto, unreachableMailboxDto));
 
-		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2", "partyIdNotFound"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var mailboxes = service.getMailboxes(partyIds, MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
 		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable, Mailbox::getReason)
 			.containsExactlyInAnyOrder(
@@ -222,43 +223,47 @@ class DigitalMailServiceTest {
 				tuple("partyId2", null, false, "Sender not accepted by recipient"),
 				tuple("partyIdNotFound", null, false, "No legal Id found for partyId: partyIdNotFound"));
 
-		verify(mockPartyIntegration, times(3)).getLegalId(eq(MUNICIPALITY_ID), anyString());
+		verify(mockPartyIntegration).getLegalIds(MUNICIPALITY_ID, partyIds);
 		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
 		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
 	}
 
 	@Test
 	void testGetMailboxesWhenNoLegalIdFound() {
-		// Test that we find no legal Id for any of the partyIds
-		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
-			.thenReturn(Optional.empty())
-			.thenReturn(Optional.empty());
+		final var partyIds = List.of("partyId1", "partyId2");
 
-		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		// Batch lookup finds no legal Ids
+		final var batchResult = new HashMap<String, String>();
+		batchResult.put("partyId1", null);
+		batchResult.put("partyId2", null);
+		when(mockPartyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds)).thenReturn(batchResult);
+
+		final var mailboxes = service.getMailboxes(partyIds, MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
 		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable, Mailbox::getReason)
 			.containsExactlyInAnyOrder(
 				tuple("partyId1", null, false, "No legal Id found for partyId: partyId1"),
 				tuple("partyId2", null, false, "No legal Id found for partyId: partyId2"));
 
-		verify(mockPartyIntegration, times(2)).getLegalId(eq(MUNICIPALITY_ID), anyString());
+		verify(mockPartyIntegration).getLegalIds(MUNICIPALITY_ID, partyIds);
 		verifyNoInteractions(mockAvailabilityService, mockKivraIntegration, mockDigitalMailIntegration);
 	}
 
 	@Test
 	void getGetMailboxesWhenEmptyResponseFromAvailabilityService() {
-		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
-			.thenReturn(Optional.of("LegalId"))
-			.thenReturn(Optional.of("anotherLegalId"));
+		final var partyIds = List.of("partyId1", "partyId2");
+
+		when(mockPartyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds))
+			.thenReturn(Map.of("partyId1", "LegalId", "partyId2", "anotherLegalId"));
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of());
 
-		final var mailboxes = service.getMailboxes(List.of("partyId1", "partyId2"), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
+		final var mailboxes = service.getMailboxes(partyIds, MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
 		assertThat(mailboxes).extracting(Mailbox::getPartyId, Mailbox::getSupplier, Mailbox::isReachable)
 			.containsExactly(
 				tuple("partyId1", null, false), tuple("partyId2", null, false));
 
-		verify(mockPartyIntegration, times(2)).getLegalId(eq(MUNICIPALITY_ID), anyString());
+		verify(mockPartyIntegration).getLegalIds(MUNICIPALITY_ID, partyIds);
 		verify(mockAvailabilityService).getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER));
 		verifyNoInteractions(mockKivraIntegration, mockDigitalMailIntegration);
 	}

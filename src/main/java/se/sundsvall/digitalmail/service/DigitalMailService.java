@@ -1,7 +1,6 @@
 package se.sundsvall.digitalmail.service;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -130,18 +129,14 @@ public class DigitalMailService {
 	}
 
 	private Map<String, String> getPartyIdLegalIdMap(final List<String> partyIds, final String municipalityId) {
-		var partyIdLegalIdNumberMap = new HashMap<String, String>();
-		partyIds.forEach(partyId -> {
-			// Add the partyId to the map even if the legal Id is null, so we can keep track of which partyIds have no legal Id.
-			partyIntegration.getLegalId(municipalityId, partyId).ifPresentOrElse(
-				legalId -> partyIdLegalIdNumberMap.put(partyId, legalId),
-				() -> {
-					partyIdLegalIdNumberMap.put(partyId, null);
-					LOGGER.warn("No legal id found for partyId: {}", sanitizeForLogging(partyId));
-				});
-		});
+		final var partyIdLegalIdMap = partyIntegration.getLegalIds(municipalityId, partyIds);
 
-		return partyIdLegalIdNumberMap;
+		// Log warnings for partyIds with no legal Id
+		partyIdLegalIdMap.entrySet().stream()
+			.filter(entry -> entry.getValue() == null)
+			.forEach(entry -> LOGGER.warn("No legal id found for partyId: {}", sanitizeForLogging(entry.getKey())));
+
+		return partyIdLegalIdMap;
 	}
 
 	private List<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> partyIdLegalIdMap) {
