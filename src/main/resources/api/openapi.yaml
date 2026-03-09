@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-- url: http://localhost:55440
+- url: http://localhost:52323
   description: Generated server url
 paths:
   /{municipalityId}/{organizationNumber}/send-digital-mail:

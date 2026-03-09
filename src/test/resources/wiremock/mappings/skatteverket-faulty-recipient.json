@@ -29,7 +29,7 @@
 				"text/xml;charset=UTF-8"
 			]
 		},
-		"bodyFileName": "../__files/skatteverket-faulty-recipient.xml",
+		"bodyFileName": "skatteverket-faulty-recipient.xml",
 		"status": 200
 	}
 }
