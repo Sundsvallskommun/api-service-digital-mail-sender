@@ -1,0 +1,28 @@
+{
+	"request": {
+		"method": "POST",
+		"url": "/party/2281/PRIVATE/legalIds",
+		"headers": {
+			"Content-Type": {
+				"equalTo": "application/json"
+			}
+		},
+		"bodyPatterns": [
+			{
+				"equalToJson": "[\"84f9c52b-8545-486a-9510-9743237bd547\",\"f10545c1-d05d-41f2-b2bc-9dd22241ebc6\",\"831f24d4-2836-4645-a502-035368b43683\",\"172524d4-ac0a-4fc6-8553-8286e04835dc\"]",
+				"ignoreArrayOrder": true
+			}
+		]
+	},
+	"response": {
+		"headers": {
+			"Content-Type": "application/json"
+		},
+		"jsonBody": {
+			"84f9c52b-8545-486a-9510-9743237bd547": "200001102391",
+			"f10545c1-d05d-41f2-b2bc-9dd22241ebc6": "201001212388",
+			"831f24d4-2836-4645-a502-035368b43683": "201301172399"
+		},
+		"status": 200
+	}
+}
