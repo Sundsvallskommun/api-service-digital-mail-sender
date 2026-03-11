@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,6 +14,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -154,6 +159,27 @@ class PartyIntegrationTest {
 			.hasSize(1)
 			.containsEntry(partyId, prefixedOrgNr);
 		verify(partyClient).getLegalIds(MUNICIPALITY_ID, partyIds);
+		verifyNoMoreInteractions(partyClient);
+	}
+
+	@Test
+	void getLegalIdsChunkingWhenPartyIdsExceedMaxPerCall() {
+		final var numberOfPartyIds = 2543;
+		final var partyIds = IntStream.range(0, numberOfPartyIds)
+			.mapToObj(i -> "partyId-" + i)
+			.toList();
+
+		when(partyClient.getLegalIds(anyString(), anyList()))
+			.thenAnswer(invocation -> {
+				final var ids = invocation.<List<String>>getArgument(1);
+				return ids.stream()
+					.collect(Collectors.toMap(id -> id, id -> "legalId-" + id));
+			});
+
+		final var result = partyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds);
+
+		assertThat(result).hasSize(numberOfPartyIds);
+		verify(partyClient, times(3)).getLegalIds(anyString(), anyList());
 		verifyNoMoreInteractions(partyClient);
 	}
 }

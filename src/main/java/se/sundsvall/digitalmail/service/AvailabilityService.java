@@ -18,9 +18,7 @@ public class AvailabilityService {
 
 	/**
 	 * Fetch a list of possible mailboxes.
-	 * If the list of legalIds is larger than MAX_LEGAL_IDS_PER_CALL it will be divided into multiple calls to the
-	 * integration, and the results
-	 * will be merged into one list.
+	 * If the list of legalIds is larger than MAX_LEGAL_IDS_PER_CALL it will be divided into multiple calls and aggregated.
 	 * Throws a problem in case no valid mailboxes are found for the given legal Ids.
 	 *
 	 * @param  legalIds           containing all legal Ids we should fetch mailboxes for
