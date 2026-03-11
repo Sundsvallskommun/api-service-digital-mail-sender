@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.service;
 
 import java.util.List;
+import java.util.stream.IntStream;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,6 +15,7 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
@@ -56,5 +58,30 @@ class AvailabilityServiceTest {
 		assertThat(availability).isEmpty();
 
 		verify(mockReachableIntegration).isReachable(anyList(), anyString());
+	}
+
+	@Test
+	void testChunkingWhenLegalIdsExceedMaxPerCall() {
+		final var numberOfLegalIds = 2543;
+		final var legalIds = IntStream.range(0, numberOfLegalIds)
+			.mapToObj(i -> "legalId-" + i)
+			.toList();
+
+		// Make sure the mock returns a mailbox for each legalId.
+		when(mockReachableIntegration.isReachable(anyList(), anyString()))
+			.thenAnswer(invocation -> {
+				final var ids = invocation.<List<String>>getArgument(0);
+				return ids.stream()
+					.map(id -> new MailboxDto(null, id, "serviceAddress", "serviceName", true))
+					.toList();
+			});
+
+		final var result = availabilityService.getRecipientMailboxesAndCheckAvailability(legalIds, ORGANIZATION_NUMBER);
+
+		// Verify we got the same number of mailboxes back.
+		assertThat(result).hasSize(numberOfLegalIds);
+
+		verify(mockReachableIntegration, times(3)).isReachable(anyList(), anyString());
+		verifyNoMoreInteractions(mockReachableIntegration);
 	}
 }
