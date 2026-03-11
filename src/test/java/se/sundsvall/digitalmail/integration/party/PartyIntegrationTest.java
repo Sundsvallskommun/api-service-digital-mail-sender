@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Test;
@@ -173,7 +174,7 @@ class PartyIntegrationTest {
 			.thenAnswer(invocation -> {
 				final var ids = invocation.<List<String>>getArgument(1);
 				return ids.stream()
-					.collect(Collectors.toMap(id -> id, id -> "legalId-" + id));
+					.collect(Collectors.toMap(Function.identity(), id -> "legalId-" + id));
 			});
 
 		final var result = partyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds);

@@ -59,7 +59,7 @@ public class PartyIntegration {
 		return result;
 	}
 
-	private HashMap<String, String> getLegalIdsByChunks(final String municipalityId, final List<String> partyIds) {
+	private Map<String, String> getLegalIdsByChunks(final String municipalityId, final List<String> partyIds) {
 		final var batchResult = new HashMap<String, String>();
 		for (var i = 0; i < partyIds.size(); i += MAX_PARTY_IDS_PER_CALL) {
 			final var partyIdsChunk = partyIds.subList(i, Math.min(i + MAX_PARTY_IDS_PER_CALL, partyIds.size()));
