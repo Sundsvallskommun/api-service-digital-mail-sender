@@ -13,6 +13,7 @@ import static java.util.Optional.ofNullable;
 @Component
 public class PartyIntegration {
 
+	private static final int MAX_PARTY_IDS_PER_CALL = 1000;
 	private final PartyClient partyClient;
 
 	public PartyIntegration(final PartyClient partyClient) {
@@ -29,6 +30,7 @@ public class PartyIntegration {
 
 	/**
 	 * Fetches legalIds for multiple partyIds in batch using the PRIVATE batch endpoint.
+	 * If the list of PartyIds is larger than MAX_PARTY_IDS_PER_CALL it will be divided into multiple calls and aggregated.
 	 * For partyIds not found via PRIVATE, falls back to individual ENTERPRISE lookups.
 	 * The returned map contains all input partyIds as keys, with null values for those not found.
 	 *
@@ -39,13 +41,13 @@ public class PartyIntegration {
 	public Map<String, String> getLegalIds(final String municipalityId, final List<String> partyIds) {
 		final var result = new HashMap<String, String>();
 
-		// Batch lookup for PRIVATE party type
-		final var batchResult = partyClient.getLegalIds(municipalityId, partyIds);
+		// Batch lookup for PRIVATE party type in chunks to handle large lists
+		final var batchResult = getLegalIdsByChunks(municipalityId, partyIds);
 
 		// Process batch results and apply prefixOrgNr
 		batchResult.forEach((partyId, legalId) -> result.put(partyId, prefixOrgNr(legalId).orElse(null)));
 
-		// For partyIds not found in batch, try ENTERPRISE individually
+		// For partyIds not found in batch, try ENTERPRISE individually as there's no batch functionality for that
 		partyIds.stream()
 			.filter(partyId -> !batchResult.containsKey(partyId))
 			.forEach(partyId -> partyClient.getLegalId(municipalityId, PartyType.ENTERPRISE, partyId)
@@ -55,6 +57,16 @@ public class PartyIntegration {
 					() -> result.put(partyId, null)));
 
 		return result;
+	}
+
+	private Map<String, String> getLegalIdsByChunks(final String municipalityId, final List<String> partyIds) {
+		final var batchResult = new HashMap<String, String>();
+		for (var i = 0; i < partyIds.size(); i += MAX_PARTY_IDS_PER_CALL) {
+			final var partyIdsChunk = partyIds.subList(i, Math.min(i + MAX_PARTY_IDS_PER_CALL, partyIds.size()));
+			batchResult.putAll(partyClient.getLegalIds(municipalityId, partyIdsChunk));
+		}
+
+		return batchResult;
 	}
 
 	/**
