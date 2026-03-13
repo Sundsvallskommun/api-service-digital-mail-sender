@@ -13,11 +13,12 @@ import static java.util.Optional.ofNullable;
 @Component
 public class PartyIntegration {
 
-	private static final int MAX_PARTY_IDS_PER_CALL = 1000;
 	private final PartyClient partyClient;
+	private final PartyProperties partyProperties;
 
-	public PartyIntegration(final PartyClient partyClient) {
+	public PartyIntegration(final PartyClient partyClient, PartyProperties partyProperties) {
 		this.partyClient = partyClient;
+		this.partyProperties = partyProperties;
 	}
 
 	@Cacheable(value = "partyCache")
@@ -61,8 +62,8 @@ public class PartyIntegration {
 
 	private Map<String, String> getLegalIdsByChunks(final String municipalityId, final List<String> partyIds) {
 		final var batchResult = new HashMap<String, String>();
-		for (var i = 0; i < partyIds.size(); i += MAX_PARTY_IDS_PER_CALL) {
-			final var partyIdsChunk = partyIds.subList(i, Math.min(i + MAX_PARTY_IDS_PER_CALL, partyIds.size()));
+		for (var i = 0; i < partyIds.size(); i += partyProperties.maxPartyIdsPerCall()) {
+			final var partyIdsChunk = partyIds.subList(i, Math.min(i + partyProperties.maxPartyIdsPerCall(), partyIds.size()));
 			batchResult.putAll(partyClient.getLegalIds(municipalityId, partyIdsChunk));
 		}
 

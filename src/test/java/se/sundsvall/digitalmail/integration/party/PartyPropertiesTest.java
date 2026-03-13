@@ -27,5 +27,6 @@ class PartyPropertiesTest {
 			assertThat(oauth2.clientSecret()).isEqualTo("some-client-secret");
 			assertThat(oauth2.tokenUrl()).isEqualTo("http://token-url.com");
 		});
+		assertThat(properties.maxPartyIdsPerCall()).isEqualTo(30);
 	}
 }
