@@ -25,6 +25,7 @@ integration:
       token-url: http://token-url.com
       client-id: some-client-id
       client-secret: some-client-secret
+    max-party-ids-per-call: 30
 
   # Skatteverket integration
   skatteverket:

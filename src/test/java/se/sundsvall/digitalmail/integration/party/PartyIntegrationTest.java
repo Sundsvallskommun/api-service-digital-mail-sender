@@ -8,6 +8,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -29,8 +30,16 @@ class PartyIntegrationTest {
 	@Mock
 	private PartyClient partyClient;
 
+	@Mock
+	private PartyProperties partyProperties;
+
 	@InjectMocks
 	private PartyIntegration partyIntegration;
+
+	@AfterEach
+	void tearDown() {
+		verifyNoMoreInteractions(partyClient, partyProperties);
+	}
 
 	@Test
 	void getLegalIdForPrivatePersonShouldReturnLegalIdWithoutPrefix() {
@@ -43,7 +52,6 @@ class PartyIntegrationTest {
 
 		assertThat(result).contains(legalId);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.PRIVATE, partyId);
-		verifyNoMoreInteractions(partyClient);
 	}
 
 	@Test
@@ -60,7 +68,6 @@ class PartyIntegrationTest {
 		assertThat(result).contains(prefixedLegalId);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.PRIVATE, partyId);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId);
-		verifyNoMoreInteractions(partyClient);
 	}
 
 	@Test
@@ -75,7 +82,6 @@ class PartyIntegrationTest {
 		assertThat(result).isEmpty();
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.PRIVATE, partyId);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId);
-		verifyNoMoreInteractions(partyClient);
 	}
 
 	@Test
@@ -86,6 +92,7 @@ class PartyIntegrationTest {
 		final var legalId2 = "199001011234";
 		final var partyIds = List.of(partyId1, partyId2);
 
+		when(partyProperties.maxPartyIdsPerCall()).thenReturn(5);
 		when(partyClient.getLegalIds(MUNICIPALITY_ID, partyIds)).thenReturn(Map.of(partyId1, legalId1, partyId2, legalId2));
 
 		final var result = partyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds);
@@ -95,7 +102,7 @@ class PartyIntegrationTest {
 			.containsEntry(partyId1, legalId1)
 			.containsEntry(partyId2, legalId2);
 		verify(partyClient).getLegalIds(MUNICIPALITY_ID, partyIds);
-		verifyNoMoreInteractions(partyClient);
+		verify(partyProperties, times(2)).maxPartyIdsPerCall();
 	}
 
 	@Test
@@ -107,6 +114,7 @@ class PartyIntegrationTest {
 		final var prefixedOrgNr = "165591628136";
 		final var partyIds = List.of(partyId1, partyId2);
 
+		when(partyProperties.maxPartyIdsPerCall()).thenReturn(5);
 		// partyId1 found via batch, partyId2 not
 		when(partyClient.getLegalIds(MUNICIPALITY_ID, partyIds)).thenReturn(Map.of(partyId1, legalId1));
 		// partyId2 found via ENTERPRISE fallback
@@ -120,7 +128,7 @@ class PartyIntegrationTest {
 			.containsEntry(partyId2, prefixedOrgNr);
 		verify(partyClient).getLegalIds(MUNICIPALITY_ID, partyIds);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId2);
-		verifyNoMoreInteractions(partyClient);
+		verify(partyProperties, times(2)).maxPartyIdsPerCall();
 	}
 
 	@Test
@@ -129,6 +137,7 @@ class PartyIntegrationTest {
 		final var partyId2 = UUID.randomUUID().toString();
 		final var partyIds = List.of(partyId1, partyId2);
 
+		when(partyProperties.maxPartyIdsPerCall()).thenReturn(5);
 		when(partyClient.getLegalIds(MUNICIPALITY_ID, partyIds)).thenReturn(Map.of());
 		when(partyClient.getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId1)).thenReturn(Optional.empty());
 		when(partyClient.getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId2)).thenReturn(Optional.empty());
@@ -142,7 +151,7 @@ class PartyIntegrationTest {
 		verify(partyClient).getLegalIds(MUNICIPALITY_ID, partyIds);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId1);
 		verify(partyClient).getLegalId(MUNICIPALITY_ID, PartyType.ENTERPRISE, partyId2);
-		verifyNoMoreInteractions(partyClient);
+		verify(partyProperties, times(2)).maxPartyIdsPerCall();
 	}
 
 	@Test
@@ -152,6 +161,7 @@ class PartyIntegrationTest {
 		final var prefixedOrgNr = "165591628136";
 		final var partyIds = List.of(partyId);
 
+		when(partyProperties.maxPartyIdsPerCall()).thenReturn(5);
 		when(partyClient.getLegalIds(MUNICIPALITY_ID, partyIds)).thenReturn(Map.of(partyId, orgNr));
 
 		final var result = partyIntegration.getLegalIds(MUNICIPALITY_ID, partyIds);
@@ -160,7 +170,7 @@ class PartyIntegrationTest {
 			.hasSize(1)
 			.containsEntry(partyId, prefixedOrgNr);
 		verify(partyClient).getLegalIds(MUNICIPALITY_ID, partyIds);
-		verifyNoMoreInteractions(partyClient);
+		verify(partyProperties, times(2)).maxPartyIdsPerCall();
 	}
 
 	@Test
@@ -170,6 +180,7 @@ class PartyIntegrationTest {
 			.mapToObj(i -> "partyId-" + i)
 			.toList();
 
+		when(partyProperties.maxPartyIdsPerCall()).thenReturn(1000);
 		when(partyClient.getLegalIds(anyString(), anyList()))
 			.thenAnswer(invocation -> {
 				final var ids = invocation.<List<String>>getArgument(1);
@@ -181,6 +192,6 @@ class PartyIntegrationTest {
 
 		assertThat(result).hasSize(numberOfPartyIds);
 		verify(partyClient, times(3)).getLegalIds(anyString(), anyList());
-		verifyNoMoreInteractions(partyClient);
+		verify(partyProperties, times(6)).maxPartyIdsPerCall();
 	}
 }

@@ -11,11 +11,9 @@ import se.sundsvall.digitalmail.integration.OAuth2;
 
 @Validated
 @ConfigurationProperties(prefix = "integration.party")
-record PartyProperties(
-
+public record PartyProperties(
 	@NotBlank String apiUrl,
-
 	@NotNull @Valid OAuth2 oauth2,
-
 	@DefaultValue("PT5S") Duration connectTimeout,
-	@DefaultValue("PT15S") Duration readTimeout) {}
+	@DefaultValue("PT15S") Duration readTimeout,
+	@DefaultValue("1000") int maxPartyIdsPerCall) {}

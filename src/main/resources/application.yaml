@@ -23,6 +23,8 @@ management:
 
 # Integrations
 integration:
+  party:
+    max-party-ids-per-call: 1000
   # Skatteverket integration
   skatteverket:
     # Max size in bytes for the outgoing SOAP-envelope (2MB)
