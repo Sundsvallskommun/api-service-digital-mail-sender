@@ -7,7 +7,7 @@ info:
     url: https://opensource.org/licenses/MIT
   version: "4.1"
 servers:
-- url: http://localhost:52323
+- url: http://localhost:51376
   description: Generated server url
 paths:
   /{municipalityId}/{organizationNumber}/send-digital-mail:
@@ -386,7 +386,7 @@ components:
           format: float
           description: The invoice amount
           examples:
-          - "123.45"
+          - 123.45
         dueDate:
           type: string
           format: date
