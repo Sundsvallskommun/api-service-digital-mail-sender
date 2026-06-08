@@ -7,7 +7,6 @@ import java.nio.charset.Charset;
 import java.util.AbstractList;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.stream.XMLInputFactory;
@@ -21,6 +20,8 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +34,8 @@ import static se.gov.minameddelanden.common.EncodingUtils.bytesToString;
 import static se.gov.minameddelanden.common.EncodingUtils.stringToBytes;
 
 public final class XmlUtil {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(XmlUtil.class);
 
 	private static final XMLInputFactory XML_INPUT_FACTORY = getXmlInputFactory();
 
@@ -177,7 +180,7 @@ public final class XmlUtil {
 
 	static XMLInputFactory getXmlInputFactory() {
 		var xmlInputFactory = XMLInputFactory.newInstance();
-		Logger.getLogger(Xml.class.getName()).finest("Using XMLInputFactory implementation " + xmlInputFactory.getClass().getName());
+		LOGGER.trace("Using XMLInputFactory implementation {}", xmlInputFactory.getClass().getName());
 		return xmlInputFactory;
 	}
 
