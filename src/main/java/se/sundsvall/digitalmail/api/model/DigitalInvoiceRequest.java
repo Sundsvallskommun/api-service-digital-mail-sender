@@ -10,6 +10,7 @@ import java.time.LocalDate;
 import java.util.List;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.digitalmail.api.validation.ValidAccountNumber;
+import se.sundsvall.digitalmail.api.validation.ValidEnum;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;
@@ -20,7 +21,9 @@ public record DigitalInvoiceRequest(
 
 	@ValidUuid @Schema(description = "partyId for the person or organization the invoice should be sent to", examples = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED) String partyId,
 
-	@NotNull @Schema(description = "Invoice type", requiredMode = REQUIRED) InvoiceType type,
+	@NotNull @ValidEnum(InvoiceType.class) @Schema(description = "Invoice type", allowableValues = {
+		"INVOICE", "REMINDER"
+	}, examples = "INVOICE", defaultValue = "INVOICE", requiredMode = REQUIRED) String type,
 
 	@NotBlank @Schema(description = "The invoice subject", examples = "Faktura från Sundsvalls kommun", requiredMode = REQUIRED) String subject,
 
@@ -39,11 +42,16 @@ public record DigitalInvoiceRequest(
 
 		@NotNull @Schema(description = "The invoice due date", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
 
-		@NotNull @Schema(requiredMode = REQUIRED) ReferenceType paymentReferenceType,
+		@NotNull @ValidEnum(ReferenceType.class) @Schema(description = "The payment reference type", allowableValues = {
+			"SE_OCR", "TENANT_REF"
+		}, examples = "SE_OCR", requiredMode = REQUIRED) String paymentReferenceType,
 
 		@NotBlank @Schema(description = "The payment reference number", maxLength = 25, examples = "426523791", requiredMode = REQUIRED) String paymentReference,
 
-		@NotNull @Schema(requiredMode = REQUIRED) AccountType accountType,
+		@NotNull @ValidEnum(AccountType.class) @Schema(description = "The receiving account type", allowableValues = {
+			"BANKGIRO", "PLUSGIRO"
+		}, examples = "BANKGIRO", requiredMode = REQUIRED) String accountType,
 
-		@ValidAccountNumber @Schema(description = "The receiving account (a valid BANKGIRO or PLUSGIRO number)", examples = "12345", requiredMode = REQUIRED) String accountNumber) {}
+		@ValidAccountNumber @Schema(description = "The receiving account (a valid BANKGIRO or PLUSGIRO number)", examples = "12345", requiredMode = REQUIRED) String accountNumber) {
+	}
 }

@@ -5,24 +5,21 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
-import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
-import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
 
 class DigitalInvoiceRequestTests {
 
 	@Test
 	void creationAndGetters() {
 		final var partyId = "somePartyId";
-		final var type = INVOICE;
+		final var type = "INVOICE";
 		final var subject = "someSubject";
 		final var reference = "someReference";
 		final var amount = 123.45f;
 		final var dueDate = LocalDate.now();
 		final var paymentReference = "somePaymentReference";
 		final var account = "someAccount";
-		final var details = new DigitalInvoiceRequest.Details(amount, dueDate, SE_OCR,
-			paymentReference, BANKGIRO, account);
+		final var details = new DigitalInvoiceRequest.Details(amount, dueDate, "SE_OCR",
+			paymentReference, "BANKGIRO", account);
 		final var contentType = "someContentType";
 		final var body = "someBody";
 		final var filename = "someFilename";
