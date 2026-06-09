@@ -4,14 +4,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import se.sundsvall.dept44.problem.Problem;
+import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
+import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.Mailbox;
+import se.sundsvall.digitalmail.api.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalmail.integration.party.PartyIntegration;
@@ -21,7 +25,9 @@ import se.sundsvall.digitalmail.integration.skatteverket.sendmail.DigitalMailInt
 import se.sundsvall.digitalmail.util.PdfCompressor;
 
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
+import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 @Service
@@ -38,24 +44,33 @@ public class DigitalMailService {
 
 	private final AvailabilityService availabilityService;
 
+	private final HtmlValidator htmlValidator;
+
 	DigitalMailService(
 		final PartyIntegration partyIntegration,
 		final DigitalMailIntegration digitalMailIntegration,
 		final KivraIntegration kivraIntegration,
-		final AvailabilityService availabilityService) {
+		final AvailabilityService availabilityService,
+		final HtmlValidator htmlValidator) {
 		this.partyIntegration = partyIntegration;
 		this.digitalMailIntegration = digitalMailIntegration;
 		this.kivraIntegration = kivraIntegration;
 		this.availabilityService = availabilityService;
+		this.htmlValidator = htmlValidator;
 	}
 
 	/**
 	 * Send a digital mail to a recipient
 	 *
-	 * @param  requestDto containing message and recipient
-	 * @return            Response whether the sending went ok or not.
+	 * @param  request            containing message and recipient
+	 * @param  municipalityId     the municipality the request belongs to
+	 * @param  organizationNumber the organization number of the sending organization
+	 * @return                    Response whether the sending went ok or not.
 	 */
-	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String municipalityId) {
+	public DigitalMailResponse sendDigitalMail(final DigitalMailRequest request, final String municipalityId, final String organizationNumber) {
+		validateHtmlBody(request);
+
+		final var requestDto = new DigitalMailDto(request, organizationNumber);
 		PdfCompressor.compress(requestDto.getAttachments());
 
 		final var legalId = partyIntegration.getLegalId(municipalityId, requestDto.getPartyId())
@@ -84,7 +99,9 @@ public class DigitalMailService {
 		return digitalMailIntegration.sendDigitalMail(requestDto, mailbox.getServiceAddress());
 	}
 
-	public DigitalInvoiceResponse sendDigitalInvoice(final InvoiceDto invoiceDto, final String municipalityId) {
+	public DigitalInvoiceResponse sendDigitalInvoice(final DigitalInvoiceRequest request, final String municipalityId) {
+		final var invoiceDto = new InvoiceDto(request);
+
 		final var ssn = partyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId())
 			.orElseThrow(() -> Problem.builder()
 				.withTitle("Error while sending digital invoice")
@@ -193,5 +210,22 @@ public class DigitalMailService {
 			.withReachable(mailboxDto.isValidMailbox())
 			.withReason(mailboxDto.getReason())
 			.build();
+	}
+
+	/**
+	 * Validate the body as HTML if the content type is text/html.
+	 *
+	 * @param request the request whose body should be validated
+	 */
+	private void validateHtmlBody(final DigitalMailRequest request) {
+		Optional.ofNullable(request.getBodyInformation())
+			.filter(bodyInfo -> TEXT_HTML_VALUE.equals(bodyInfo.getContentType()) && !htmlValidator.validate(bodyInfo.getBody()))
+			.ifPresent(bodyInfo -> {
+				throw Problem.builder()
+					.withTitle("Body HTML is invalid")
+					.withStatus(BAD_REQUEST)
+					.withDetail("Use https://validator.w3.org/ to make sure your HTML validates")
+					.build();
+			});
 	}
 }

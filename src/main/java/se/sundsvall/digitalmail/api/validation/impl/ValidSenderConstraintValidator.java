@@ -1,10 +1,10 @@
-package se.sundsvall.digitalmail.api.model.validation.annotation.impl;
+package se.sundsvall.digitalmail.api.validation.impl;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import org.springframework.stereotype.Component;
 import se.sundsvall.digitalmail.api.healthcheck.SenderHealthIndicator;
-import se.sundsvall.digitalmail.api.model.validation.annotation.ValidSender;
+import se.sundsvall.digitalmail.api.validation.ValidSender;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 import static org.springframework.util.CollectionUtils.isEmpty;

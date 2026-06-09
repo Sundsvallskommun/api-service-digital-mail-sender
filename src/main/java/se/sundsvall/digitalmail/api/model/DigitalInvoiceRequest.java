@@ -9,7 +9,7 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.util.List;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
-import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumber;
+import se.sundsvall.digitalmail.api.validation.ValidAccountNumber;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;

@@ -1,11 +1,11 @@
-package se.sundsvall.digitalmail.api.model.validation.annotation;
+package se.sundsvall.digitalmail.api.validation;
 
 import jakarta.validation.Constraint;
 import jakarta.validation.Payload;
 import java.lang.annotation.Documented;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import se.sundsvall.digitalmail.api.model.validation.annotation.impl.ValidAccountNumberConstraintValidator;
+import se.sundsvall.digitalmail.api.validation.impl.ValidAccountNumberConstraintValidator;
 
 import static java.lang.annotation.ElementType.CONSTRUCTOR;
 import static java.lang.annotation.ElementType.FIELD;

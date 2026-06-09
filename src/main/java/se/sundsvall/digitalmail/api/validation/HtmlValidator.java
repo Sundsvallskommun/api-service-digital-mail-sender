@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.api.model.validation;
+package se.sundsvall.digitalmail.api.validation;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

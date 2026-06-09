@@ -12,12 +12,11 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.digitalmail.Application;
 import se.sundsvall.digitalmail.api.model.DeliveryStatus;
+import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
+import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.Mailbox;
-import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
-import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.service.DigitalMailService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,7 +25,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
@@ -51,9 +49,6 @@ class DigitalMailResourceTest {
 	private static final String HAS_AVAILABLE_MAILBOXES_PATH = "/" + MUNICIPALITY_ID + "/{organizationNumber}/mailboxes";
 
 	@MockitoBean
-	private HtmlValidator mockHtmlValidator;
-
-	@MockitoBean
 	private DigitalMailService mockDigitalMailService;
 
 	@Autowired
@@ -61,7 +56,7 @@ class DigitalMailResourceTest {
 
 	@AfterEach
 	void tearDown() {
-		verifyNoMoreInteractions(mockDigitalMailService, mockHtmlValidator);
+		verifyNoMoreInteractions(mockDigitalMailService);
 	}
 
 	@Test
@@ -75,7 +70,7 @@ class DigitalMailResourceTest {
 				.build())
 			.build();
 
-		when(mockDigitalMailService.sendDigitalMail(any(DigitalMailDto.class), anyString())).thenReturn(response);
+		when(mockDigitalMailService.sendDigitalMail(any(DigitalMailRequest.class), anyString(), anyString())).thenReturn(response);
 
 		final var result = webTestClient.post()
 			.uri(SEND_DIGITAL_MAIL_PATH, ORGANIZATION_NUMBER)
@@ -95,8 +90,7 @@ class DigitalMailResourceTest {
 			assertThat(resultDeliverystatus.getTransactionId()).isEqualTo(response.getDeliveryStatus().getTransactionId());
 		});
 
-		verify(mockDigitalMailService).sendDigitalMail(any(DigitalMailDto.class), anyString());
-		verifyNoInteractions(mockHtmlValidator);
+		verify(mockDigitalMailService).sendDigitalMail(any(DigitalMailRequest.class), anyString(), anyString());
 	}
 
 	@Test
@@ -104,7 +98,7 @@ class DigitalMailResourceTest {
 		final var request = generateInvoiceRequest();
 		final var response = new DigitalInvoiceResponse(request.partyId(), true);
 
-		when(mockDigitalMailService.sendDigitalInvoice(any(InvoiceDto.class), anyString())).thenReturn(response);
+		when(mockDigitalMailService.sendDigitalInvoice(any(DigitalInvoiceRequest.class), anyString())).thenReturn(response);
 
 		final var result = webTestClient.post()
 			.uri(SEND_DIGITAL_INVOICE_PATH)
@@ -121,8 +115,7 @@ class DigitalMailResourceTest {
 		assertThat(result.partyId()).isEqualTo(response.partyId());
 		assertThat(result.sent()).isEqualTo(response.sent());
 
-		verify(mockDigitalMailService, times(1)).sendDigitalInvoice(any(InvoiceDto.class), anyString());
-		verifyNoInteractions(mockHtmlValidator);
+		verify(mockDigitalMailService, times(1)).sendDigitalInvoice(any(DigitalInvoiceRequest.class), anyString());
 	}
 
 	@Test
@@ -149,7 +142,6 @@ class DigitalMailResourceTest {
 				tuple(partyId, true, supplier));
 
 		verify(mockDigitalMailService, times(1)).getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
-		verifyNoInteractions(mockHtmlValidator);
 	}
 
 	@Test
@@ -172,6 +164,5 @@ class DigitalMailResourceTest {
 			.isEmpty();
 
 		verify(mockDigitalMailService, times(1)).getMailboxes(List.of(partyId), MUNICIPALITY_ID, ORGANIZATION_NUMBER);
-		verifyNoInteractions(mockHtmlValidator);
 	}
 }

@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.api.model.validation;
+package se.sundsvall.digitalmail.api.validation;
 
 import jakarta.validation.ValidationException;
 import org.junit.jupiter.api.Test;
