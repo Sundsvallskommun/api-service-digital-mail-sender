@@ -1,6 +1,8 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
 import feign.Request;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -15,15 +17,12 @@ import static java.util.Collections.emptySet;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Import(FeignConfiguration.class)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class KivraConfig {
 
 	static final String INTEGRATION_NAME = "Kivra";
 
 	private final KivraProperties properties;
-
-	KivraConfig(final KivraProperties properties) {
-		this.properties = properties;
-	}
 
 	@Bean
 	FeignBuilderCustomizer feignBuilderCustomizer() {

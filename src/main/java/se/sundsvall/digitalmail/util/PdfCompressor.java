@@ -4,20 +4,18 @@ import java.io.ByteArrayOutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.openpdf.text.Document;
 import org.openpdf.text.pdf.PdfReader;
 import org.openpdf.text.pdf.PdfSmartCopy;
 import org.openpdf.text.pdf.PdfStream;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import se.sundsvall.digitalmail.api.model.File;
 
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
+@Slf4j
 public final class PdfCompressor {
-
-	private static final Logger LOGGER = LoggerFactory.getLogger(PdfCompressor.class);
 
 	private PdfCompressor() {}
 
@@ -26,7 +24,7 @@ public final class PdfCompressor {
 			return;
 		}
 		files.stream().filter(file -> StringUtils.isNotEmpty(file.getBody())).forEach(file -> {
-			LOGGER.info("Trying to compress pdf: {}", sanitizeForLogging(file.getFilename()));
+			log.info("Trying to compress pdf: {}", sanitizeForLogging(file.getFilename()));
 
 			final var sizeBeforeCompression = file.getBody().length();
 			file.setBody(compress(file.getBody()));
@@ -39,9 +37,9 @@ public final class PdfCompressor {
 		final var compressedPercentage = String.format("%.0f", (double) sizeAfterCompression / sizeBeforeCompression * 100);
 
 		if (!"100".equals(compressedPercentage)) {
-			LOGGER.info("Pdf is now {}% of the original size.", compressedPercentage);
+			log.info("Pdf is now {}% of the original size.", compressedPercentage);
 		} else {
-			LOGGER.info("Couldn't compress pdf.");
+			log.info("Couldn't compress pdf.");
 		}
 	}
 
@@ -65,7 +63,7 @@ public final class PdfCompressor {
 			return Base64.getEncoder().encodeToString(result.toByteArray());
 
 		} catch (final Exception e) {
-			LOGGER.warn("A problem occurred during compression of PDF: {}", e.getMessage());
+			log.warn("A problem occurred during compression of PDF: {}", e.getMessage());
 		}
 
 		// If compression fails, return the original content

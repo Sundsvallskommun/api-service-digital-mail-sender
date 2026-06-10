@@ -13,6 +13,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Primary;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
 
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 	"spring.lifecycle.timeout-per-shutdown-phase=0s"
 })
 @ActiveProfiles("junit")
+@DirtiesContext
 class CertificateHealthSchedulerShedlockTests {
 
 	@TestConfiguration
@@ -46,7 +48,7 @@ class CertificateHealthSchedulerShedlockTests {
 			final var mockBean = Mockito.mock(KivraIntegration.class);
 
 			// Let mock hang
-			doAnswer(invocation -> {
+			doAnswer(_ -> {
 				mockCalledTime = LocalDateTime.now();
 				await().forever()
 					.until(() -> false);
@@ -72,7 +74,7 @@ class CertificateHealthSchedulerShedlockTests {
 
 		// Verify lock
 		await().atMost(5, SECONDS)
-			.untilAsserted(() -> assertThat(getLockedAt("certificate-health"))
+			.untilAsserted(() -> assertThat(getLockedAt())
 				.isCloseTo(LocalDateTime.now(systemUTC()), within(10, ChronoUnit.SECONDS)));
 
 		// Only one call should be made as long as transferFiles() is locked and mock is waiting for first call to finish
@@ -80,10 +82,10 @@ class CertificateHealthSchedulerShedlockTests {
 		verifyNoMoreInteractions(kivraIntegration);
 	}
 
-	private LocalDateTime getLockedAt(String name) {
+	private LocalDateTime getLockedAt() {
 		return jdbcTemplate.query(
 			"SELECT locked_at FROM shedlock WHERE name = :name",
-			Map.of("name", name),
+			Map.of("name", "certificate-health"),
 			this::mapTimestamp);
 	}
 

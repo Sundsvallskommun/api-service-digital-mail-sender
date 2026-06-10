@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
@@ -31,33 +32,17 @@ import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static se.sundsvall.dept44.util.LogUtils.sanitizeForLogging;
 
 @Service
+@Slf4j
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class DigitalMailService {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(DigitalMailService.class);
 	private static final String ERROR_NO_LEGAL_ID_FOUND = "No legal Id found for partyId: %s";
 
 	private final PartyIntegration partyIntegration;
-
 	private final DigitalMailIntegration digitalMailIntegration;
-
 	private final KivraIntegration kivraIntegration;
-
 	private final AvailabilityService availabilityService;
-
 	private final HtmlValidator htmlValidator;
-
-	DigitalMailService(
-		final PartyIntegration partyIntegration,
-		final DigitalMailIntegration digitalMailIntegration,
-		final KivraIntegration kivraIntegration,
-		final AvailabilityService availabilityService,
-		final HtmlValidator htmlValidator) {
-		this.partyIntegration = partyIntegration;
-		this.digitalMailIntegration = digitalMailIntegration;
-		this.kivraIntegration = kivraIntegration;
-		this.availabilityService = availabilityService;
-		this.htmlValidator = htmlValidator;
-	}
 
 	/**
 	 * Send a digital mail to a recipient
@@ -119,26 +104,26 @@ public class DigitalMailService {
 	}
 
 	public List<Mailbox> getMailboxes(final List<String> partyIds, final String municipalityId, final String organizationNumber) {
-		var partyIdLegalIdMap = getPartyIdLegalIdMap(partyIds, municipalityId);
+		final var partyIdLegalIdMap = getPartyIdLegalIdMap(partyIds, municipalityId);
 
 		// Now we know which partyIds have a legal Id and which do not, extract the ones we have and check availability.
-		var foundLegalIds = partyIdLegalIdMap.values().stream()
+		final var foundLegalIds = partyIdLegalIdMap.values().stream()
 			.filter(Objects::nonNull)
 			.toList();
 
 		// If we have no legal Ids we cannot continue, create unreachable mailboxes for all partyIds.
 		if (foundLegalIds.isEmpty()) {
 			// And return it directly, no need to call availabilityService with an empty list.
-			LOGGER.info("No legal Ids found for any of the given partyIds, returning unreachable mailboxes for all partyIds.");
+			log.info("No legal Ids found for any of the given partyIds, returning unreachable mailboxes for all partyIds.");
 			return createUnreachableMailboxes(partyIds);
 		}
 
 		// Otherwise, call availabilityService with the found legal Ids.
-		var mailBoxDtoList = availabilityService.getRecipientMailboxesAndCheckAvailability(foundLegalIds, organizationNumber);
+		final var mailBoxDtoList = availabilityService.getRecipientMailboxesAndCheckAvailability(foundLegalIds, organizationNumber);
 
 		// Same thing here, if we got no mailboxes back (unlikely), create unreachable mailboxes for all partyIds.
 		if (mailBoxDtoList.isEmpty()) {
-			LOGGER.info("No mailboxes found for any of the given legal Ids, returning unreachable mailboxes for all partyIds.");
+			log.info("No mailboxes found for any of the given legal Ids, returning unreachable mailboxes for all partyIds.");
 			return createUnreachableMailboxes(partyIds);
 		}
 
@@ -151,21 +136,21 @@ public class DigitalMailService {
 		// Log warnings for partyIds with no legal Id
 		partyIdLegalIdMap.entrySet().stream()
 			.filter(entry -> entry.getValue() == null)
-			.forEach(entry -> LOGGER.warn("No legal id found for partyId: {}", sanitizeForLogging(entry.getKey())));
+			.forEach(entry -> log.warn("No legal id found for partyId: {}", sanitizeForLogging(entry.getKey())));
 
 		return partyIdLegalIdMap;
 	}
 
 	private List<Mailbox> createMailboxes(final List<MailboxDto> mailBoxDtoList, final Map<String, String> partyIdLegalIdMap) {
-		var mailboxes = new ArrayList<Mailbox>();
+		final var mailboxes = new ArrayList<Mailbox>();
 		// Create a reversed hashmap so we don't need to iterate through the whole original hashmap to find a legal Id
-		var legalIdPartyIdMap = createLegalIdPartyIdMap(partyIdLegalIdMap);
+		final var legalIdPartyIdMap = createLegalIdPartyIdMap(partyIdLegalIdMap);
 
 		// Map each MailboxDto to a Mailbox object.
-		for (MailboxDto mailboxDto : mailBoxDtoList) {
-			var legalId = mailboxDto.getRecipientId();
+		for (final MailboxDto mailboxDto : mailBoxDtoList) {
+			final var legalId = mailboxDto.getRecipientId();
 			// Find the corresponding partyId
-			var partyId = legalIdPartyIdMap.get(legalId);
+			final var partyId = legalIdPartyIdMap.get(legalId);
 
 			// Create a Mailbox object and add it to the list to return
 			mailboxes.add(toMailbox(mailboxDto, partyId));
@@ -181,7 +166,7 @@ public class DigitalMailService {
 		return mailboxes;
 	}
 
-	private Map<String, String> createLegalIdPartyIdMap(Map<String, String> partyIdLegalIdMap) {
+	private Map<String, String> createLegalIdPartyIdMap(final Map<String, String> partyIdLegalIdMap) {
 		return partyIdLegalIdMap.entrySet().stream()
 			.filter(entry -> entry.getValue() != null) // Filter out null values, i.e. legal Ids not found.
 			.collect(Collectors.toMap(
@@ -220,7 +205,7 @@ public class DigitalMailService {
 	private void validateHtmlBody(final DigitalMailRequest request) {
 		Optional.ofNullable(request.getBodyInformation())
 			.filter(bodyInfo -> TEXT_HTML_VALUE.equals(bodyInfo.getContentType()) && !htmlValidator.validate(bodyInfo.getBody()))
-			.ifPresent(bodyInfo -> {
+			.ifPresent(_ -> {
 				throw Problem.builder()
 					.withTitle("Body HTML is invalid")
 					.withStatus(BAD_REQUEST)

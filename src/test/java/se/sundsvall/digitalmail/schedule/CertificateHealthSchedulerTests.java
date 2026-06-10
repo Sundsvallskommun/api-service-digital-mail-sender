@@ -36,13 +36,14 @@ import static org.springframework.test.util.ReflectionTestUtils.setField;
 
 @ExtendWith(MockitoExtension.class)
 class CertificateHealthSchedulerTests {
+
 	private static final String SCHEDULER_NAME = "certificate-health";
 
 	@Mock
 	private NotificationProperties notificationPropertiesMock;
 
 	@Mock
-	private MessagingIntegration messagingIntegrationmock;
+	private MessagingIntegration messagingIntegrationMock;
 
 	@Mock
 	private KivraIntegration kivraIntegrationMock;
@@ -75,7 +76,7 @@ class CertificateHealthSchedulerTests {
 
 	@AfterEach
 	void verifyNoMoreMockInteractions() {
-		verifyNoMoreInteractions(notificationPropertiesMock, messagingIntegrationmock, kivraIntegrationMock, dept44HealthUtilityMock);
+		verifyNoMoreInteractions(notificationPropertiesMock, messagingIntegrationMock, kivraIntegrationMock, dept44HealthUtilityMock);
 	}
 
 	@Test
@@ -126,7 +127,7 @@ class CertificateHealthSchedulerTests {
 		verify(mailMock, times(4)).sender();
 		verify(senderMock, times(2)).emailAddress();
 		verify(senderMock, times(2)).name();
-		verify(messagingIntegrationmock, times(2)).sendEmail(eq("2281"), emailRequestCaptor.capture());
+		verify(messagingIntegrationMock, times(2)).sendEmail(eq("2281"), emailRequestCaptor.capture());
 
 		assertThat(emailRequestCaptor.getAllValues()).hasSize(2)
 			.allSatisfy(request -> {
@@ -179,7 +180,7 @@ class CertificateHealthSchedulerTests {
 		verify(slackMock).channel();
 		verify(slackMock).message();
 		verify(slackMock).token();
-		verify(messagingIntegrationmock).sendSlack(eq("2281"), slackRequestCaptor.capture());
+		verify(messagingIntegrationMock).sendSlack(eq("2281"), slackRequestCaptor.capture());
 
 		assertThat(slackRequestCaptor.getValue().getChannel()).isEqualTo(channel);
 		assertThat(slackRequestCaptor.getValue().getMessage()).isEqualTo(message);
@@ -224,8 +225,8 @@ class CertificateHealthSchedulerTests {
 		verify(notificationPropertiesMock, times(5)).mail();
 		verify(notificationPropertiesMock, times(4)).slack();
 		verify(dept44HealthUtilityMock, times(2)).setHealthIndicatorUnhealthy(SCHEDULER_NAME, "A potential certificate issue has been detected and needs to be investigated");
-		verify(messagingIntegrationmock).sendEmail(eq(municipalityId), any());
-		verify(messagingIntegrationmock).sendSlack(eq(municipalityId), any());
+		verify(messagingIntegrationMock).sendEmail(eq(municipalityId), any());
+		verify(messagingIntegrationMock).sendSlack(eq(municipalityId), any());
 	}
 
 	@ParameterizedTest

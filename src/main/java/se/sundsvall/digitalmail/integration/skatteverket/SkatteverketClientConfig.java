@@ -5,8 +5,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ws.client.WebServiceClientException;
@@ -21,15 +22,11 @@ import se.sundsvall.dept44.problem.Problem;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 
 @Configuration
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class SkatteverketClientConfig {
 
 	private final Logbook logbook;
 	private final SkatteverketProperties properties;
-
-	SkatteverketClientConfig(final SkatteverketProperties properties, final Logbook logbook) {
-		this.logbook = logbook;
-		this.properties = properties;
-	}
 
 	// Separate the beans since we don't want the "reachable" one to get intercepted for the size-check.
 	@Bean("skatteverketSendmailWebserviceTemplate")
@@ -73,21 +70,20 @@ class SkatteverketClientConfig {
 			.withKeyStorePassword(properties.keyStorePassword());
 	}
 
+	@Slf4j
 	static class SoapMessageSizeInterceptor extends ClientInterceptorAdapter {
-
-		private static final Logger LOG = LoggerFactory.getLogger(SoapMessageSizeInterceptor.class);
 
 		private final long maxSize;
 
 		public SoapMessageSizeInterceptor(final long maxSize) {
 			this.maxSize = maxSize;
 
-			LOG.info("Max size of SOAP messages is set to {} bytes", maxSize);
+			log.info("Max size of SOAP messages is set to {} bytes", maxSize);
 		}
 
 		@Override
 		public boolean handleRequest(final MessageContext messageContext) throws WebServiceClientException {
-			LOG.debug("Checking size of SOAP message");
+			log.debug("Checking size of SOAP message");
 
 			final var soapMessage = (SoapMessage) messageContext.getRequest();
 
@@ -95,7 +91,7 @@ class SkatteverketClientConfig {
 				soapMessage.writeTo(outputStream);
 				checkSizeOfMessage(outputStream);
 			} catch (IOException e) {
-				LOG.warn("Couldn't calculate size of SOAP message, sending it anyway");
+				log.warn("Couldn't calculate size of SOAP message, sending it anyway");
 			}
 
 			return true;

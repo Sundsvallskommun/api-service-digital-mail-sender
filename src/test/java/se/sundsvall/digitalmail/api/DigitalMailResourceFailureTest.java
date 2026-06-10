@@ -11,6 +11,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -34,7 +35,8 @@ import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceRequest;
 @ActiveProfiles("junit")
 @AutoConfigureWebTestClient
 @SpringBootTest(classes = Application.class, webEnvironment = RANDOM_PORT)
-class DigitalMailResourceFailuresTest {
+@DirtiesContext
+class DigitalMailResourceFailureTest {
 
 	private static final String MUNICIPALITY_ID = "2281";
 

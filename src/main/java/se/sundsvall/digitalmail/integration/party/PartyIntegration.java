@@ -5,21 +5,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import static java.util.Optional.ofNullable;
 
 @Component
+@RequiredArgsConstructor
 public class PartyIntegration {
 
 	private final PartyClient partyClient;
 	private final PartyProperties partyProperties;
-
-	public PartyIntegration(final PartyClient partyClient, PartyProperties partyProperties) {
-		this.partyClient = partyClient;
-		this.partyProperties = partyProperties;
-	}
 
 	@Cacheable(value = "partyCache")
 	public Optional<String> getLegalId(final String municipalityId, final String partyId) {

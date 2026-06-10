@@ -9,6 +9,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class MessagingMapperTest {
+
 	private static final String EMAIL_ADDRESS = "emailAddress";
 	private static final String SUBJECT = "subject";
 	private static final String MESSAGE = "message";

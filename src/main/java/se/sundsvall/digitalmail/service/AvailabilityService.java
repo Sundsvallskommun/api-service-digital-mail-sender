@@ -2,19 +2,18 @@ package se.sundsvall.digitalmail.service;
 
 import java.util.ArrayList;
 import java.util.List;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import se.sundsvall.digitalmail.integration.skatteverket.reachable.ReachableIntegration;
 
 @Service
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class AvailabilityService {
 
 	private final ReachableIntegration reachableIntegration;
 	private static final int MAX_LEGAL_IDS_PER_CALL = 1000;
-
-	public AvailabilityService(final ReachableIntegration reachableIntegration) {
-		this.reachableIntegration = reachableIntegration;
-	}
 
 	/**
 	 * Fetch a list of possible mailboxes.

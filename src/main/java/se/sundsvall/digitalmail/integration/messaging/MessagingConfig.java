@@ -1,6 +1,8 @@
 package se.sundsvall.digitalmail.integration.messaging;
 
 import feign.Request;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -13,15 +15,12 @@ import se.sundsvall.dept44.configuration.feign.decoder.ProblemErrorDecoder;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Import(FeignConfiguration.class)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class MessagingConfig {
 
 	static final String INTEGRATION_NAME = "messagingClient";
 
 	private final MessagingProperties properties;
-
-	MessagingConfig(MessagingProperties properties) {
-		this.properties = properties;
-	}
 
 	@Bean
 	FeignBuilderCustomizer feignBuilderCustomizer() {

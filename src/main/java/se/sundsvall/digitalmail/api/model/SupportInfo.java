@@ -2,14 +2,12 @@ package se.sundsvall.digitalmail.api.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
 @Schema(description = "Contains contact information and where the recipient may turn to for questions.", requiredMode = REQUIRED)
-@Getter
-@Setter
+@Data
 public class SupportInfo {
 
 	@NotBlank

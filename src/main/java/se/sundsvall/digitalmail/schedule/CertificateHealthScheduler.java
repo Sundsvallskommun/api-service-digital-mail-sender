@@ -4,8 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import se.sundsvall.dept44.scheduling.Dept44Scheduled;
@@ -22,8 +21,8 @@ import static se.sundsvall.digitalmail.integration.messaging.MessagingMapper.toE
 import static se.sundsvall.digitalmail.integration.messaging.MessagingMapper.toSlackRequest;
 
 @Component
+@Slf4j
 public class CertificateHealthScheduler {
-	private static final Logger LOGGER = LoggerFactory.getLogger(CertificateHealthScheduler.class);
 	private static final String EMPTY_STRING = "";
 	private static final String SUNDSVALL_MUNICIPALITY_ID = "2281";
 	private static final String HEALTH_MESSAGE = "A potential certificate issue has been detected and needs to be investigated";
@@ -54,7 +53,7 @@ public class CertificateHealthScheduler {
 				dept44HealthUtility.setHealthIndicatorHealthy(schedulerName);
 				sendNotification.set(true); // Reset notification signal if indicator is considered to be healthy
 			} else {
-				LOGGER.warn(HEALTH_MESSAGE);
+				log.warn(HEALTH_MESSAGE);
 				dept44HealthUtility.setHealthIndicatorUnhealthy(schedulerName, HEALTH_MESSAGE);
 			}
 		};

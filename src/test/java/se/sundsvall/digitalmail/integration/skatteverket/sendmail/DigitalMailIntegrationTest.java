@@ -24,12 +24,14 @@ import static org.mockito.Mockito.when;
 import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 
 @ExtendWith(MockitoExtension.class)
-class SecureMailIntegrationTest {
+class DigitalMailIntegrationTest {
 
 	@Mock
 	private WebServiceTemplate mockWebServiceTemplate;
+
 	@Mock
 	private DigitalMailMapper mockMapper;
+
 	@InjectMocks
 	private DigitalMailIntegration mailIntegration;
 

@@ -5,27 +5,9 @@ import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBElement;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;
-import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableEntryException;
-import java.security.cert.X509Certificate;
-import java.util.Collections;
-import java.util.GregorianCalendar;
-import java.util.List;
-import javax.xml.datatype.DatatypeConfigurationException;
-import javax.xml.datatype.DatatypeFactory;
-import javax.xml.datatype.XMLGregorianCalendar;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.jose4j.base64url.Base64;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import se.gov.minameddelanden.common.X509CertificateWithPrivateKey;
@@ -47,7 +29,6 @@ import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.dept44.requestid.RequestId;
-import se.sundsvall.dept44.util.KeyStoreUtils;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.DeliveryStatus;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
@@ -55,16 +36,27 @@ import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
+import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.util.Collections;
+import java.util.GregorianCalendar;
+import java.util.List;
+
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static se.sundsvall.digitalmail.util.LegalIdUtil.prefixOrgNumber;
 
 @Component
+@Slf4j
 class DigitalMailMapper {
-
-	public static final String SKATTEVERKET_CERT_NAME = "skatteverket";
-	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailMapper.class);
 
 	private static final ObjectFactory OBJECT_FACTORY = new ObjectFactory();
 	private static final String NAMESPACE_URI = "http://minameddelanden.gov.se/schema/Message/v3";
@@ -73,7 +65,6 @@ class DigitalMailMapper {
 
 	private final DocumentBuilder documentBuilder;
 
-	private final KeyStore keyStore;
 	private final X509CertificateWithPrivateKey certificate;
 
 	// Since the marshaller is not thread safe, we need to create a new one for each thread.
@@ -90,38 +81,17 @@ class DigitalMailMapper {
 		}
 	});
 
-	DigitalMailMapper(final SkatteverketProperties properties) throws UnrecoverableEntryException, KeyStoreException, NoSuchAlgorithmException, ParserConfigurationException {
+	DigitalMailMapper(final SkatteverketProperties properties, final X509CertificateWithPrivateKey certificate) throws ParserConfigurationException {
 		this.properties = properties;
-
-		// Load the KeyStore and get the signing key and certificate.
-		keyStore = KeyStoreUtils.loadKeyStore(Base64.decode(properties.keyStoreAsBase64()), properties.keyStorePassword());
-
-		// Read certificate from keystore
-		certificate = setupCertificate();
-
-		// Create document builder
+		this.certificate = certificate;
 		final var documentBuilderFactory = DocumentBuilderFactory.newInstance();
 		documentBuilderFactory.setNamespaceAware(true);
-		documentBuilder = documentBuilderFactory.newDocumentBuilder();
+		this.documentBuilder = documentBuilderFactory.newDocumentBuilder();
 	}
 
-	private Marshaller getMarshaller() {
+	// Package-private so the marshaling failure path can be exercised in tests via a throwing marshaller.
+	Marshaller getMarshaller() {
 		return threadLocalMarshaller.get();
-	}
-
-	/**
-	 * Reads certificate information from a keystore
-	 *
-	 * @return X509CertificateWithPrivateKey containing the certificate and private key
-	 */
-	private X509CertificateWithPrivateKey setupCertificate()
-		throws KeyStoreException, UnrecoverableEntryException, NoSuchAlgorithmException {
-		final var privateKeyEntry = (KeyStore.PrivateKeyEntry) keyStore.getEntry(
-			getAliasFromKeystore(keyStore, SKATTEVERKET_CERT_NAME),
-			new KeyStore.PasswordProtection(properties.keyStorePassword().toCharArray()));
-		final var cert = (X509Certificate) privateKeyEntry.getCertificate();
-
-		return new X509CertificateWithPrivateKey(cert, privateKeyEntry.getPrivateKey());
 	}
 
 	DigitalMailResponse createDigitalMailResponse(final DeliverSecureResponse deliveryResult, final String partyId) {
@@ -132,7 +102,6 @@ class DigitalMailMapper {
 			.withPartyId(partyId)
 			.build());
 		return digitalMailResponse;
-
 	}
 
 	/**
@@ -153,7 +122,7 @@ class DigitalMailMapper {
 	 * @return     A Sealed delivery signed by not the sender but us as a mediator.
 	 */
 	SealedDelivery createSealedDelivery(final DigitalMailDto dto) {
-		LOG.info("Creating sealed delivery");
+		log.info("Creating sealed delivery");
 		try {
 			// Get the correct certificate
 			// Create the signedDeliveryDocument, inner one.
@@ -188,7 +157,7 @@ class DigitalMailMapper {
 			return sealedDelivery;
 		} catch (final JAXBException | DatatypeConfigurationException e) {
 			// Needed to see stacktrace
-			LOG.error("Failed to create sealed delivery", e);
+			log.error("Failed to create sealed delivery", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create a SealedDelivery object to send")
 				.withStatus(INTERNAL_SERVER_ERROR)
@@ -262,7 +231,7 @@ class DigitalMailMapper {
 			final var digest = md5.digest();
 			return DatatypeConverter.printHexBinary(digest);
 		} catch (final Exception e) {
-			LOG.error("Couldn't create MD5-checksum for attachment", e);
+			log.error("Couldn't create MD5-checksum for attachment", e);
 			throw Problem.builder()
 				.withTitle("Couldn't create MD5-checksum for attachment")
 				.withStatus(INTERNAL_SERVER_ERROR)
@@ -350,39 +319,4 @@ class DigitalMailMapper {
 		return sender;
 	}
 
-	/**
-	 * Retrieve the alias for the key from the keystore. As we only have one key, we get the first one, if we need to get
-	 * more, we need to find it by alias.
-	 *
-	 * @param  keyStore          the keystore to search in
-	 * @param  wantedAlias       the alias we want to find
-	 * @return                   the alias of the key in the keystore
-	 * @throws KeyStoreException if the keystore cannot be accessed or the alias is not
-	 */
-	String getAliasFromKeystore(final KeyStore keyStore, final String wantedAlias) throws KeyStoreException {
-		final var aliases = keyStore.aliases();
-
-		var alias = "";
-		var foundAlias = false;
-
-		// Find the aliases and stop when we get the one we want.
-		while (aliases.hasMoreElements()) {
-			alias = aliases.nextElement();
-
-			if (alias.equalsIgnoreCase(wantedAlias)) {
-				foundAlias = true;
-				LOG.info("Found keystore-entry with alias: {}", alias);
-				break;
-			}
-		}
-
-		if (foundAlias) {
-			return alias;
-		}
-
-		throw Problem.builder()
-			.withTitle("Couldn't find certificate for " + wantedAlias)
-			.withStatus(INTERNAL_SERVER_ERROR)
-			.build();
-	}
 }

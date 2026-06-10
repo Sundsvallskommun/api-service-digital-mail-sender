@@ -2,26 +2,22 @@ package se.sundsvall.digitalmail.integration.messaging;
 
 import generated.se.sundsvall.messaging.EmailRequest;
 import generated.se.sundsvall.messaging.SlackRequest;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 @Component
+@Slf4j
+@RequiredArgsConstructor
 public class MessagingIntegration {
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(MessagingIntegration.class);
-
 	private final MessagingClient messagingClient;
-
-	public MessagingIntegration(final MessagingClient messagingClient) {
-		this.messagingClient = messagingClient;
-	}
 
 	public void sendEmail(final String municipalityId, final EmailRequest request) {
 		try {
 			messagingClient.sendEmail(municipalityId, request);
 		} catch (final Exception e) {
-			LOGGER.warn("Error when sending email", e);
+			log.warn("Error when sending email", e);
 		}
 	}
 
@@ -29,7 +25,7 @@ public class MessagingIntegration {
 		try {
 			messagingClient.sendSlackMessage(municipalityId, request);
 		} catch (final Exception e) {
-			LOGGER.warn("Error when sending slack message", e);
+			log.warn("Error when sending slack message", e);
 		}
 	}
 }

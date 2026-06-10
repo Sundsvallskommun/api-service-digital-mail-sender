@@ -1,7 +1,9 @@
 package se.sundsvall.digitalmail.domain.invoice;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.Getter;
 
+@Getter
 @Schema(description = "Invoice type", examples = "INVOICE", defaultValue = "INVOICE")
 public enum InvoiceType {
 	INVOICE("invoice"),
@@ -11,9 +13,5 @@ public enum InvoiceType {
 
 	InvoiceType(final String value) {
 		this.value = value;
-	}
-
-	public String getValue() {
-		return value;
 	}
 }

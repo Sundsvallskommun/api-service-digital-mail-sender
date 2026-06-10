@@ -1,8 +1,7 @@
 package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -16,10 +15,9 @@ import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Component
+@Slf4j
 @CircuitBreaker(name = "digitalMailIntegration")
 public class DigitalMailIntegration {
-
-	private static final Logger LOG = LoggerFactory.getLogger(DigitalMailIntegration.class);
 
 	private final WebServiceTemplate distributeTemplate;
 	private final DigitalMailMapper mapper;
@@ -40,26 +38,26 @@ public class DigitalMailIntegration {
 	 * @return                The response from the service
 	 */
 	public DigitalMailResponse sendDigitalMail(final DigitalMailDto requestDto, final String serviceAddress) {
-		LOG.debug("Trying to send secure digital mail.");
+		log.debug("Trying to send secure digital mail.");
 
 		try {
-			LOG.info("Creating deliver secure request");
+			log.info("Creating deliver secure request");
 			final var deliverSecureRequest = mapper.createDeliverSecure(requestDto);
 
-			LOG.info("Sending deliver secure request");
+			log.info("Sending deliver secure request");
 			final var deliverSecureResponse = (DeliverSecureResponse) distributeTemplate.marshalSendAndReceive(serviceAddress, deliverSecureRequest);
 
-			LOG.info("Mapping deliver secure response");
+			log.info("Mapping deliver secure response");
 			return mapper.createDigitalMailResponse(deliverSecureResponse, requestDto.getPartyId());
 		} catch (Exception e) {
 			// Might come from interceptor
 			if (e instanceof ThrowableProblem) {
-				LOG.error("Failed to send digital mail", e);
+				log.error("Failed to send digital mail", e);
 				throw e;
 			}
 
 			// Needed to get stacktraces
-			LOG.error("Failed to send digital mail", e);
+			log.error("Failed to send digital mail", e);
 			final var cause = getProblemCause(e);
 
 			throw Problem.builder()
@@ -76,7 +74,7 @@ public class DigitalMailIntegration {
 		try {
 			return (ThrowableProblem) e.getCause();
 		} catch (Exception ex) {
-			LOG.error("Couldn't get cause", e);
+			log.error("Couldn't get cause", e);
 			return Problem.builder()
 				.withDetail("Couldn't get cause").withStatus(INTERNAL_SERVER_ERROR)
 				.build();

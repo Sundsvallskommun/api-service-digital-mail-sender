@@ -2,6 +2,8 @@ package se.sundsvall.digitalmail.integration.party;
 
 import feign.Request;
 import feign.codec.ErrorDecoder;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cloud.openfeign.FeignBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Import;
@@ -14,15 +16,12 @@ import se.sundsvall.dept44.configuration.feign.decoder.ProblemErrorDecoder;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 
 @Import(FeignConfiguration.class)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 class PartyConfig {
 
 	static final String INTEGRATION_NAME = "PartyClient";
 
 	private final PartyProperties properties;
-
-	PartyConfig(final PartyProperties properties) {
-		this.properties = properties;
-	}
 
 	@Bean
 	FeignBuilderCustomizer feignBuilderCustomizer() {
