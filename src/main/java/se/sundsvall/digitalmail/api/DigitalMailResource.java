@@ -5,11 +5,11 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
-import java.util.Optional;
 import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -28,99 +28,54 @@ import se.sundsvall.digitalmail.api.model.DigitalInvoiceResponse;
 import se.sundsvall.digitalmail.api.model.DigitalMailRequest;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.Mailbox;
-import se.sundsvall.digitalmail.api.model.validation.HtmlValidator;
-import se.sundsvall.digitalmail.api.model.validation.annotation.ValidSender;
-import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
-import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
+import se.sundsvall.digitalmail.api.validation.ValidSender;
 import se.sundsvall.digitalmail.service.DigitalMailService;
 
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON_VALUE;
-import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.ResponseEntity.ok;
 
 @RestController
 @Validated
 @RequestMapping(value = "/{municipalityId}")
 @Tag(name = "Digital Mail")
-@ApiResponse(responseCode = "200",
-	description = "Successful Operation",
-	useReturnTypeSchema = true)
-@ApiResponse(responseCode = "400",
-	description = "Bad Request",
-	content = @Content(
-		mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-		schema = @Schema(oneOf = {
-			Problem.class, ConstraintViolationProblem.class
-		})))
-@ApiResponse(responseCode = "500",
-	description = "Internal Server Error",
-	content = @Content(
-		mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-		schema = @Schema(implementation = Problem.class)))
+@ApiResponses({
+	@ApiResponse(responseCode = "200", description = "Successful Operation", useReturnTypeSchema = true),
+	@ApiResponse(responseCode = "400", description = "Bad Request", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(oneOf = {
+		Problem.class, ConstraintViolationProblem.class
+	}))),
+	@ApiResponse(responseCode = "500", description = "Internal Server Error", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+})
 class DigitalMailResource {
 
 	private final DigitalMailService digitalMailService;
 
-	private final HtmlValidator htmlValidator;
-
-	DigitalMailResource(final DigitalMailService digitalMailService, final HtmlValidator htmlValidator) {
+	DigitalMailResource(final DigitalMailService digitalMailService) {
 		this.digitalMailService = digitalMailService;
-		this.htmlValidator = htmlValidator;
 	}
 
 	@Operation(summary = "Send a digital mail")
-	@ApiResponse(responseCode = "404",
-		description = "Not Found",
-		content = @Content(
-			mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-			schema = @Schema(implementation = Problem.class)))
-	@PostMapping(
-		value = "/{organizationNumber}/send-digital-mail",
-		consumes = APPLICATION_JSON_VALUE,
-		produces = APPLICATION_JSON_VALUE)
+	@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	@PostMapping(value = "/{organizationNumber}/send-digital-mail", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<DigitalMailResponse> sendDigitalMail(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Parameter(name = "organizationNumber", description = "The organization number of the sending organization", example = "5561234567") @ValidSender @ValidOrganizationNumber @PathVariable final String organizationNumber,
 		@Valid @RequestBody final DigitalMailRequest request) {
-
-		// Validate the body as HTML if the content type is text/html
-		Optional.ofNullable(request.getBodyInformation())
-			.filter(bodyInfo -> TEXT_HTML_VALUE.equals(bodyInfo.getContentType()) && !htmlValidator.validate(bodyInfo.getBody()))
-			.ifPresent(bodyInfo -> {
-				throw Problem.builder()
-					.withTitle("Body HTML is invalid")
-					.withStatus(BAD_REQUEST)
-					.withDetail("Use https://validator.w3.org/ to make sure your HTML validates")
-					.build();
-			});
-
-		return ok(digitalMailService.sendDigitalMail(new DigitalMailDto(request, organizationNumber), municipalityId));
+		return ok(digitalMailService.sendDigitalMail(request, municipalityId, organizationNumber));
 	}
 
 	@Operation(summary = "Send a digital invoice")
-	@ApiResponse(responseCode = "404",
-		description = "Not Found",
-		content = @Content(
-			mediaType = APPLICATION_PROBLEM_JSON_VALUE,
-			schema = @Schema(implementation = Problem.class)))
-	@PostMapping(
-		value = "/send-digital-invoice",
-		consumes = APPLICATION_JSON_VALUE,
-		produces = APPLICATION_JSON_VALUE)
+	@ApiResponse(responseCode = "404", description = "Not Found", content = @Content(mediaType = APPLICATION_PROBLEM_JSON_VALUE, schema = @Schema(implementation = Problem.class)))
+	@PostMapping(value = "/send-digital-invoice", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<DigitalInvoiceResponse> sendDigitalInvoice(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Valid @RequestBody final DigitalInvoiceRequest request) {
-		return ok(digitalMailService.sendDigitalInvoice(new InvoiceDto(request), municipalityId));
+		return ok(digitalMailService.sendDigitalInvoice(request, municipalityId));
 	}
 
 	// A Post instead of GET since we may have a long list of partyIds, and GET has a limit on the URL length.
 	@Operation(summary = "Retrieve a list of mailboxes. Contains partyId, supplier and if the mailbox is reachable for the given organization.")
-	@PostMapping(
-		value = "/{organizationNumber}/mailboxes",
-		consumes = APPLICATION_JSON_VALUE,
-		produces = APPLICATION_JSON_VALUE)
+	@PostMapping(value = "/{organizationNumber}/mailboxes", consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
 	ResponseEntity<List<Mailbox>> hasAvailableMailboxes(
 		@Parameter(name = "municipalityId", description = "Municipality id", example = "2281") @ValidMunicipalityId @PathVariable final String municipalityId,
 		@Parameter(name = "organizationNumber", description = "The organization number of the intended sending organization", example = "5561234567") @ValidSender @ValidOrganizationNumber @PathVariable final String organizationNumber,

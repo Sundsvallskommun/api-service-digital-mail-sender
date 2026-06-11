@@ -1,84 +1,98 @@
 package se.sundsvall.digitalmail.integration.skatteverket.sendmail;
 
-import jakarta.xml.bind.JAXBContext;
-import jakarta.xml.bind.JAXBElement;
-import java.io.ByteArrayInputStream;
+import jakarta.xml.bind.JAXBException;
+import jakarta.xml.bind.Marshaller;
 import java.nio.charset.StandardCharsets;
-import java.security.KeyStore;
 import java.util.Base64;
 import java.util.List;
-import javax.xml.crypto.dsig.XMLSignature;
-import javax.xml.crypto.dsig.XMLSignatureFactory;
-import javax.xml.crypto.dsig.dom.DOMValidateContext;
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
-import org.assertj.core.api.SoftAssertions;
-import org.assertj.core.api.junit.jupiter.SoftAssertionsExtension;
-import org.junit.jupiter.api.Disabled;
+import java.util.Map;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.ActiveProfiles;
-import se.gov.minameddelanden.common.sign.X509KeySelector;
-import se.gov.minameddelanden.schema.message.v3.SealedDelivery;
-import se.gov.minameddelanden.schema.message.v3.SignedDelivery;
+import org.w3c.dom.Node;
 import se.gov.minameddelanden.schema.service.DeliveryResult;
 import se.gov.minameddelanden.schema.service.DeliveryStatus;
-import se.gov.minameddelanden.schema.service.v3.DeliverSecure;
 import se.gov.minameddelanden.schema.service.v3.DeliverSecureResponse;
 import se.sundsvall.dept44.problem.ThrowableProblem;
-import se.sundsvall.digitalmail.Application;
+import se.sundsvall.digitalmail.SkatteverketTestKeystore;
 import se.sundsvall.digitalmail.TestObjectFactory;
 import se.sundsvall.digitalmail.api.model.BodyInformation;
 import se.sundsvall.digitalmail.api.model.File;
+import se.sundsvall.digitalmail.integration.skatteverket.SkatteverketProperties;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
+import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 import static se.sundsvall.digitalmail.TestObjectFactory.PREFIXED_ORGANIZATION_NUMBER;
 
-@ActiveProfiles("junit")
-@SpringBootTest(webEnvironment = RANDOM_PORT, classes = Application.class)
-@ExtendWith(SoftAssertionsExtension.class)
+@ExtendWith(MockitoExtension.class)
 class DigitalMailMapperTest {
 
-	@Autowired
+	@Mock
+	private SkatteverketProperties mockProperties;
+
 	private DigitalMailMapper mapper;
 
-	@Value("${integration.skatteverket.key-store-as-base64}")
-	private String keyStoreAsBase64;
+	@BeforeEach
+	void setUp() throws Exception {
+		mapper = new DigitalMailMapper(mockProperties, SkatteverketTestKeystore.signingCertificate());
+	}
 
 	@Test
-	void testCreateDeliverSecure(final SoftAssertions softly) {
+	void testCreateDeliverSecure() {
+		when(mockProperties.supportedSenders()).thenReturn(Map.of(ORGANIZATION_NUMBER, "Sundsvalls kommun"));
+
 		final var sealedDelivery = mapper.createDeliverSecure(TestObjectFactory.generateDigitalMailRequestDto()).getDeliverSecure();
 		final var seal = sealedDelivery.getSeal();
 		final var signedDelivery = sealedDelivery.getSignedDelivery();
 
-		softly.assertThat(seal.getReceivedTime()).isNotNull();
-		softly.assertThat(seal.isSignaturesOK()).isTrue();
+		assertThat(seal.getReceivedTime()).isNotNull();
+		assertThat(seal.isSignaturesOK()).isTrue();
 
-		softly.assertThat(signedDelivery.getDelivery().getHeader().getCorrelationId()).isNull();
-		softly.assertThat(signedDelivery.getDelivery().getHeader().getRecipient()).isEqualTo("recipientId");
-		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls kommun");
-		softly.assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo(PREFIXED_ORGANIZATION_NUMBER);
+		assertThat(signedDelivery.getDelivery().getHeader().getCorrelationId()).isNull();
+		assertThat(signedDelivery.getDelivery().getHeader().getRecipient()).isEqualTo("recipientId");
+		assertThat(signedDelivery.getDelivery().getHeader().getSender().getName()).isEqualTo("Sundsvalls kommun");
+		assertThat(signedDelivery.getDelivery().getHeader().getSender().getId()).isEqualTo(PREFIXED_ORGANIZATION_NUMBER);
 
 		final var header = signedDelivery.getDelivery().getMessages().getFirst().getHeader();
 
-		softly.assertThat(header.getSubject()).isEqualTo("Some subject");
-		softly.assertThat(header.getLanguage()).isEqualTo("svSE");
-		softly.assertThat(header.getSupportinfo().getPhoneNumber()).isEqualTo("0701740605");
-		softly.assertThat(header.getSupportinfo().getEmailAdress()).isEqualTo("email@somewhere.com");
-		softly.assertThat(header.getSupportinfo().getURL()).isEqualTo("http://url.com");
-		softly.assertThat(header.getSupportinfo().getText()).isEqualTo("support text");
+		assertThat(header.getSubject()).isEqualTo("Some subject");
+		assertThat(header.getLanguage()).isEqualTo("svSE");
+		assertThat(header.getSupportinfo().getPhoneNumber()).isEqualTo("0701740605");
+		assertThat(header.getSupportinfo().getEmailAdress()).isEqualTo("email@somewhere.com");
+		assertThat(header.getSupportinfo().getURL()).isEqualTo("http://url.com");
+		assertThat(header.getSupportinfo().getText()).isEqualTo("support text");
 
 		final var body = signedDelivery.getDelivery().getMessages().getFirst().getBody();
-		softly.assertThat(body.getBody()).isNotNull();
-		softly.assertThat(body.getContentType()).isEqualTo("text/plain");
+		assertThat(body.getBody()).isNotNull();
+		assertThat(body.getContentType()).isEqualTo("text/plain");
+	}
+
+	@Test
+	void createSealedDeliveryWhenMarshallingFailsThrowsProblem() throws Exception {
+		when(mockProperties.supportedSenders()).thenReturn(Map.of(ORGANIZATION_NUMBER, "Sundsvalls kommun"));
+
+		final var throwingMarshaller = mock(Marshaller.class);
+		doThrow(new JAXBException("Marshalling failed")).when(throwingMarshaller).marshal(any(), any(Node.class));
+
+		final var spyMapper = spy(mapper);
+		doReturn(throwingMarshaller).when(spyMapper).getMarshaller();
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> spyMapper.createSealedDelivery(TestObjectFactory.generateDigitalMailRequestDto()))
+			.satisfies(thrownProblem -> assertThat(thrownProblem.getStatus()).isEqualTo(INTERNAL_SERVER_ERROR));
 	}
 
 	@Test
@@ -115,23 +129,6 @@ class DigitalMailMapperTest {
 
 		// Check that the text we sent in is the same as the bytes generated.
 		assertThat(new String(bodyBytes)).isEqualTo(bodyContent);
-	}
-
-	@Test
-	void testGetAliasFromKeystore() throws Exception {
-		final var keyStore = getKeyStore();
-		final var alias = mapper.getAliasFromKeystore(keyStore, DigitalMailMapper.SKATTEVERKET_CERT_NAME);
-
-		assertThat(alias).isEqualTo("skatteverket");
-	}
-
-	@Test
-	void testGetAliasFromKeystore_shouldThrowException_whenNotFound() throws Exception {
-		final var keyStore = getKeyStore();
-
-		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> mapper.getAliasFromKeystore(keyStore, "notFound"))
-			.withMessage("Couldn't find certificate for notFound");
 	}
 
 	@Test
@@ -197,53 +194,5 @@ class DigitalMailMapperTest {
 
 		assertThat(messageBody.getBody()).isEqualTo(new byte[0]);
 		assertThat(messageBody.getContentType()).isEqualTo(TEXT_PLAIN_VALUE);
-	}
-
-	@Disabled("Implement validation of created message, so it works..")
-	@Test
-	void testCreateDeliverSecure_andValidateSignature() throws Exception {
-		final var dto = TestObjectFactory.generateDigitalMailRequestDto();
-		final var deliverSecure = mapper.createDeliverSecure(dto);
-		final var sealedDelivery = deliverSecure.getDeliverSecure();
-
-		final var documentFactory = DocumentBuilderFactory.newInstance();
-		documentFactory.setNamespaceAware(true);
-		final var documentBuilder = documentFactory.newDocumentBuilder();
-		final var document = documentBuilder.newDocument();
-
-		final var sealedDeliveryJAXBElement = new JAXBElement<>(new QName("http://minameddelanden.gov.se/schema/Message/v3", "sealedDelivery"), SealedDelivery.class, sealedDelivery);
-		final var jaxbContext = JAXBContext.newInstance(SignedDelivery.class, SealedDelivery.class, DeliverSecure.class);
-		final var marshaller = jaxbContext.createMarshaller();
-
-		marshaller.marshal(sealedDeliveryJAXBElement, document);
-
-		final var nodeList = document.getElementsByTagNameNS(XMLSignature.XMLNS, "Signature");
-		if (nodeList.getLength() == 0) {
-			throw new Exception("Cannot find Signature element");
-		}
-
-		final var signatureFactory = XMLSignatureFactory.getInstance("DOM");
-		final var validateContext = new DOMValidateContext(new X509KeySelector(), nodeList.item(0));
-		final var xmlSignature = signatureFactory.unmarshalXMLSignature(validateContext);
-
-		final var iterator = xmlSignature.getSignedInfo().getReferences().iterator();
-
-		for (var j = 0; iterator.hasNext(); j++) {
-			var refValid = iterator.next().validate(validateContext);
-
-			System.out.println("ref[" + j + "] validity status: " + refValid);
-		}
-
-		final var validated = xmlSignature.validate(validateContext);
-
-		System.out.println(validated);
-
-		assertThat(validated).isTrue();
-	}
-
-	private KeyStore getKeyStore() throws Exception {
-		KeyStore keyStore = KeyStore.getInstance(KeyStore.getDefaultType());
-		keyStore.load(new ByteArrayInputStream(Base64.getDecoder().decode(keyStoreAsBase64.getBytes())), "changeit".toCharArray());
-		return keyStore;
 	}
 }

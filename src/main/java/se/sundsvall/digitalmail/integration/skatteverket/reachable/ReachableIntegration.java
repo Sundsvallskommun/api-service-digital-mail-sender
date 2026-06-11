@@ -2,8 +2,7 @@ package se.sundsvall.digitalmail.integration.skatteverket.reachable;
 
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.ws.client.core.WebServiceTemplate;
@@ -14,9 +13,9 @@ import se.sundsvall.digitalmail.integration.skatteverket.MailboxDto;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 
 @Component
+@Slf4j
 @CircuitBreaker(name = "reachableIntegration")
 public class ReachableIntegration {
-	private static final Logger LOGGER = LoggerFactory.getLogger(ReachableIntegration.class);
 	private final WebServiceTemplate isReachableTemplate;
 	private final RecipientIntegrationMapper mapper;
 
@@ -39,10 +38,10 @@ public class ReachableIntegration {
 			// Call Skatteverket to see which mailboxes (if any) are present for the given legal Ids
 			final var isReachableRequest = mapper.createIsReachableRequest(legalIds, organizationNumber);
 
-			LOGGER.info("Sending is reachable request");
+			log.info("Sending is reachable request");
 			final var isReachableResponse = (IsReachableResponse) isReachableTemplate.marshalSendAndReceive(isReachableRequest);
 
-			LOGGER.info("Mapping and getting mailbox settings");
+			log.info("Mapping and getting mailbox settings");
 			return mapper.toMailboxDtos(isReachableResponse);
 		} catch (Exception e) {
 			throw Problem.builder()

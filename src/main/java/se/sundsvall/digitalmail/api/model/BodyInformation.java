@@ -3,6 +3,7 @@ package se.sundsvall.digitalmail.api.model;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 
@@ -11,6 +12,7 @@ import static lombok.AccessLevel.PROTECTED;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
 import static org.springframework.http.MediaType.TEXT_PLAIN_VALUE;
 
+@Data
 @Schema(description = "The body of the message")
 @Builder(setterPrefix = "with")
 @NoArgsConstructor
@@ -26,19 +28,4 @@ public class BodyInformation {
 	@Schema(description = "Plain-text body")
 	private String body;
 
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(final String contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getBody() {
-		return body;
-	}
-
-	public void setBody(final String body) {
-		this.body = body;
-	}
 }

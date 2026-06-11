@@ -3,6 +3,7 @@ package se.sundsvall.digitalmail.integration.kivra;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.Getter;
+import lombok.Setter;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
@@ -28,24 +29,22 @@ public class InvoiceDto {
 	private final String accountNumber;
 	private final List<File> files;
 
+	@Setter
 	private String ssn;
 
 	public InvoiceDto(final DigitalInvoiceRequest invoiceRequest) {
 		partyId = invoiceRequest.partyId();
-		type = invoiceRequest.type();
+		type = InvoiceType.valueOf(invoiceRequest.type());
 		subject = invoiceRequest.subject();
 		reference = invoiceRequest.reference();
 		payable = ofNullable(invoiceRequest.payable()).orElse(true);
 		amount = invoiceRequest.details().amount();
 		dueDate = invoiceRequest.details().dueDate();
-		paymentReferenceType = invoiceRequest.details().paymentReferenceType();
+		paymentReferenceType = ReferenceType.valueOf(invoiceRequest.details().paymentReferenceType());
 		paymentReference = invoiceRequest.details().paymentReference();
-		accountType = invoiceRequest.details().accountType();
+		accountType = AccountType.valueOf(invoiceRequest.details().accountType());
 		accountNumber = invoiceRequest.details().accountNumber();
 		files = invoiceRequest.files();
 	}
 
-	public void setSsn(final String ssn) {
-		this.ssn = ssn;
-	}
 }

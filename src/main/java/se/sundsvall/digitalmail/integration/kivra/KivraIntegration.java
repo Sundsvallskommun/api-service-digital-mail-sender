@@ -2,6 +2,8 @@ package se.sundsvall.digitalmail.integration.kivra;
 
 import generated.com.kivra.UserMatchV2SSN;
 import java.util.Optional;
+import lombok.AccessLevel;
+import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -9,13 +11,10 @@ import static se.sundsvall.digitalmail.integration.kivra.KivraMapper.mapInvoiceT
 
 @Component
 @EnableConfigurationProperties(KivraProperties.class)
+@RequiredArgsConstructor(access = AccessLevel.PACKAGE)
 public class KivraIntegration {
 
 	private final KivraClient client;
-
-	KivraIntegration(final KivraClient client) {
-		this.client = client;
-	}
 
 	public boolean sendInvoice(final InvoiceDto invoiceDto) {
 		final var content = mapInvoiceToContent(invoiceDto);

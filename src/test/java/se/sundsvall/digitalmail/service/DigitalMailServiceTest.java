@@ -14,6 +14,7 @@ import se.sundsvall.dept44.problem.Problem;
 import se.sundsvall.dept44.problem.ThrowableProblem;
 import se.sundsvall.digitalmail.api.model.DigitalMailResponse;
 import se.sundsvall.digitalmail.api.model.Mailbox;
+import se.sundsvall.digitalmail.api.validation.HtmlValidator;
 import se.sundsvall.digitalmail.integration.kivra.InvoiceDto;
 import se.sundsvall.digitalmail.integration.kivra.KivraIntegration;
 import se.sundsvall.digitalmail.integration.party.PartyIntegration;
@@ -33,12 +34,14 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.HttpStatus.NOT_FOUND;
 import static se.sundsvall.digitalmail.TestObjectFactory.MUNICIPALITY_ID;
 import static se.sundsvall.digitalmail.TestObjectFactory.ORGANIZATION_NUMBER;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDto;
-import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceDto;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDtoWithHtmlBody;
+import static se.sundsvall.digitalmail.TestObjectFactory.generateInvoiceRequest;
 
 @ExtendWith(MockitoExtension.class)
 class DigitalMailServiceTest {
@@ -55,12 +58,15 @@ class DigitalMailServiceTest {
 	@Mock
 	private AvailabilityService mockAvailabilityService;
 
+	@Mock
+	private HtmlValidator mockHtmlValidator;
+
 	@InjectMocks
 	private DigitalMailService service;
 
 	@AfterEach
 	void afterEach() {
-		verifyNoMoreInteractions(mockPartyIntegration, mockDigitalMailIntegration, mockKivraIntegration, mockAvailabilityService);
+		verifyNoMoreInteractions(mockPartyIntegration, mockDigitalMailIntegration, mockKivraIntegration, mockAvailabilityService, mockHtmlValidator);
 	}
 
 	@Test
@@ -74,7 +80,7 @@ class DigitalMailServiceTest {
 
 		final var pdfLength = request.getAttachments().getFirst().getBody().length();  // Save the length of the pdf before compression
 
-		final var digitalMailResponse = service.sendDigitalMail(request, MUNICIPALITY_ID);
+		final var digitalMailResponse = service.sendDigitalMail(request, MUNICIPALITY_ID, ORGANIZATION_NUMBER);
 
 		final var compressedPdfLength = request.getAttachments().getFirst().getBody().length(); // Save the length of the pdf after compression
 
@@ -93,7 +99,7 @@ class DigitalMailServiceTest {
 		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.empty());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID))
+			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
 			.satisfies(thrownProblem -> {
 				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital mail: No legal Id found for partyId: " + request.getPartyId());
@@ -112,7 +118,7 @@ class DigitalMailServiceTest {
 		when(mockAvailabilityService.getRecipientMailboxesAndCheckAvailability(anyList(), eq(ORGANIZATION_NUMBER))).thenReturn(List.of());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID))
+			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
 			.satisfies(thrownProblem -> {
 				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
 				assertThat(thrownProblem.getMessage()).isEqualTo("Couldn't find any mailboxes: No mailbox could be found for any of the given partyIds or the recipients doesn't allow the sender.");
@@ -123,6 +129,23 @@ class DigitalMailServiceTest {
 		verify(mockDigitalMailIntegration, never()).sendDigitalMail(any(DigitalMailDto.class), eq("serviceAddress"));
 	}
 
+	@Test
+	void sendDigitalMailWithInvalidHtmlBodyShouldThrowProblem() {
+		final var request = generateDigitalMailRequestDtoWithHtmlBody();
+
+		when(mockHtmlValidator.validate(anyString())).thenReturn(false);
+
+		assertThatExceptionOfType(ThrowableProblem.class)
+			.isThrownBy(() -> service.sendDigitalMail(request, MUNICIPALITY_ID, ORGANIZATION_NUMBER))
+			.satisfies(thrownProblem -> {
+				assertThat(thrownProblem.getStatus()).isEqualTo(BAD_REQUEST);
+				assertThat(thrownProblem.getMessage()).isEqualTo("Body HTML is invalid: Use https://validator.w3.org/ to make sure your HTML validates");
+			});
+
+		verify(mockHtmlValidator).validate(anyString());
+		verifyNoInteractions(mockPartyIntegration, mockAvailabilityService, mockDigitalMailIntegration, mockKivraIntegration);
+	}
+
 	/**
 	 * Test scenario where the recipient has a valid mailbox and the invoice is sent successfully.
 	 */
@@ -130,18 +153,20 @@ class DigitalMailServiceTest {
 	void sendDigitalInvoice_1() {
 		final var municipalityId = "2281";
 		final var legalId = "someLegalId";
-		final var invoiceDto = generateInvoiceDto();
-		when(mockPartyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId())).thenReturn(Optional.of(legalId));
+		final var request = generateInvoiceRequest();
+		when(mockPartyIntegration.getLegalId(municipalityId, request.partyId())).thenReturn(Optional.of(legalId));
 		when(mockKivraIntegration.verifyValidRecipient(legalId)).thenReturn(true);
-		when(mockKivraIntegration.sendInvoice(invoiceDto)).thenReturn(true);
+		when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenReturn(true);
 
-		final var response = service.sendDigitalInvoice(invoiceDto, municipalityId);
+		final var response = service.sendDigitalInvoice(request, municipalityId);
 
 		assertThat(response).isNotNull();
+		assertThat(response.partyId()).isEqualTo(request.partyId());
+		assertThat(response.sent()).isTrue();
 
-		verify(mockPartyIntegration).getLegalId(municipalityId, invoiceDto.getPartyId());
+		verify(mockPartyIntegration).getLegalId(municipalityId, request.partyId());
 		verify(mockKivraIntegration).verifyValidRecipient(legalId);
-		verify(mockKivraIntegration).sendInvoice(invoiceDto);
+		verify(mockKivraIntegration).sendInvoice(any(InvoiceDto.class));
 		verifyNoMoreInteractions(mockKivraIntegration, mockPartyIntegration);
 	}
 
@@ -152,30 +177,32 @@ class DigitalMailServiceTest {
 	void sendDigitalInvoice_2() {
 		final var municipalityId = "2281";
 		final var legalId = "somelegalId";
-		final var invoiceDto = generateInvoiceDto();
-		when(mockPartyIntegration.getLegalId(municipalityId, invoiceDto.getPartyId())).thenReturn(Optional.of(legalId));
+		final var request = generateInvoiceRequest();
+		when(mockPartyIntegration.getLegalId(municipalityId, request.partyId())).thenReturn(Optional.of(legalId));
 		when(mockKivraIntegration.verifyValidRecipient(legalId)).thenReturn(false);
 
-		final var response = service.sendDigitalInvoice(invoiceDto, municipalityId);
+		final var response = service.sendDigitalInvoice(request, municipalityId);
 
 		assertThat(response).isNotNull();
+		assertThat(response.partyId()).isEqualTo(request.partyId());
+		assertThat(response.sent()).isFalse();
 
-		verify(mockPartyIntegration).getLegalId(municipalityId, invoiceDto.getPartyId());
+		verify(mockPartyIntegration).getLegalId(municipalityId, request.partyId());
 		verify(mockKivraIntegration).verifyValidRecipient(legalId);
 		verifyNoMoreInteractions(mockKivraIntegration, mockPartyIntegration);
 	}
 
 	@Test
 	void sendDigitalInvoiceNoLegalIdFromPartyShouldThrowProblem() {
-		final var invoiceDto = generateInvoiceDto();
+		final var request = generateInvoiceRequest();
 		when(mockPartyIntegration.getLegalId(anyString(), anyString()))
 			.thenReturn(Optional.empty());
 
 		assertThatExceptionOfType(ThrowableProblem.class)
-			.isThrownBy(() -> service.sendDigitalInvoice(invoiceDto, ""))
+			.isThrownBy(() -> service.sendDigitalInvoice(request, ""))
 			.satisfies(thrownProblem -> {
 				assertThat(thrownProblem.getStatus()).isEqualTo(NOT_FOUND);
-				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital invoice: No legal Id found for partyId: " + invoiceDto.getPartyId());
+				assertThat(thrownProblem.getMessage()).isEqualTo("Error while sending digital invoice: No legal Id found for partyId: " + request.partyId());
 			});
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
@@ -184,12 +211,12 @@ class DigitalMailServiceTest {
 
 	@Test
 	void sendDigitalInvoice_kivraIntegrationThrowsProblem() {
-		final var invoiceDto = generateInvoiceDto();
+		final var request = generateInvoiceRequest();
 		when(mockPartyIntegration.getLegalId(anyString(), anyString())).thenReturn(Optional.of("someLegalId"));
 		when(mockKivraIntegration.verifyValidRecipient("someLegalId")).thenReturn(true);
 		when(mockKivraIntegration.sendInvoice(any(InvoiceDto.class))).thenThrow(Problem.builder().withStatus(INTERNAL_SERVER_ERROR).build());
 
-		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(invoiceDto, ""));
+		assertThatExceptionOfType(ThrowableProblem.class).isThrownBy(() -> service.sendDigitalInvoice(request, ""));
 
 		verify(mockPartyIntegration).getLegalId(anyString(), anyString());
 		verify(mockKivraIntegration).verifyValidRecipient("someLegalId");

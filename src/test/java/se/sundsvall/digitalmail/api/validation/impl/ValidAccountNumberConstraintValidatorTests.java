@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.api.model.validation.annotation.impl;
+package se.sundsvall.digitalmail.api.validation.impl;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import se.sundsvall.digitalmail.api.model.validation.annotation.ValidAccountNumber;
+import se.sundsvall.digitalmail.api.validation.ValidAccountNumber;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.verify;

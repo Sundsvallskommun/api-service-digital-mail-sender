@@ -13,9 +13,6 @@ import se.sundsvall.digitalmail.integration.skatteverket.DigitalMailDto;
 
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.MediaType.TEXT_HTML_VALUE;
-import static se.sundsvall.digitalmail.domain.invoice.AccountType.BANKGIRO;
-import static se.sundsvall.digitalmail.domain.invoice.InvoiceType.INVOICE;
-import static se.sundsvall.digitalmail.domain.invoice.ReferenceType.SE_OCR;
 
 public final class TestObjectFactory {
 
@@ -60,16 +57,16 @@ public final class TestObjectFactory {
 	public static DigitalInvoiceRequest generateInvoiceRequest() {
 		return new DigitalInvoiceRequest(
 			UUID.randomUUID().toString(),
-			INVOICE,
+			"INVOICE",
 			"someSubject",
 			"someReference",
 			true,
 			new DigitalInvoiceRequest.Details(
 				123.45f,
 				LocalDate.now(),
-				SE_OCR,
+				"SE_OCR",
 				"somePaymentReference",
-				BANKGIRO,
+				"BANKGIRO",
 				"991-1884"),
 			List.of(
 				new File(APPLICATION_PDF_VALUE, "someBody", "someFilename")));

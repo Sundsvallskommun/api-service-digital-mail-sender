@@ -1,4 +1,4 @@
-package se.sundsvall.digitalmail.api.model.validation.annotation.impl;
+package se.sundsvall.digitalmail.api.validation.impl;
 
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.HashMap;
