@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.schedule;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -98,7 +99,7 @@ public class CertificateHealthScheduler {
 	}
 
 	private void sendMail(final String recipient) {
-		final var time = LocalDateTime.now().truncatedTo(MINUTES);
+		final var time = LocalDateTime.now(ZoneId.systemDefault()).truncatedTo(MINUTES);
 
 		ofNullable(toEmailRequest(
 			recipient,

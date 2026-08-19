@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.integration.kivra;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import lombok.Getter;
 import lombok.Setter;
@@ -15,7 +16,7 @@ import static java.util.Optional.ofNullable;
 @Getter
 public class InvoiceDto {
 
-	private final LocalDate generatedAt = LocalDate.now();
+	private final LocalDate generatedAt = LocalDate.now(ZoneId.systemDefault());
 	private final String partyId;
 	private final InvoiceType type;
 	private final String subject;
