@@ -339,7 +339,8 @@ components:
         instance:
           type: string
           format: uri
-        causeAsProblem: {}
+        causeAsProblem:
+          $ref: "#/components/schemas/ThrowableProblem"
     Violation:
       type: object
       properties:
@@ -387,7 +388,7 @@ components:
           description: The invoice amount
           examples:
           - 123.45
-          minimum: 0
+          exclusiveMinimum: 0
         dueDate:
           type: string
           format: date
