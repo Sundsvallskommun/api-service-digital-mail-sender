@@ -1,6 +1,7 @@
 package se.sundsvall.digitalmail.api.validation;
 
 import jakarta.validation.ValidationException;
+import java.util.Base64;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -8,6 +9,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import se.sundsvall.dept44.test.annotation.resource.Load;
 import se.sundsvall.dept44.test.extension.ResourceLoaderExtension;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -19,6 +21,13 @@ class HtmlValidatorTests {
 	@Test
 	void validValue(@Load("valid-html.base64") final String html) {
 		assertThat(validator.validate(html)).isTrue();
+	}
+
+	@Test
+	void validRealisticValue(@Load("valid-realistic-html.html") final String html) {
+		final var base64Html = Base64.getEncoder().encodeToString(html.getBytes(UTF_8));
+
+		assertThat(validator.validate(base64Html)).isTrue();
 	}
 
 	@Test
