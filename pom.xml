@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>se.sundsvall.dept44</groupId>
 		<artifactId>dept44-service-parent</artifactId>
-		<version>8.0.10</version>
+		<version>8.0.11</version>
 		<relativePath />
 		<!-- lookup parent from repository -->
 	</parent>
@@ -17,7 +17,7 @@
 		<my-messages-generated-sources-folder>${project.build.directory}/my-messages-recipient-sources</my-messages-generated-sources-folder>
 		<kivra-generated-sources-package>generated.com.kivra</kivra-generated-sources-package>
 		<commons-io.version>2.22.0</commons-io.version>
-		<nu-html-validator.version>25.12.22</nu-html-validator.version>
+		<nu-html-validator.version>26.9.16</nu-html-validator.version>
 		<cxf.version>4.2.3</cxf.version>
 		<istack-commons-runtime.version>4.2.0</istack-commons-runtime.version>
 		<librepdf.version>3.0.5</librepdf.version>
@@ -284,6 +284,8 @@
 						<exclude>**/org/w3/**/*</exclude>
 						<exclude>**/se/gov/minameddelanden/**/*</exclude>
 						<exclude>**/generated/**</exclude>
+						<!-- nu-validator's CSS parser has methods too large for JaCoCo to instrument -->
+						<exclude>org/w3c/css/**</exclude>
 					</excludes>
 				</configuration>
 			</plugin>
