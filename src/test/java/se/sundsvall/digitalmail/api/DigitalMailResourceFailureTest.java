@@ -103,7 +103,7 @@ class DigitalMailResourceFailureTest {
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
 		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
-				tuple("sendDigitalMail.organizationNumber", "must match the regular expression ^([1235789][\\d][2-9]\\d{7})$"),
+				tuple("sendDigitalMail.organizationNumber", "must match the regular expression ^([1235-9][\\d][2-9]\\d{7})$"),
 				tuple("sendDigitalMail.organizationNumber", "Sending organization is not registered as authorized sender"));
 
 		verifyNoInteractions(mockDigitalMailService);
@@ -168,7 +168,7 @@ class DigitalMailResourceFailureTest {
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
 		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(
-				tuple("hasAvailableMailboxes.organizationNumber", "must match the regular expression ^([1235789][\\d][2-9]\\d{7})$"),
+				tuple("hasAvailableMailboxes.organizationNumber", "must match the regular expression ^([1235-9][\\d][2-9]\\d{7})$"),
 				tuple("hasAvailableMailboxes.organizationNumber", "Sending organization is not registered as authorized sender"));
 
 		verifyNoInteractions(mockDigitalMailService);
