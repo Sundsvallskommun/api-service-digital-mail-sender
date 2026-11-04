@@ -4,14 +4,11 @@ import generated.com.kivra.ContentUserV2;
 import generated.com.kivra.PartsResponsive;
 import generated.com.kivra.PaymentMultipleOptions;
 import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static generated.com.kivra.PaymentMultipleOptions.CurrencyEnum.SEK;
 
 final class KivraMapper {
-
-	static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
 	private KivraMapper() {}
 
@@ -19,7 +16,6 @@ final class KivraMapper {
 		return new ContentUserV2()
 			.ssn(invoiceDto.getSsn())
 			.subject(invoiceDto.getSubject())
-			.generatedAt(DATE_FORMATTER.format(invoiceDto.getGeneratedAt()))
 			.type(invoiceDto.getType().getValue())
 			.parts(invoiceDto.getFiles().stream()
 				.map(file -> new PartsResponsive()
