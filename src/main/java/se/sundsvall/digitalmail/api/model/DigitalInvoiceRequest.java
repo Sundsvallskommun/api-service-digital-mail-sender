@@ -2,12 +2,15 @@ package se.sundsvall.digitalmail.api.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 import java.util.List;
+
+import jakarta.validation.constraints.Size;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.digitalmail.api.validation.ValidAccountNumber;
 import se.sundsvall.digitalmail.api.validation.ValidEnum;
@@ -38,7 +41,7 @@ public record DigitalInvoiceRequest(
 	@Schema(description = "Invoice details")
 	public record Details(
 
-		@NotNull @Positive @Schema(description = "The invoice amount", examples = "123.45", requiredMode = REQUIRED) Float amount,
+		@NotNull @DecimalMin("1") @Schema(description = "The invoice amount", examples = "123.45", requiredMode = REQUIRED) Float amount,
 
 		@NotNull @Schema(description = "The invoice due date", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
 
@@ -46,7 +49,7 @@ public record DigitalInvoiceRequest(
 			"SE_OCR", "TENANT_REF"
 		}, examples = "SE_OCR", requiredMode = REQUIRED) String paymentReferenceType,
 
-		@NotBlank @Schema(description = "The payment reference number", maxLength = 25, examples = "426523791", requiredMode = REQUIRED) String paymentReference,
+		@NotBlank @Size(max = 25) @Schema(description = "The payment reference number", maxLength = 25, examples = "426523791", requiredMode = REQUIRED) String paymentReference,
 
 		@NotNull @ValidEnum(AccountType.class) @Schema(description = "The receiving account type", allowableValues = {
 			"BANKGIRO", "PLUSGIRO"
