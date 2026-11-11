@@ -6,7 +6,6 @@ import generated.com.kivra.PaymentMultipleOptions;
 import generated.com.kivra.PaymentMultipleOptionsOptionsInner;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static generated.com.kivra.PaymentMultipleOptions.CurrencyEnum.SEK;
@@ -14,15 +13,12 @@ import static org.apache.commons.lang3.StringUtils.trim;
 
 final class KivraMapper {
 
-	static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-
 	private KivraMapper() {}
 
 	static ContentUserV2 mapInvoiceToContent(final InvoiceDto invoiceDto) {
 		return new ContentUserV2()
 			.ssn(invoiceDto.getSsn())
 			.subject(invoiceDto.getSubject())
-			.generatedAt(DATE_FORMATTER.format(invoiceDto.getGeneratedAt()))
 			.type(invoiceDto.getType().getValue())
 			.parts(invoiceDto.getFiles().stream()
 				.map(file -> new PartsResponsive()
