@@ -1,7 +1,37 @@
 {
 	"request": {
 		"method": "POST",
-		"url": "/kivra/content"
+		"url": "/kivra/content",
+		"bodyPatterns": [
+			{
+				"equalToJson": {
+					"ssn": "190101010159",
+					"subject": "Faktura från Sundsvalls kommun",
+					"type": "invoice",
+					"parts": [
+						{
+							"name": "invoice_12345.pdf",
+							"data": "c29tZSBwZGYgZGF0YQo=",
+							"content_type": "application/pdf"
+						}
+					],
+					"payment_multiple_options": {
+						"payable": true,
+						"method": "1",
+						"account": "991-1884",
+						"currency": "SEK",
+						"options": [
+							{
+								"due_date": "2023-10-30",
+								"amount": "123.45",
+								"type": "SE_OCR",
+								"reference": "426523791"
+							}
+						]
+					}
+				}
+			}
+		]
 	},
 	"response": {
 		"headers": {
