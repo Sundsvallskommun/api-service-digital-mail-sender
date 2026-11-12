@@ -368,7 +368,7 @@ components:
           description: The invoice amount
           examples:
             - 123.45
-          exclusiveMinimum: 0
+          minimum: 1
         dueDate:
           type: string
           format: date

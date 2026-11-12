@@ -1,5 +1,6 @@
 package se.sundsvall.digitalmail.api;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -18,6 +19,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.problem.violations.Violation;
 import se.sundsvall.digitalmail.Application;
+import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
 import se.sundsvall.digitalmail.service.DigitalMailService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -206,5 +208,39 @@ class DigitalMailResourceFailureTest {
 			Arguments.of(List.of(""), field, message),
 			Arguments.of(List.of(), "hasAvailableMailboxes.partyIds", "must not be empty"),
 			Arguments.of(List.of(uuid, uuid), "hasAvailableMailboxes.partyIds", "must only contain unique elements"));
+	}
+
+	@ParameterizedTest
+	@MethodSource("invalidInvoiceDetailsProvider")
+	void sendDigitalInvoiceWithInvalidDetails(final DigitalInvoiceRequest.Details details, final String field, final String message) {
+		final var request = generateInvoiceRequest();
+		final var invalidRequest = new DigitalInvoiceRequest(request.partyId(), request.type(), request.subject(), request.reference(), request.payable(), details, request.files());
+
+		final var problem = webTestClient.post()
+			.uri(SEND_DIGITAL_INVOICE_PATH)
+			.contentType(APPLICATION_JSON)
+			.body(fromValue(invalidRequest))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectHeader().contentType(APPLICATION_PROBLEM_JSON)
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult();
+
+		assertThat(problem.getResponseBody()).isNotNull();
+		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
+		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
+			.containsExactly(tuple(field, message));
+
+		verifyNoInteractions(mockDigitalMailService);
+	}
+
+	private static Stream<Arguments> invalidInvoiceDetailsProvider() {
+		final var dueDate = LocalDate.now().plusDays(30);
+		return Stream.of(
+			Arguments.of(new DigitalInvoiceRequest.Details(0.5f, dueDate, "SE_OCR", "426523791", "BANKGIRO", "991-1884"),
+				"details.amount", "must be greater than or equal to 1"),
+			Arguments.of(new DigitalInvoiceRequest.Details(123.45f, dueDate, "SE_OCR", "1".repeat(26), "BANKGIRO", "991-1884"),
+				"details.paymentReference", "size must be between 1 and 25"));
 	}
 }
