@@ -241,6 +241,8 @@ class DigitalMailResourceFailureTest {
 			Arguments.of(new DigitalInvoiceRequest.Details(0.5f, dueDate, "SE_OCR", "426523791", "BANKGIRO", "991-1884"),
 				"details.amount", "must be greater than or equal to 1"),
 			Arguments.of(new DigitalInvoiceRequest.Details(123.45f, dueDate, "SE_OCR", "1".repeat(26), "BANKGIRO", "991-1884"),
-				"details.paymentReference", "size must be between 1 and 25"));
+				"details.paymentReference", "size must be between 1 and 25"),
+			Arguments.of(new DigitalInvoiceRequest.Details(123.45f, LocalDate.now().minusDays(1), "SE_OCR", "426523791", "BANKGIRO", "991-1884"),
+				"details.dueDate", "Due date must be a future date for an invoice"));
 	}
 }

@@ -372,7 +372,7 @@ components:
         dueDate:
           type: string
           format: date
-          description: The invoice due date
+          description: The invoice due date, Must be a future date when type is INVOICE
           examples:
             - 2023-10-09
         paymentReferenceType:

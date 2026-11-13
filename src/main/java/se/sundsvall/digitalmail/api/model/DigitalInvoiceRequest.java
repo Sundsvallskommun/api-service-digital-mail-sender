@@ -12,12 +12,14 @@ import java.util.List;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.digitalmail.api.validation.ValidAccountNumber;
 import se.sundsvall.digitalmail.api.validation.ValidEnum;
+import se.sundsvall.digitalmail.api.validation.ValidInvoiceDueDate;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+@ValidInvoiceDueDate
 public record DigitalInvoiceRequest(
 
 	@ValidUuid @Schema(description = "partyId for the person or organization the invoice should be sent to", examples = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED) String partyId,
@@ -41,7 +43,7 @@ public record DigitalInvoiceRequest(
 
 		@NotNull @DecimalMin("1") @Schema(description = "The invoice amount", examples = "123.45", requiredMode = REQUIRED) Float amount,
 
-		@NotNull @Schema(description = "The invoice due date", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
+		@NotNull @Schema(description = "The invoice due date, Must be a future date when type is INVOICE", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
 
 		@NotNull @ValidEnum(ReferenceType.class) @Schema(description = "The payment reference type", allowableValues = {
 			"SE_OCR", "TENANT_REF"

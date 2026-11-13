@@ -63,7 +63,7 @@ public final class TestObjectFactory {
 			true,
 			new DigitalInvoiceRequest.Details(
 				123.45f,
-				LocalDate.now(),
+				LocalDate.now().plusDays(30),
 				"SE_OCR",
 				"somePaymentReference",
 				"BANKGIRO",
