@@ -2,21 +2,24 @@ package se.sundsvall.digitalmail.api.model;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 import se.sundsvall.dept44.common.validators.annotation.ValidUuid;
 import se.sundsvall.digitalmail.api.validation.ValidAccountNumber;
 import se.sundsvall.digitalmail.api.validation.ValidEnum;
+import se.sundsvall.digitalmail.api.validation.ValidInvoiceDueDate;
 import se.sundsvall.digitalmail.domain.invoice.AccountType;
 import se.sundsvall.digitalmail.domain.invoice.InvoiceType;
 import se.sundsvall.digitalmail.domain.invoice.ReferenceType;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 
+@ValidInvoiceDueDate
 public record DigitalInvoiceRequest(
 
 	@ValidUuid @Schema(description = "partyId for the person or organization the invoice should be sent to", examples = "6a5c3d04-412d-11ec-973a-0242ac130003", requiredMode = REQUIRED) String partyId,
@@ -38,15 +41,15 @@ public record DigitalInvoiceRequest(
 	@Schema(description = "Invoice details")
 	public record Details(
 
-		@NotNull @Positive @Schema(description = "The invoice amount", examples = "123.45", requiredMode = REQUIRED) Float amount,
+		@NotNull @DecimalMin("1") @Schema(description = "The invoice amount", examples = "123.45", requiredMode = REQUIRED) Float amount,
 
-		@NotNull @Schema(description = "The invoice due date", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
+		@NotNull @Schema(description = "The invoice due date, Must be a future date when type is INVOICE", examples = "2023-10-09", requiredMode = REQUIRED) LocalDate dueDate,
 
 		@NotNull @ValidEnum(ReferenceType.class) @Schema(description = "The payment reference type", allowableValues = {
 			"SE_OCR", "TENANT_REF"
 		}, examples = "SE_OCR", requiredMode = REQUIRED) String paymentReferenceType,
 
-		@NotBlank @Schema(description = "The payment reference number", maxLength = 25, examples = "426523791", requiredMode = REQUIRED) String paymentReference,
+		@NotBlank @Size(min = 1, max = 25) @Schema(description = "The payment reference number", examples = "426523791", requiredMode = REQUIRED) String paymentReference,
 
 		@NotNull @ValidEnum(AccountType.class) @Schema(description = "The receiving account type", allowableValues = {
 			"BANKGIRO", "PLUSGIRO"
