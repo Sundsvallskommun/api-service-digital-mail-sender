@@ -69,7 +69,7 @@ public final class TestObjectFactory {
 				"BANKGIRO",
 				"991-1884"),
 			List.of(
-				new File(APPLICATION_PDF_VALUE, "someBody", "someFilename")));
+				new File(APPLICATION_PDF_VALUE, SAMPLE_PDF_BASE64, "someFilename")));
 	}
 
 	public static InvoiceDto generateInvoiceDto() {

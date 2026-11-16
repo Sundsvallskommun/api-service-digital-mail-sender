@@ -20,6 +20,7 @@ import se.sundsvall.dept44.problem.violations.ConstraintViolationProblem;
 import se.sundsvall.dept44.problem.violations.Violation;
 import se.sundsvall.digitalmail.Application;
 import se.sundsvall.digitalmail.api.model.DigitalInvoiceRequest;
+import se.sundsvall.digitalmail.api.model.File;
 import se.sundsvall.digitalmail.service.DigitalMailService;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,6 +30,7 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
+import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_PROBLEM_JSON;
 import static org.springframework.web.reactive.function.BodyInserters.fromValue;
 import static se.sundsvall.digitalmail.TestObjectFactory.generateDigitalMailRequestDtoWithHtmlBody;
@@ -130,6 +132,31 @@ class DigitalMailResourceFailureTest {
 		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
 		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
 			.containsExactlyInAnyOrder(tuple("sendDigitalInvoice.municipalityId", "not a valid municipality ID"));
+
+		verifyNoInteractions(mockDigitalMailService);
+	}
+
+	@Test
+	void sendDigitalInvoiceWithInvalidPdf() {
+		final var request = generateInvoiceRequest();
+		final var requestWithInvalidPdf = new DigitalInvoiceRequest(request.partyId(), request.type(), request.subject(), request.reference(), request.payable(), request.details(),
+			List.of(new File(APPLICATION_PDF_VALUE, "c29tZSBwZGYgZGF0YQo=", "invoice.pdf")));
+
+		final var problem = webTestClient.post()
+			.uri(SEND_DIGITAL_INVOICE_PATH)
+			.contentType(APPLICATION_JSON)
+			.body(fromValue(requestWithInvalidPdf))
+			.exchange()
+			.expectStatus().isBadRequest()
+			.expectHeader().contentType(APPLICATION_PROBLEM_JSON)
+			.expectBody(ConstraintViolationProblem.class)
+			.returnResult();
+
+		assertThat(problem.getResponseBody()).isNotNull();
+		assertThat(problem.getResponseBody().getTitle()).isEqualTo("Constraint Violation");
+		assertThat(problem.getResponseBody().getStatus()).isEqualTo(BAD_REQUEST);
+		assertThat(problem.getResponseBody().getViolations()).extracting(Violation::field, Violation::message)
+			.containsExactlyInAnyOrder(tuple("files[0].body", "not a valid PDF"));
 
 		verifyNoInteractions(mockDigitalMailService);
 	}
