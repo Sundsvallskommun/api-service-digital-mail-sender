@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import se.sundsvall.dept44.common.validators.annotation.OneOf;
 import se.sundsvall.dept44.common.validators.annotation.ValidBase64;
+import se.sundsvall.digitalmail.api.validation.ValidPdf;
 
 import static io.swagger.v3.oas.annotations.media.Schema.RequiredMode.REQUIRED;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
@@ -28,6 +29,7 @@ public class File {
 
 	@NotBlank
 	@ValidBase64
+	@ValidPdf
 	@Schema(description = "BASE64-encoded body", requiredMode = REQUIRED)
 	private String body;
 

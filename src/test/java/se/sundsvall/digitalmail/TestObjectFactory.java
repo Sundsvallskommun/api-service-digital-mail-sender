@@ -63,13 +63,13 @@ public final class TestObjectFactory {
 			true,
 			new DigitalInvoiceRequest.Details(
 				123.45f,
-				LocalDate.now(),
+				LocalDate.now().plusDays(30),
 				"SE_OCR",
 				"somePaymentReference",
 				"BANKGIRO",
 				"991-1884"),
 			List.of(
-				new File(APPLICATION_PDF_VALUE, "someBody", "someFilename")));
+				new File(APPLICATION_PDF_VALUE, SAMPLE_PDF_BASE64, "someFilename")));
 	}
 
 	public static InvoiceDto generateInvoiceDto() {
